@@ -1,0 +1,43 @@
+2013-05-14 GOdroid v1.3.8
+- Fix for some tablet devices (menu button without function)
+
+2013-05-12 GOdroid v1.3.7
+- Menu button added
+- Text size calculation corrected
+
+2013-02-10 GOdroid v1.3.6
+- Added function to share current game (eg. via email attachment,
+google drive, Bluetooth)
+- Open external .sgf files with 3rd party apps (eg. from email attachment,
+file manager/SD card, Internet browser)
+
+2013-01-25 GOdroid v1.3.5
+- French translation added (Laurent L)
+- Functionality added that allows to open .sgf files directly from SD card
+(file manager required; may not work an all devices)
+
+2013-01-12 GOdroid v1.3.4
+- Italian translation added (Alessio Gerola)
+- Hungarian translation added (Téglás Zoltán, review: András Oláh)
+- Option to open game collections (SGF format) added
+
+2013-01-03 GOdroid v1.3.3
+- Font size calculation corrected (major issue with Chinese translation)
+
+2012-12-29 GOdroid v1.3.2
+- Option to jump to start of current game ("replay") added
+- Portuguese (Brazil) translation added (Igor Costa)
+
+2012-12-23 GOdroid v1.3.1
+- Fixed a crash on 19x19 boards
+- Finnish translation added (Daniel Landau)
+- Romanian translation added (Mircea Damian)
+- Spanish translation added (Pol Urós Guardiola)
+
+20012-12-16 GOdroid v1.3.0
+- Saved games contain complete move history
+- Move variations support added
+- Polish translation added (Piotr Goliasz)
+- German translation added
+
+

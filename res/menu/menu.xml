@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<menu xmlns:a="http://schemas.android.com/apk/res/android">
+	<item a:id="@+id/menuNewGame"
+		a:title="@string/menuNewGameLabel"
+		a:alphabeticShortcut="@string/menuNewGameShortcut"
+		a:icon="@drawable/newGameMenuIcon"/>
+	<item a:id="@+id/menuUndo"
+		a:title="@string/menuUndoLabel"
+		a:alphabeticShortcut="@string/menuUndoShortcut"
+		a:icon="@drawable/undoMenuIcon"/>
+	<item a:id="@+id/menuRedo"
+		a:title="@string/menuRedoLabel"
+		a:alphabeticShortcut="@string/menuRedoShortcut"/>
+	<item a:id="@+id/menuPass"
+		a:title="@string/menuPassLabel"
+		a:alphabeticShortcut="@string/menuPassShortcut"
+		a:icon="@drawable/passMenuIcon"/>
+	<item a:id="@+id/menuSaveLoad"
+		a:title="@string/menuSaveLoadLabel"
+		a:alphabeticShortcut="@string/menuSaveLoadShortcut"
+		a:icon="@drawable/saveLoadMenuIcon">
+		<menu>
+			<item a:id="@+id/menuSave"
+				a:title="@string/menuSaveLabel"/>
+			<item a:id="@+id/menuLoad"
+				a:title="@string/menuLoadLabel"/>
+		</menu>
+	</item>
+
+	<!-- extended menu -->
+	<item a:id="@+id/menuToStart"
+		a:title="@string/menuToStartLabel"
+		a:alphabeticShortcut="@string/menuToStartShortcut"/>
+	<!-- too slow (takes minutes) in most situations
+	<item a:id="@+id/menuShowTerritory"
+		a:title="@string/menuShowTerritoryLabel"/>
+	-->
+	<item a:id="@+id/menuShareGame"
+		a:title="@string/menuShareGameLabel"/>
+	<item a:id="@+id/menuInfo"
+		a:title="@string/menuInfoLabel"
+		a:alphabeticShortcut="@string/menuInfoShortcut"
+		a:icon="@drawable/infoMenuIcon"/>
+	<item a:id="@+id/menuExit"
+		a:title="@string/menuExitLabel"
+		a:alphabeticShortcut="@string/menuExitShortcut"
+		a:icon="@drawable/exitMenuIcon"/>
+</menu>

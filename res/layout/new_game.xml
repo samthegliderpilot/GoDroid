@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:a="http://schemas.android.com/apk/res/android"
+	style="@style/FillParent">
+	<ScrollView style="@style/FillParent"
+		a:layout_above="@+id/newGameDialogButtons">
+		<LinearLayout style="@style/FillParent"
+			a:orientation="vertical"
+			a:gravity="center_horizontal"
+			a:paddingLeft="10dip" a:paddingRight="10dip">
+			<TextView a:text="@string/newGameDialogBoardSizeLabel"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogBoardSizeSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogBoardSizeListWievItems"
+				a:prompt="@string/newGameDialogBoardSizeLabel"/>
+			<TextView a:text="@string/newGameDialogHandicapLabel"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogHandicapSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogHandicapListWievItems"
+				a:prompt="@string/newGameDialogHandicapLabel"/>
+			<TextView a:text="@string/newGameDialogHumanPlaysLabelText"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogHumanPlaysSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogHumanPlaysItems"
+				a:prompt="@string/newGameDialogHumanPlaysLabelText"/>
+			<TextView a:text="@string/newGameDialogStrengthLabel"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogStrengthSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogStrengthItems"
+				a:prompt="@string/newGameDialogStrengthLabel"/>
+			<TextView a:text="@string/newGameDialogKomiLabel"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogKomiSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogKomiItems"
+				a:prompt="@string/newGameDialogKomiLabel"/>
+			<TextView a:text="@string/newGameDialogScoringLabel"
+				style="@style/TextDialogEntry"/>
+			<Spinner a:id="@+id/newGameDialogScoringSpinner"
+				style="@style/SpinnerDialogEntry"
+				a:entries="@array/newGameDialogScoringItems"
+				a:prompt="@string/newGameDialogScoringLabel"/>
+		</LinearLayout>
+	</ScrollView>
+	<LinearLayout a:id="@id/newGameDialogButtons"
+		style="@style/WrapContent"
+		a:orientation="horizontal"
+		a:gravity="center_vertical"
+		a:paddingLeft="10dip" a:paddingRight="10dip"
+		a:layout_alignParentBottom="true"
+		a:layout_centerHorizontal="true"
+		a:layout_marginTop="15dip">
+		<Button a:id="@+id/newGameDialogApplyButton"
+			style="@style/WrapContent"
+			a:text="@string/newGameDialogApplytButtonText"
+			a:enabled="false"/>
+		<Button a:id="@+id/newGameDialogStartButton"
+			style="@style/WrapContent"
+			a:text="@string/newGameDialogStartButtonText"/>
+	</LinearLayout>
+</RelativeLayout>

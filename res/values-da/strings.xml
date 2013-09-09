@@ -1,0 +1,147 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">GOdroid</string>
+	<string name="app_description"><![CDATA[\
+Strategisk brætspil.
+
+Spil det ældgamle spil Go (Weiqi, Igo, Baduk) mod din computer.
+
+Bruger interface for GNU Go (v3.8 inkluderet).
+GNU Go er en AI motor som spiller Go på ca. 8 til 12 kyu styrke.
+		]]></string>
+	<string name="blackColorText">Sort</string>
+	<string name="whiteColorText">Hvid</string>
+	<string name="capturesLabelText">Fanger</string>
+	<string name="stonesLabelText">Sten</string>
+	<string name="moveLabelText">Træk</string>
+	<string name="territoryLabelText">Territorium</string>
+	<string name="scoreLabelText">Score</string>
+	<string name="tapHintText">Rør stenen for at lægge.\nHold inde for at zoome.</string>
+	<string name="menuNewGameLabel">Nyt Spil</string>
+	<string name="menuNewGameShortcut">N</string>
+	<string name="menuPassLabel">Pass</string>
+	<string name="menuPassShortcut">P</string>
+	<string name="menuUndoLabel">Angre</string>
+	<string name="menuUndoShortcut">U</string>
+	<string name="menuRedoLabel">Gentag</string>
+	<string name="menuRedoShortcut">R</string>
+	<string name="menuSaveLoadLabel">Gem/Indlæs</string>
+	<string name="menuSaveLoadShortcut">S</string>
+	<string name="menuSaveLabel">Gem Spil</string>
+	<string name="menuLoadLabel">Indlæs Spil</string>
+	<string name="menuInfoLabel">Info</string>
+	<string name="menuInfoShortcut">I</string>
+	<string name="menuExitLabel">Afslut</string>
+	<string name="menuExitShortcut">E</string>
+	<string name="accessFailedAlertMessage">Kunne ikke åbne \'%s\'.</string>
+	<string name="sdCardName">SD kort</string>
+	<string name="invalidFileNameAlertMessage">
+		Ugyldigt filnavn \'%s\'.
+	</string>
+	<string name="fileAlreadyExistsMessage" formatted="false">
+		<!-- overwriteButtonLabel? -->
+		Fil \'%s\' findes allerede. %s?
+	</string>
+	<string name="loadGameFailedAlertMessage" formatted="false">
+		Kunne ikke indlæse fil \'%s\'.
+	</string>
+	<string name="overwriteButtonLabel">Overskriv</string>
+	<string name="gameSavedInFileMessage" formatted="false">
+		Spil gemt i fil \'%s\'.
+	</string>
+	<string name="deleteFileMessage" formatted="false">
+		Slet fil \'%s\'?
+	</string>
+	<string name="deleteButtonLabel">Slet</string>
+	<string name="failedLoadingGameAlertMessage" formatted="false">
+		Kunne ikke indlæse fil \'%s\'.
+	</string>
+	<string name="noFiles2load" formatted="false">
+		Ingen .sgf filer fundet i \'%s\'.
+	</string>
+	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogHumanPlaysLabelText">Menneske spiller</string>
+	<string name="newGameDialogBoardSizeLabel">Bræt størrelse</string>
+	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogStrengthLabel">Styrke</string>
+	<string name="newGameDialogKomiLabel">Komi</string>
+	<string name="newGameDialogScoringLabel">Scoring</string>
+	<string name="newGameDialogStartButtonText">
+		<b>Nyt Spil</b>
+	</string>
+	<string name="newGameDialogApplytButtonText">
+		<b>Anvend Ændringer</b>
+	</string>
+	<string name="yourTurnText">Din tur</string>
+	<string name="resignedText">giver op</string>
+	<string name="passedText">passer</string>
+	<string name="noUndoHintText">Angre er ikke mulig</string>
+	<string name="noRedoHintText">Gentag er ikke mulig</string>
+	<string name="undoHintText">Smut til venste her for at angre</string>
+	<string name="redoHintText">Smut til højre her for at gentage</string>
+	<!-- passedDialogMessageText: '%s %s.' eg. 'Black passes.'-->
+	<string name="passedDialogMessageText" formatted="false">%s %s.</string>
+	<string name="waitProgressLastMoveMessage">
+		Venter på at sidste træk bliver færdig…
+	</string>
+	<string name="waitProgressFinalScoreMessage">
+		Beregner territorium status…
+	</string>
+	<string name="waitProgressEstimatingScoreMessage">
+		Estimerer score…
+	</string>
+	<string name="BYauthorText">af</string>
+	<!-- game BY author-->
+	<string name="goRulesText">Spilleregler</string>
+	<string name="goRulesUrl" formatted="false">
+		http://da.wikipedia.org/wiki/Go#Regler
+	</string>
+	<string name="projectHomepageText">Projektets hjemmeside</string>
+	<string name="gnuGoHomepageText">GNU Go hjemmeside</string>
+	<string name="newGameDialogHumanPlaysBlackListWievItem">
+		<b>Sort</b> (computer hvid)
+	</string>
+	<string name="newGameDialogHumanPlaysWhiteListWievItem">
+		<b>Hvid</b> (computer sort)
+	</string>
+	<string name="newGameDialogHumanPlaysBothListWievItem">
+		<b>Begge</b> (menneske vs. menneske)
+	</string>
+	<string name="newGameDialogHumanPlaysNoneListWievItem">
+		<b>Ingen</b> (computer vs. computer)
+	</string>
+	<string name="none">Ingen</string>
+	<string name="number2">2</string>
+	<string name="number3">3</string>
+	<string name="number4">4</string>
+	<string name="number5">5</string>
+	<string name="number6">6</string>
+	<string name="number7">7</string>
+	<string name="number8">8</string>
+	<string name="number9">9</string>
+	<string name="newGameDialogHandicapListWievItem0">@string/none</string>
+	<string name="newGameDialogHandicapListWievItem2">@string/number2</string>
+	<string name="newGameDialogHandicapListWievItem3">@string/number3</string>
+	<string name="newGameDialogHandicapListWievItem4">@string/number4</string>
+	<string name="newGameDialogHandicapListWievItem5">@string/number5</string>
+	<string name="newGameDialogHandicapListWievItem6">@string/number6</string>
+	<string name="newGameDialogHandicapListWievItem7">@string/number7</string>
+	<string name="newGameDialogHandicapListWievItem8">@string/number8</string>
+	<string name="newGameDialogHandicapListWievItem9">@string/number9</string>
+	<string name="newGameDialogStrengthListWievItem1">1 (hurtigere)</string>
+	<string name="newGameDialogStrengthListWievItem2">@string/number2</string>
+	<string name="newGameDialogStrengthListWievItem3">@string/number3</string>
+	<string name="newGameDialogStrengthListWievItem4">@string/number4</string>
+	<string name="newGameDialogStrengthListWievItem5">@string/number5</string>
+	<string name="newGameDialogStrengthListWievItem6">@string/number6</string>
+	<string name="newGameDialogStrengthListWievItem7">@string/number7</string>
+	<string name="newGameDialogStrengthListWievItem8">@string/number8</string>
+	<string name="newGameDialogStrengthListWievItem9">@string/number9</string>
+	<string name="newGameDialogStrengthListWievItem10">10 (stærkere)</string>
+	<string name="newGameDialogKomiListWievItem1">@string/none</string>
+	<string name="newGameDialogKomiListWievItem2">0.5</string>
+	<string name="newGameDialogKomiListWievItem3">5.5</string>
+	<string name="newGameDialogKomiListWievItem4">6.5</string>
+	<string name="newGameDialogScoringJapaneseListWievItem">Japansk</string>
+	<string name="newGameDialogScoringChineseListWievItem">Kinesisk</string>
+</resources>

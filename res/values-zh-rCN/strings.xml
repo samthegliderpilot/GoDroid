@@ -1,0 +1,111 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<resources>
+    <string name="app_name">围棋GOdroid</string>
+    <string name="app_description">
+		<![CDATA[\
+策略类棋盘游戏。
+
+与电脑进行这个古老的对战游戏。
+
+用户界面适合 GNU Go (v3.8 包括)。
+GNU Go 是 一个AI 引擎将展示6-8个难度级别。
+		]]>
+	</string>
+    <string name="blackColorText">黑棋</string>
+    <string name="whiteColorText">白棋</string>
+    <string name="capturesLabelText">提子</string>
+    <string name="stonesLabelText">活子</string>
+    <string name="moveLabelText">落子</string>
+    <string name="territoryLabelText">实地</string>
+    <string name="scoreLabelText">得分</string>
+    <string name="tapHintText">点棋落子\n长按放大</string>
+    <string name="menuNewGameLabel">新棋局</string>
+    <string name="menuNewGameShortcut">N</string>
+    <string name="menuPassLabel">虚手</string>
+    <string name="menuPassShortcut">P</string>
+    <string name="menuUndoLabel">撤消</string>
+    <string name="menuUndoShortcut">U</string>
+    <string name="menuRedoLabel">恢复</string>
+    <string name="menuRedoShortcut">R</string>
+    <string name="menuSaveLoadLabel">保存/载入</string>
+    <string name="menuSaveLoadShortcut">S</string>
+    <string name="menuSaveLabel">保存棋局</string>
+    <string name="menuLoadLabel">载入棋局</string>
+    <string name="menuInfoLabel">关于</string>
+    <string name="menuInfoShortcut">I</string>
+    <string name="menuExitLabel">退出</string>
+    <string name="menuExitShortcut">E</string>
+    <string name="accessFailedAlertMessage">打开 \'%s\'. 失败</string>
+    <string name="sdCardName">SD 卡</string>
+    <string name="invalidFileNameAlertMessage">无效文件名 \'%s\'.</string>
+    <string name="fileAlreadyExistsMessage" formatted="false">文件 \'%s\' 已经存在. %s?</string>
+    <string name="loadGameFailedAlertMessage" formatted="false">载入 \'%s\'.文件失败</string>
+    <string name="overwriteButtonLabel">覆盖</string>
+    <string name="gameSavedInFileMessage">棋局保存在 \'%s\'.</string>
+    <string name="deleteFileMessage">删除 \'%s\'?</string>
+    <string name="deleteButtonLabel">删除</string>
+    <string name="failedLoadingGameAlertMessage">载入 \'%s\'.文件失败</string>
+    <string name="noFiles2load" formatted="false">\'%s\'.里没有 .sgf 文件</string>
+    <string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+    <string name="newGameDialogHumanPlaysLabelText">棋手</string>
+    <string name="newGameDialogBoardSizeLabel">棋盘</string>
+    <string name="newGameDialogHandicapLabel">让子</string>
+    <string name="newGameDialogStrengthLabel">难度</string>
+    <string name="newGameDialogKomiLabel">贴目</string>
+    <string name="newGameDialogScoringLabel">计分</string>
+    <string name="newGameDialogStartButtonText"><b>开始棋局</b></string>
+    <string name="newGameDialogApplytButtonText"><b>应用设置</b></string>
+    <string name="yourTurnText">该你了</string>
+    <string name="resignedText">同意</string>
+    <string name="passedText">虚手</string>
+    <string name="noUndoHintText">不能撤消</string>
+    <string name="noRedoHintText">不能恢复</string>
+    <string name="undoHintText">这里向左滑动撤消</string>
+    <string name="redoHintText">这里向右滑动恢复</string>
+    <string name="passedDialogMessageText" formatted="false">%s %s.</string>
+    <string name="waitProgressLastMoveMessage">等待最后一步完成 …</string>
+    <string name="waitProgressFinalScoreMessage">计算实地 …</string>
+    <string name="waitProgressEstimatingScoreMessage">估算得分 …</string>
+    <string name="BYauthorText">by</string>
+    <string name="goRulesText">规则</string>
+    <string name="projectHomepageText">项目主页</string>
+    <string name="gnuGoHomepageText">GNU围棋主页</string>
+    <string name="newGameDialogHumanPlaysBlackListWievItem"><b>黑棋</b> (电脑 白棋)</string>
+    <string name="newGameDialogHumanPlaysWhiteListWievItem"><b>白棋</b> (电脑 黑棋)</string>
+    <string name="newGameDialogHumanPlaysBothListWievItem"><b>两个</b> (棋手 vs. 棋手)</string>
+    <string name="newGameDialogHumanPlaysNoneListWievItem"><b>无</b> (电脑 vs. 电脑)</string>
+    <string name="none">无</string>
+    <string name="number2">2</string>
+    <string name="number3">3</string>
+    <string name="number4">4</string>
+    <string name="number5">5</string>
+    <string name="number6">6</string>
+    <string name="number7">7</string>
+    <string name="number8">8</string>
+    <string name="number9">9</string>
+    <string name="newGameDialogHandicapListWievItem0">@string/none</string>
+    <string name="newGameDialogHandicapListWievItem2">@string/number2</string>
+    <string name="newGameDialogHandicapListWievItem3">@string/number3</string>
+    <string name="newGameDialogHandicapListWievItem4">@string/number4</string>
+    <string name="newGameDialogHandicapListWievItem5">@string/number5</string>
+    <string name="newGameDialogHandicapListWievItem6">@string/number6</string>
+    <string name="newGameDialogHandicapListWievItem7">@string/number7</string>
+    <string name="newGameDialogHandicapListWievItem8">@string/number8</string>
+    <string name="newGameDialogHandicapListWievItem9">@string/number9</string>
+    <string name="newGameDialogStrengthListWievItem1">1 (更快)</string>
+    <string name="newGameDialogStrengthListWievItem2">@string/number2</string>
+    <string name="newGameDialogStrengthListWievItem3">@string/number3</string>
+    <string name="newGameDialogStrengthListWievItem4">@string/number4</string>
+    <string name="newGameDialogStrengthListWievItem5">@string/number5</string>
+    <string name="newGameDialogStrengthListWievItem6">@string/number6</string>
+    <string name="newGameDialogStrengthListWievItem7">@string/number7</string>
+    <string name="newGameDialogStrengthListWievItem8">@string/number8</string>
+    <string name="newGameDialogStrengthListWievItem9">@string/number9</string>
+    <string name="newGameDialogStrengthListWievItem10">10 (更强)</string>
+    <string name="newGameDialogKomiListWievItem1">@string/none</string>
+    <string name="newGameDialogKomiListWievItem2">0.5</string>
+    <string name="newGameDialogKomiListWievItem3">5.5</string>
+    <string name="newGameDialogKomiListWievItem4">6.5</string>
+    <string name="newGameDialogScoringJapaneseListWievItem">日（数目）</string>
+    <string name="newGameDialogScoringChineseListWievItem">中（数子）</string>
+</resources>

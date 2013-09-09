@@ -1,0 +1,154 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+	<string name="app_name">GOdroid</string>
+	<string name="app_description">
+		<![CDATA[\
+Gioco da tavolo strategico.
+
+Gioca all\'antico gioco del Go (Weiqi, Igo, Baduk) contro il tuo terminale.
+
+Interfaccia utente per GNU Go (v3.8 inclusa).
+GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
+		]]>
+	</string>
+	<string name="blackColorText">Nero</string>
+	<string name="whiteColorText">Bianco</string>
+	<string name="capturesLabelText">Catture</string>
+	<string name="stonesLabelText">Pietre</string>
+	<string name="moveLabelText">Mossa</string>
+	<string name="territoryLabelText">Territorio</string>
+	<string name="scoreLabelText">Punteggio</string>
+	<string name="tapHintText">Tocca per giocare.\nPremi per ingrandire.</string>
+	<string name="menuNewGameLabel">Nuova Partita</string>
+	<string name="menuNewGameShortcut">N</string>
+	<string name="menuPassLabel">Passa</string>
+	<string name="menuPassShortcut">P</string>
+	<string name="menuUndoLabel">Annulla</string>
+	<string name="menuUndoShortcut">A</string>
+	<string name="menuRedoLabel">Ripeti</string>
+	<string name="menuRedoShortcut">R</string>
+	<string name="menuSaveLoadLabel">Salva/Carica</string>
+	<string name="menuSaveLoadShortcut">S</string>
+	<string name="menuSaveLabel">Salva Partita</string>
+	<string name="menuLoadLabel">Carica Partita</string>
+	<string name="menuInfoLabel">Info</string>
+	<string name="menuInfoShortcut">I</string>
+	<string name="menuExitLabel">Esci</string>
+	<string name="menuExitShortcut">E</string>
+	<string name="menuToStartShortcut">1</string>
+	<string name="accessFailedAlertMessage">Fallito accesso a \'%s\'.</string>
+	<string name="sdCardName">SD card</string>
+	<string name="invalidFileNameAlertMessage">
+		Nome file \'%s\' non valido.
+	</string>
+	<string name="fileAlreadyExistsMessage" formatted="false"><!-- overwriteButtonLabel? -->
+		\'%s\' esiste già. %s?
+	</string>
+	<string name="loadGameFailedAlertMessage" formatted="false">
+		Fallito caricamento di  \'%s\'.
+	</string>
+	<string name="overwriteButtonLabel">Sovrascrivi</string>
+	<string name="gameSavedInFileMessage" formatted="false">
+		Partita salvata in \'%s\'.
+	</string>
+	<string name="deleteFileMessage" formatted="false">
+		Eliminare \'%s\'?
+	</string>
+	<string name="deleteButtonLabel">Elimina</string>
+	<string name="failedLoadingGameAlertMessage" formatted="false">
+		Fallito caricamento di \'%s\'.
+	</string>
+	<string name="noFiles2load" formatted="false">
+		Nessun file .sgf trovato in \'%s\'.
+	</string>
+	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogHumanPlaysLabelText">Giocatore umano</string>
+	<string name="newGameDialogBoardSizeLabel">Dimensione Tavola</string>
+	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogStrengthLabel">Forza</string>
+	<string name="newGameDialogKomiLabel">Komi</string>
+	<string name="newGameDialogScoringLabel">Regole Punteggio</string>
+	<string name="newGameDialogStartButtonText"><b>Nuova Partita</b></string>
+	<string name="newGameDialogApplytButtonText"><b>Applica Cambiamenti</b></string>
+	<string name="yourTurnText">Tuo turno</string>
+	<string name="resignedText">si arrende</string>
+	<string name="passedText">passa</string>
+	<string name="noUndoHintText">Impossibile annullare</string>
+	<string name="noRedoHintText">Impossibile ripetere</string>
+	<string name="undoHintText">Scorri qui verso destra per annullare</string>
+	<string name="redoHintText">Scorri qui verso sinistra per ripetere</string>
+	<!-- passedDialogMessageText: '%s %s.' eg. 'Black passes.'-->
+	<string name="passedDialogMessageText" formatted="false">%s %s.</string>
+	<string name="waitProgressLastMoveMessage">
+		In attesa dell\'ultima mossa…
+	</string>
+	<string name="waitProgressFinalScoreMessage">
+		Calcolo dello stato dei territori…
+	</string>
+	<string name="waitProgressEstimatingScoreMessage">
+		Stima punteggio…
+	</string>
+	<string name="BYauthorText">di</string><!-- game BY author-->
+	<string name="goRulesText">Regole del gioco</string>
+	<string name="goRulesUrl" formatted="false">
+		http://it.wikipedia.org/wiki/Go_(gioco)#Regole_di_base
+	</string>
+	<string name="projectHomepageText">Homepage progetto</string>
+	<string name="gnuGoHomepageText">Homepage GNU Go</string>
+
+	<string name="newGameDialogHumanPlaysBlackListWievItem">
+		<b>Nero</b> (computer bianco)
+	</string>
+	<string name="newGameDialogHumanPlaysWhiteListWievItem">
+		<b>Bianco</b> (computer nero)
+	</string>
+	<string name="newGameDialogHumanPlaysBothListWievItem">
+		<b>Entrambi</b> (umano vs. umano)
+	</string>
+	<string name="newGameDialogHumanPlaysNoneListWievItem">
+		<b>Nessuno</b> (computer vs. computer)
+	</string>
+	<string name="none">Nessuno</string>
+	<string name="number2">2</string>
+	<string name="number3">3</string>
+	<string name="number4">4</string>
+	<string name="number5">5</string>
+	<string name="number6">6</string>
+	<string name="number7">7</string>
+	<string name="number8">8</string>
+	<string name="number9">9</string>
+	<string name="newGameDialogHandicapListWievItem0">@string/none</string>
+	<string name="newGameDialogHandicapListWievItem2">@string/number2</string>
+	<string name="newGameDialogHandicapListWievItem3">@string/number3</string>
+	<string name="newGameDialogHandicapListWievItem4">@string/number4</string>
+	<string name="newGameDialogHandicapListWievItem5">@string/number5</string>
+	<string name="newGameDialogHandicapListWievItem6">@string/number6</string>
+	<string name="newGameDialogHandicapListWievItem7">@string/number7</string>
+	<string name="newGameDialogHandicapListWievItem8">@string/number8</string>
+	<string name="newGameDialogHandicapListWievItem9">@string/number9</string>
+
+	<string name="newGameDialogStrengthListWievItem1">1 (più veloce)</string>
+	<string name="newGameDialogStrengthListWievItem2">@string/number2</string>
+	<string name="newGameDialogStrengthListWievItem3">@string/number3</string>
+	<string name="newGameDialogStrengthListWievItem4">@string/number4</string>
+	<string name="newGameDialogStrengthListWievItem5">@string/number5</string>
+	<string name="newGameDialogStrengthListWievItem6">@string/number6</string>
+	<string name="newGameDialogStrengthListWievItem7">@string/number7</string>
+	<string name="newGameDialogStrengthListWievItem8">@string/number8</string>
+	<string name="newGameDialogStrengthListWievItem9">@string/number9</string>
+	<string name="newGameDialogStrengthListWievItem10">10 (più forte)</string>
+
+	<string name="newGameDialogKomiListWievItem1">@string/none</string>
+	<string name="newGameDialogKomiListWievItem2">0.5</string>
+	<string name="newGameDialogKomiListWievItem3">5.5</string>
+	<string name="newGameDialogKomiListWievItem4">6.5</string>
+
+	<string name="newGameDialogScoringJapaneseListWievItem">Giapponesi</string>
+	<string name="newGameDialogScoringChineseListWievItem">Cinesi</string>
+	<string name="saveGameFailedAlertMessage" formatted="false">
+		Fallito salvataggio del file \'%s\'.
+	</string>
+	<string name="chooseVariationText">Scegli variazione</string>
+	<string name="menuToStartLabel">Replay</string>
+	<string name="goProblemFileInfo">Tsumego</string>
+</resources>
