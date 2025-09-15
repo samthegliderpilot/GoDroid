@@ -3,115 +3,111 @@
 	<string name="app_name">GOdroid</string>
 	<string name="app_description">
 		<![CDATA[\
-Strategic board game.
+Jeux de stratégie.
 
-Play the ancient game Go (Weiqi, Igo, Baduk) against your computer.
+Jouer au Go (Weiqi, Igo, Baduk) contre votre ordinateur.
 
-User interface for GNU Go (v3.8 included).
-GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
+Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle de niveaux 8 à 12 Kyu.
 		]]>
 	</string>
-	<string name="blackColorText">Black</string>
-	<string name="whiteColorText">White</string>
-	<string name="capturesLabelText">Captures</string>
-	<string name="stonesLabelText">Stones</string>
-	<string name="moveLabelText">Move</string>
-	<string name="territoryLabelText">Territory</string>
+	<string name="blackColorText">Noir</string>
+	<string name="whiteColorText">Blanc</string>
+	<string name="capturesLabelText">Prisonniers</string>
+	<string name="stonesLabelText">Pierres</string>
+	<string name="moveLabelText">Coup</string>
+	<string name="territoryLabelText">Territoire</string>
 	<string name="scoreLabelText">Score</string>
-	<string name="tapHintText">Tap stone to play.\nLong press to zoom.</string>
-	<string name="menuNewGameLabel">New Game</string>
+	<string name="tapHintText">Tapoter la pierre pour valider.\nAppuie long pour zoomer.</string>
+	<string name="menuNewGameLabel">Nouvelle Partie</string>
 	<string name="menuNewGameShortcut">N</string>
-	<string name="menuPassLabel">Pass</string>
+	<string name="menuPassLabel">Passer</string>
 	<string name="menuPassShortcut">P</string>
-	<string name="menuUndoLabel">Undo</string>
-	<string name="menuUndoShortcut">U</string>
-	<string name="menuRedoLabel">Redo</string>
+	<string name="menuUndoLabel">Annule</string>
+	<string name="menuUndoShortcut">A</string>
+	<string name="menuRedoLabel">Recommence</string>
 	<string name="menuRedoShortcut">R</string>
-	<string name="menuSaveLoadLabel">Save/Load</string>
+	<string name="menuSaveLoadLabel">Sauvegarder/Charger</string>
 	<string name="menuSaveLoadShortcut">S</string>
-	<string name="menuSaveLabel">Save Game</string>
-	<string name="menuLoadLabel">Load Game</string>
+	<string name="menuSaveLabel">Sauvegarder une partie</string>
+	<string name="menuLoadLabel">Charger une partie</string>
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
-	<string name="menuExitLabel">Exit</string>
-	<string name="menuExitShortcut">E</string>
+	<string name="menuExitLabel">Quitter</string>
+	<string name="menuExitShortcut">Q</string>
 	<string name="menuToStartShortcut">1</string>
-	<string name="accessFailedAlertMessage">Failed to accesss \'%s\'.</string>
-	<string name="sdCardName">SD card</string>
+	<string name="accessFailedAlertMessage">Impossible d\'accéder \'%s\'.</string>
+	<string name="sdCardName">Carte SD</string>
 	<string name="invalidFileNameAlertMessage">
-		Invalid file name \'%s\'.
+		Nom de fichier invalide \'%s\'.
 	</string>
 	<string name="fileAlreadyExistsMessage" formatted="false"><!-- overwriteButtonLabel? -->
-		File \'%s\' already exists. %s?
+		Fichier \'%s\' existe déja. %s?
 	</string>
 	<string name="loadGameFailedAlertMessage" formatted="false">
-		Failed to load file \'%s\'.
+		Impossible de charger le fichier \'%s\'.
 	</string>
-	<string name="overwriteButtonLabel">Overwrite</string>
+	<string name="overwriteButtonLabel">Ecraser</string>
 	<string name="gameSavedInFileMessage" formatted="false">
-		Game saved in file \'%s\'.
+		Partie sauvegardée dans le fichier \'%s\'.
 	</string>
 	<string name="deleteFileMessage" formatted="false">
-		Delete file \'%s\'?
+		Supprimer le fichier \'%s\'?
 	</string>
-	<string name="deleteButtonLabel">Delete</string>
+	<string name="deleteButtonLabel">Supprimer</string>
 	<string name="failedLoadingGameAlertMessage" formatted="false">
-		Failed to load file \'%s\'.
+		Impossible de charger le fichier \'%s\'.
 	</string>
 	<string name="noFiles2load" formatted="false">
-		No .sgf files found in \'%s\'.
+		Aucun fichier .sgf trouvé dans \'%s\'.
 	</string>
 	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
-	<string name="newGameDialogHumanPlaysLabelText">Human plays</string>
-	<string name="newGameDialogBoardSizeLabel">Board Size</string>
+	<string name="newGameDialogHumanPlaysLabelText">Le Joueur joue les</string>
+	<string name="newGameDialogBoardSizeLabel">Taille du plateau</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
-	<string name="newGameDialogStrengthLabel">Strength</string>
+	<string name="newGameDialogStrengthLabel">Force</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
-	<string name="newGameDialogScoringLabel">Rules</string>
-	<string name="newGameDialogStartButtonText"><b>New Game</b></string>
-	<string name="newGameDialogApplytButtonText"><b>Apply Changes</b></string>
-	<string name="yourTurnText">Your turn</string>
-	<string name="resignedText">resigns</string>
-	<string name="passedText">passes</string>
-	<string name="noUndoHintText">Undo not possible</string>
-	<string name="noRedoHintText">Redo not possible</string>
-	<string name="undoHintText">Left fling here to undo</string>
-	<string name="redoHintText">Right fling here to redo</string>
+	<string name="newGameDialogScoringLabel">Règles</string>
+	<string name="newGameDialogStartButtonText"><b>Nouvelle Partie</b></string>
+	<string name="newGameDialogApplytButtonText"><b>Modifier</b></string>
+	<string name="yourTurnText">A vous</string>
+	<string name="resignedText">abandon</string>
+	<string name="passedText">passe</string>
+	<string name="noUndoHintText">Impossible d\'annuler</string>
+	<string name="noRedoHintText">Impossible de recommencer</string>
+	<string name="undoHintText">Glisser à gauche pour annuler le coup</string>
+	<string name="redoHintText">Glisser à droite pour recommencer le coup</string>
 	<!-- passedDialogMessageText: '%s %s.' eg. 'Black passes.'-->
 	<string name="passedDialogMessageText" formatted="false">%s %s.</string>
 	<string name="waitProgressLastMoveMessage">
-		Waiting for last move to finish…
+		En attende du dernier coup…
 	</string>
 	<string name="waitProgressFinalScoreMessage">
-		Calculating territory status…
+		Calcul des territoires…
 	</string>
 	<string name="waitProgressEstimatingScoreMessage">
-		Estimating score…
+		Calcul du score…
 	</string>
-	<string name="BYauthorText">by</string><!-- game BY author-->
-	<string name="goRulesText">Game rules</string>
+	<string name="BYauthorText">par</string><!-- game BY author-->
+	<string name="goRulesText">Régle du Jeu</string>
 	<string name="goRulesUrl" formatted="false">
-		http://en.wikipedia.org/wiki/Go_%28game%29#Basic_rules
+		http://fr.wikipedia.org/wiki/Jeu_de_go#Abr.C3.A9g.C3.A9_des_r.C3.A8gles_du_jeu
 	</string>
-	<string name="projectHomepageText">Project homepage</string>
-	<string name="gnuGoHomepageText">GNU Go homepage</string>
+	<string name="projectHomepageText">Page du projet</string>
+	<string name="gnuGoHomepageText">Projet GNU Go</string>
 
-	<string name="newGameDialogBoardSizeListWievItemSize9">9 × 9</string>
-	<string name="newGameDialogBoardSizeListWievItemSize13">13 × 13</string>
-	<string name="newGameDialogBoardSizeListWievItemSize19">19 × 19</string>
 	<string name="newGameDialogHumanPlaysBlackListWievItem">
-		<b>Black</b> (computer white)
+		<b>Noirs</b> (ordinateur blancs)
 	</string>
 	<string name="newGameDialogHumanPlaysWhiteListWievItem">
-		<b>White</b> (computer black)
+		<b>Blancs</b> (ordinateur noirs)
 	</string>
 	<string name="newGameDialogHumanPlaysBothListWievItem">
-		<b>Both</b> (human vs. human)
+		<b>Les deux</b> (partie entre humain)
 	</string>
 	<string name="newGameDialogHumanPlaysNoneListWievItem">
-		<b>None</b> (computer vs. computer)
+		<b>Aucun</b> (partie entre ordinateur)
 	</string>
-	<string name="none">None</string>
+	<string name="none">Aucun</string>
 	<string name="number2">2</string>
 	<string name="number3">3</string>
 	<string name="number4">4</string>
@@ -130,7 +126,7 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="newGameDialogHandicapListWievItem8">@string/number8</string>
 	<string name="newGameDialogHandicapListWievItem9">@string/number9</string>
 
-	<string name="newGameDialogStrengthListWievItem1">1 (faster)</string>
+	<string name="newGameDialogStrengthListWievItem1">1 (plus faible)</string>
 	<string name="newGameDialogStrengthListWievItem2">@string/number2</string>
 	<string name="newGameDialogStrengthListWievItem3">@string/number3</string>
 	<string name="newGameDialogStrengthListWievItem4">@string/number4</string>
@@ -139,21 +135,20 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="newGameDialogStrengthListWievItem7">@string/number7</string>
 	<string name="newGameDialogStrengthListWievItem8">@string/number8</string>
 	<string name="newGameDialogStrengthListWievItem9">@string/number9</string>
-	<string name="newGameDialogStrengthListWievItem10">10 (stronger)</string>
+	<string name="newGameDialogStrengthListWievItem10">10 (plus fort)</string>
 
 	<string name="newGameDialogKomiListWievItem1">@string/none</string>
 	<string name="newGameDialogKomiListWievItem2">0.5</string>
 	<string name="newGameDialogKomiListWievItem3">5.5</string>
 	<string name="newGameDialogKomiListWievItem4">6.5</string>
 
-	<string name="newGameDialogScoringJapaneseListWievItem">Japanese</string>
-	<string name="newGameDialogScoringChineseListWievItem">Chinese</string>
+	<string name="newGameDialogScoringJapaneseListWievItem">Japonaises</string>
+	<string name="newGameDialogScoringChineseListWievItem">Chinoises</string>
 	<string name="saveGameFailedAlertMessage" formatted="false">
-		Failed to save to file \'%s\'.
+		Impossible de sauvegarder le fichier \'%s\'.
 	</string>
-	<string name="chooseVariationText">Choose variation</string>
-	<string name="menuToStartLabel">To first move</string>
-	<string name="goProblemFileInfo">Go problem</string>
-	<string name="menuShowTerritoryLabel">@string/territoryLabelText</string>
-	<string name="menuShareGameLabel">Share game</string>
+	<string name="chooseVariationText">Choisir la variation</string>
+	<string name="menuToStartLabel">Aller au premier coup</string>
+	<string name="goProblemFileInfo">Exercise de Go</string>
+	<string name="menuShareGameLabel">Partager la partie</string>
 </resources>

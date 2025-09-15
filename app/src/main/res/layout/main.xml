@@ -1,0 +1,68 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:a="http://schemas.android.com/apk/res/android"
+	a:orientation="vertical"
+	style="@style/FillParent">
+	<de.agrothe.go.ScoreView a:id="@+id/scoreView"
+		style="@style/FillParent"
+		a:layout_alignParentTop="true"
+		a:layout_above="@+id/boardView">
+		<ImageView a:id="@+id/MenuButton"
+			style="@style/MenuButton"
+			a:layout_alignParentTop="true"
+			a:layout_alignParentRight="true"/>
+		<TableLayout
+			style="@style/WrapContent"
+			a:layout_centerInParent="true"
+			a:padding="@dimen/scoreViewTextPadding"
+			a:stretchColumns="1,2"
+			a:shrinkColumns="0">
+			<TableRow>
+				<TextView a:id="@+id/blackColorTextView"
+					a:text="@string/blackColorText"
+					a:layout_column="1"
+					style="@style/TableLayoutTextCentered"/>
+				<TextView a:id="@+id/whiteColorTextView"
+					a:text="@string/whiteColorText"
+					style="@style/TableLayoutTextCentered"/>
+			</TableRow>
+			<TableRow>
+				<TextView a:id="@+id/capturesRowTextView"
+					a:text="@string/capturesLabelText"
+					style="@style/TableLayoutText"/>
+				<TextView a:id="@+id/blackCapturesTextView"
+					style="@style/TableLayoutTextCentered"/>
+				<TextView a:id="@+id/whiteCapturesTextView"
+					style="@style/TableLayoutTextCentered"/>
+			</TableRow>
+			<TableRow>
+				<TextView a:id="@+id/moveRowTextView"
+					a:text="@string/moveLabelText"
+					style="@style/TableLayoutText"/>
+				<include layout="@layout/move_cell"
+					a:id="@+id/blackMoveCell"/>
+				<include layout="@layout/move_cell"
+					a:id="@+id/whiteMoveCell"/>
+			</TableRow>
+			<TableRow a:id="@+id/scoreTableRow"
+				a:visibility="gone">
+				<TextView a:id="@+id/scoreRowTextView"
+					a:text="@string/scoreLabelText"
+					style="@style/TableLayoutText"/>
+				<TextView a:id="@+id/blackScoreTextView"
+					style="@style/TableLayoutTextCentered"/>
+				<TextView a:id="@+id/whiteScoreTextView"
+					style="@style/TableLayoutTextCentered"/>
+			</TableRow>
+			<TableRow a:id="@+id/messageTableRow"
+				a:visibility="gone">
+				<TextView a:id="@+id/messageScoreTextView"
+					a:layout_span="3"
+					style="@style/TableLayoutTextCentered"/>
+			</TableRow>
+		</TableLayout>
+	</de.agrothe.go.ScoreView>
+	<de.agrothe.go.BoardView a:id="@id/boardView"
+		style="@style/FillParent"
+		a:layout_alignParentBottom="true"/>
+</RelativeLayout>
+
