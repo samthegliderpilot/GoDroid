@@ -1,0 +1,70 @@
+# Built application files
+*.apk
+*.ap_
+*.aab
+
+# Files for the ART/Dalvik VM
+*.dex
+
+# Java class files
+*.class
+
+# Generated files
+bin/
+gen/
+out/
+
+# Gradle files
+.gradle/
+build/
+**/build/
+
+# Local configuration file (sdk path, etc)
+local.properties
+
+# Log files
+*.log
+
+# Android Studio project files
+.idea/
+*.iml
+*.iws
+
+# Keystore files (if you ever add them — keep them private)
+*.jks
+*.keystore
+
+# NDK
+obj/
+
+# Mac junk
+.DS_Store
+
+# Windows junk
+Thumbs.db
+
+# Ignore crashlytics/fabric files if added
+crashlytics-build.properties
+fabric.properties
+
+# Kotlin build folder (sometimes created outside build/)
+.kotlinc/
+
+# Ignore lint and navigation generated files
+.navigation/
+.cxx/
+
+# Ignore fastlane files if you're using fastlane later
+fastlane/report.xml
+fastlane/screenshots
+
+# Ignore OS files
+*.swp
+*.swo
+
+# Ignore Jetpack Compose compiler metrics
+compose-metrics/
+compose-build/
+
+# Ignore packaging/intermediates (just in case)
+intermediates/
