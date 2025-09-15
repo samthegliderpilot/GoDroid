@@ -300,6 +300,7 @@ void onCreate ( // 0
 			public
 			void onClick (final View pView)
 			{
+				invalidateOptionsMenu();
 				openOptionsMenu ();
 			}
 		}
@@ -1511,50 +1512,10 @@ File getSaveLoadGamesDir ()
 	File saveLoadGamesDir = null;
 	try
 	{
-//		final int buildVersion = Build.VERSION.SDK_INT;
-		final File externalStorageDir =
-			getExternalStorageDirectory (/* buildVersion */);
-		boolean dirExists;
-		if (externalStorageDir == null
-			|| !storageCardMounted ()
-			|| ((dirExists = (saveLoadGamesDir = new File (
-					externalStorageDir, _saveLoadGamesDirName)).exists ())
-				&& !saveLoadGamesDir.isDirectory ())
-			|| (!dirExists && !saveLoadGamesDir.mkdir ()))
-		{
-			throw new Exception ("not mounted?");
+		saveLoadGamesDir = new File(getExternalFilesDir(null), "GOdroid");
+		if (!saveLoadGamesDir.exists()) {
+			saveLoadGamesDir.mkdirs();
 		}
-		// migrate files from earlier app versions
-		/*
-		if (_migrateFiles && buildVersion >= 8) // todo remove when no old app versions in use any more
-		{
-			final File preV8externalStorageDir =
-				getExternalStorageDirectory (7);
-			if (preV8externalStorageDir != null
-				&& !preV8externalStorageDir.equals (externalStorageDir)
-				&& preV8externalStorageDir.exists ()
-				&& preV8externalStorageDir.isDirectory ())
-			{
-				final File preV8saveLoadGamesDir = new File (
-					preV8externalStorageDir, _saveLoadGamesDirName);
-				if (preV8saveLoadGamesDir.exists ()
-					&& preV8saveLoadGamesDir.isDirectory ())
-				{
-					final File[] files = preV8saveLoadGamesDir.listFiles ();
-					if (files != null)
-					{
-						for (final File file : files)
-						{
-							file.renameTo (
-								new File (saveLoadGamesDir, file.getName ()));
-						}
-					}
-					preV8saveLoadGamesDir.delete ();
-				}
-			}
-		}
-		_migrateFiles = false;
-		*/
 	}
 	catch (final Exception e)
 	{
@@ -2117,15 +2078,15 @@ void setScoreViewTextSize (
 	final float pTextSize
 	)
 {
-	for (final TextView view : _scoreViewTextViews)
-	{
-		view.setTextSize (TypedValue.COMPLEX_UNIT_PX, pTextSize);
-	}
-	final int size = (int)pTextSize;
-	final LinearLayout.LayoutParams layoutParams =
-		new LinearLayout.LayoutParams (size, size);
-	_blackMoveProgressBar.setLayoutParams (layoutParams);
-	_whiteMoveProgressBar.setLayoutParams (layoutParams);
+	//for (final TextView view : _scoreViewTextViews)
+	//{
+	//	view.setTextSize (TypedValue.COMPLEX_UNIT_PX, pTextSize);
+	//}
+	//final int size = (int)pTextSize;
+	//final LinearLayout.LayoutParams layoutParams =
+	//	new LinearLayout.LayoutParams (size, size);
+	//_blackMoveProgressBar.setLayoutParams (layoutParams);
+	//_whiteMoveProgressBar.setLayoutParams (layoutParams);
 }
 
 static
