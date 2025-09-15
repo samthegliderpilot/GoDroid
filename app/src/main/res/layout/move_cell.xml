@@ -1,10 +1,18 @@
-<LinearLayout xmlns:a="http://schemas.android.com/apk/res/android"
-	style="@style/WrapContent"
-	a:orientation="horizontal"
-	a:gravity="center">
-	<TextView a:tag="@string/moveTextViewTag"
-		style="@style/TableLayoutText"/>
-	<ProgressBar a:tag="@string/moveProgressBarTag"
-		style="@style/WrapContent"
-		a:visibility="gone"/>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:gravity="center">
+
+    <TextView
+        android:tag="@string/moveTextViewTag"
+        style="@style/TableLayoutText" />
+
+    <ProgressBar
+        android:tag="@string/moveProgressBarTag"
+        style="@style/WrapContent"
+android:layout_width="12dp"
+    android:layout_height="12dp"
+        android:visibility="invisible" />
+
 </LinearLayout>

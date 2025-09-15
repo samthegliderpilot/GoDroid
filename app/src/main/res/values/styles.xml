@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="Theme.NoBackground" parent="android:Theme.Black.NoTitleBar"/>
+	<style name="Theme.NoBackground" parent="android:Theme.Holo.NoActionBar"/>
 	<style name="FillParent">
-		<item name="android:layout_width">fill_parent</item>
-		<item name="android:layout_height">fill_parent</item>
+		<item name="android:layout_width">match_parent</item>
+		<item name="android:layout_height">match_parent</item>
 	</style>
 	<style name="WrapContent">
 		<item name="android:layout_width">wrap_content</item>

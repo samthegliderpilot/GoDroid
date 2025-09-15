@@ -1,16 +1,29 @@
 <?xml version="1.0" encoding="utf-8"?>
-<TableLayout xmlns:a="http://schemas.android.com/apk/res/android"
-	style="@style/FillParent"
-	a:stretchColumns="0" a:shrinkColumns="0">
-	<TableRow>
-		<CheckBox a:id="@+id/fileNameTextView"
-			style="@style/WrapContent"
-			a:gravity="center_vertical"/>
-		<ImageButton a:id="@+id/fileDeleteButton"
-			style="@style/FillParent"
-			a:src="@drawable/deleteButtonIcon"
-			a:background="@color/transparentColor"
-			a:gravity="center_vertical"
-			a:paddingLeft="5dip" a:paddingRight="5dip"/>
-	</TableRow>
+<TableLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:stretchColumns="0"
+    android:shrinkColumns="0">
+
+    <TableRow>
+
+        <CheckBox
+            android:id="@+id/fileNameTextView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            style="@style/WrapContent" />
+
+        <ImageButton
+            android:id="@+id/fileDeleteButton"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:src="@drawable/deleteButtonIcon"
+            android:background="@color/transparentColor"
+            android:gravity="center_vertical"
+            android:paddingLeft="5dp"
+            android:paddingRight="5dp"
+            style="@style/FillParent" />
+
+    </TableRow>
 </TableLayout>
