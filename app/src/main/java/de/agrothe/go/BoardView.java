@@ -29,6 +29,9 @@ import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
 import android.widget.Toast;
+import androidx.core.view.WindowInsetsCompat;
+import androidx.core.view.ViewCompat;
+import androidx.core.graphics.Insets;
 import static de.agrothe.go.Globals._scoreView;
 import static de.agrothe.go.Globals.*;
 import de.agrothe.util.Generics;
@@ -419,6 +422,18 @@ void surfaceDestroyed (
 {
 }
 
+int getNavigationBarHeight(View anyAttachedView) {
+	WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(anyAttachedView);
+
+	if (insets != null) {
+		Insets navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
+		return navInsets.bottom;
+	}
+
+	// Insets not ready yet
+	return 0;
+}
+
 public
 void surfaceChanged ( // 4
 	final SurfaceHolder pHolder,
@@ -463,7 +478,8 @@ void surfaceChanged ( // 4
 	if (boardBitmap == null)
 	{
 		_boardBitmap = Bitmap.createBitmap (pWidth, pHeight, _bitmapConfig);
-		_boardWidth = pWidth; _boardHeight = pHeight;
+		_boardWidth = pWidth;
+		_boardHeight = pHeight - getNavigationBarHeight(_boardView);
 		if (isLandscape)
 		{
 			_yBoardOffset = 0;

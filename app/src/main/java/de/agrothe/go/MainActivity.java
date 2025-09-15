@@ -1877,16 +1877,16 @@ void showScore (
 	{
 		_capturesRowTextView.setText (R.string.capturesLabelText);
 		_moveRowTextView.setText (R.string.moveLabelText);
-		_scoreTableRow.setVisibility (View.GONE);
+		_scoreTableRow.setVisibility (View.INVISIBLE);
 		_messageTableRow.setVisibility (View.GONE);
-		setScoreViewTextSize (_3rowsTextSize);
+		setScoreViewTextSize (_4rowsTextSize);
 		_blackScoreTextView.setText (null);
 		_whiteScoreTextView.setText (null);
 		return;
 	}
 	if (pBlackTerritory == _SHOW_MESSAGE)
 	{
-		_scoreTableRow.setVisibility (View.GONE);
+		_scoreTableRow.setVisibility (View.INVISIBLE);
 		_messageTableRow.setVisibility (View.VISIBLE);
 		setScoreViewTextSize (_4rowsTextSize);
 		_messageScoreTextView.setText ((String)pStatus);
@@ -2031,7 +2031,7 @@ void sizeScoreViewTexts (
 			R.array.scoreView4LinesColumn0Strings,
 			R.array.scoreView4LinesColumns, resources, paint),
 		maxLines, padding, pWidth, pHeight);
-	setScoreViewTextSize (_3rowsTextSize);
+	setScoreViewTextSize (_4rowsTextSize);
 	findViewById (R.id.MenuButton);
 }
 
