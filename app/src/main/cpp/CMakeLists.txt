@@ -1,0 +1,5 @@
+cmake_minimum_required(VERSION 3.10)
+project(GOdroidNative)
+add_compile_options(-Wno-error=format-security,-Wl,-z,max-page-size=16384)
+add_subdirectory(gnugo-3.8)
+set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -Wl,--page-size=65536")

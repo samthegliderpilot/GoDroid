@@ -7,17 +7,28 @@ android {
     compileSdk = 36
 
     defaultConfig {
-        applicationId = "de.agrothe.go"
-        minSdk = 24
+        minSdk = 21
         targetSdk = 36
         versionCode = 1
         versionName = "1.0"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
+
+        // Set ABI filters (choose what you really want)
+        ndk {
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+        }
+
+        externalNativeBuild {
+            ndkBuild {
+                // Optional: You can pass compiler flags here
+                // cppFlags += "-DDEBUG"
+            }
+        }
     }
 
     buildTypes {
-        release {
+        getByName("release") {
             isMinifyEnabled = false
             proguardFiles(
                 getDefaultProguardFile("proguard-android-optimize.txt"),
@@ -25,36 +36,51 @@ android {
             )
         }
     }
+
+    // ✅ Use ndkBuild and point to Android.mk
+    externalNativeBuild {
+        ndkBuild {
+            path = file("src/main/cpp/Android.mk")
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
     }
+
+    buildFeatures {
+        compose = true
+    }
 }
 
+// Clean up gnugo sources before copy (optional, but safe)
+tasks.named("clean") {
+    doFirst {
+        delete("$projectDir/src/main/cpp/gnugo-3.8")
+    }
+}
+
+// Copy base gnugo + patches
 tasks.register<Copy>("copyGnugoSources") {
-    // Copy base gnugo source first
     from("$rootDir/third_party/gnugo-3.8")
     into("$projectDir/src/main/cpp/gnugo-3.8")
 }
 
 tasks.register<Copy>("copyGnugoPatches") {
-    // Copy patch files on top, overriding anything if needed
     from("$rootDir/patches/gnugo-3.8")
     into("$projectDir/src/main/cpp/gnugo-3.8")
+    duplicatesStrategy = DuplicatesStrategy.INCLUDE
 }
 
-// Combine into a single task that depends on both
-tasks.register("prepareGnugoSources") {
-    dependsOn("copyGnugoSources", "copyGnugoPatches")
-}
-
-// Hook the combined task to run before preBuild
 tasks.named("preBuild") {
-    dependsOn("prepareGnugoSources")
+    dependsOn("copyGnugoPatches")
+}
+tasks.named("copyGnugoPatches") {
+    dependsOn("copyGnugoSources")
 }
 
 dependencies {
-
     implementation(libs.appcompat)
     implementation(libs.material)
     testImplementation(libs.junit)

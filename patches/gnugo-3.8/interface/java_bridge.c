@@ -3,6 +3,7 @@
 #include <stdio.h>
 #include <string.h>
 #include "gtp.h"
+#include "interface.h"
 
 char gtp_input_line[100];
 char gtp_output_line[GTP_BUFSIZE*2];

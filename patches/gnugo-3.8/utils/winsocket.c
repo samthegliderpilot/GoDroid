@@ -229,20 +229,6 @@ winsocket_fputs(const char *string, FILE *file)
 
 
 int
-winsocket_fprintf(FILE *file, const char *format_string, ...)
-{
-  va_list arguments;
-  int result;
-
-  va_start(arguments, format_string);
-  result = winsocket_vfprintf(file, format_string, arguments);
-  va_end(arguments);
-
-  return result;
-}
-
-
-int
 winsocket_vfprintf(FILE *file, const char *format_string, va_list arguments)
 {
 /* AGR
@@ -262,6 +248,22 @@ winsocket_vfprintf(FILE *file, const char *format_string, va_list arguments)
  strcat (gtp_output_line, format_line);
  return numBytes;
 }
+
+
+int
+winsocket_fprintf(FILE *file, const char *format_string, ...)
+{
+  va_list arguments;
+  int result;
+
+  va_start(arguments, format_string);
+  result = winsocket_vfprintf(file, format_string, arguments);
+  va_end(arguments);
+
+  return result;
+}
+
+
 
 
 #endif	/* USE_WINDOWS_SOCKET_CLUDGE */
