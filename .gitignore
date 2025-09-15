@@ -68,3 +68,6 @@ compose-build/
 
 # Ignore packaging/intermediates (just in case)
 intermediates/
+
+# the gnugo folder that had all of 3.8 and our patches is handeled in a build step, do not include it in git
+app\src\main\cpp\gnugo-3.8
