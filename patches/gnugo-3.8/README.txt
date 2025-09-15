@@ -1,3 +1,5 @@
 This directory tree contains all files that were modified or added on base of the orignal GNU Go 3.8 sources. To build the android native shared library take the original GNU Go 3.8 sources and replace/add the corresponding files with the files found here.
 
 The changes found here are unfortunally a sad hack. A later version should implement usage of the GTP proocol over sockets (which didn't work at first attempt via JNI). First tries can still be found in interfac/java_bridge.c, but that implementation had issues with buffering of the 'from_gnugo_stream'.
+
+2025 Update: If gnugo is ever updated, or if there are better databases you want to use for the generate .c files in patterns, you must build gnugo (probably on a *nix environment) and regenerate them, then copy them into the approprate location here in patches.

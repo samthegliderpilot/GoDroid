@@ -31,6 +31,28 @@ android {
     }
 }
 
+tasks.register<Copy>("copyGnugoSources") {
+    // Copy base gnugo source first
+    from("$rootDir/third_party/gnugo-3.8")
+    into("$projectDir/src/main/cpp/gnugo-3.8")
+}
+
+tasks.register<Copy>("copyGnugoPatches") {
+    // Copy patch files on top, overriding anything if needed
+    from("$rootDir/patches/gnugo-3.8")
+    into("$projectDir/src/main/cpp/gnugo-3.8")
+}
+
+// Combine into a single task that depends on both
+tasks.register("prepareGnugoSources") {
+    dependsOn("copyGnugoSources", "copyGnugoPatches")
+}
+
+// Hook the combined task to run before preBuild
+tasks.named("preBuild") {
+    dependsOn("prepareGnugoSources")
+}
+
 dependencies {
 
     implementation(libs.appcompat)

@@ -553,59 +553,59 @@ void enableMenuItem (
 	pMenuItem.setEnabled (pEnable);
 }
 
-public
-boolean onOptionsItemSelected (
-	final MenuItem pItem
+	public
+	boolean onOptionsItemSelected (
+			final MenuItem pItem
 	)
-{
-	switch (pItem.getItemId ())
 	{
-	case R.id.menuNewGame:
-		if (_changeGameDialog == null)
-		{
-			initChangeGameDialog ();
+		int id = pItem.getItemId();
+
+		if (id == R.id.menuNewGame) {
+			if (_changeGameDialog == null) {
+				initChangeGameDialog();
+			}
+			showChangedGameDialog();
+			return true;
+		} else if (id == R.id.menuPass) {
+			showMove(_gameInfo._playerBlackMoves, getPassedText(false));
+			nextMove(GameInfo.Passed._Passed);
+			return true;
+		} else if (id == R.id.menuUndo) {
+			showUndoRedoHint(_undoHintText);
+			undo();
+			return true;
+		} else if (id == R.id.menuRedo) {
+			showUndoRedoHint(_redoHintText);
+			redo();
+			return true;
+		} else if (id == R.id.menuSave) {
+			saveGame(null);
+			return true;
+		} else if (id == R.id.menuLoad) {
+			loadGame();
+			return true;
+		} else if (id == R.id.menuInfo) {
+			showInfo();
+			return true;
+		} else if (id == R.id.menuToStart) {
+			restartGame();
+			return true;
+/* too slow (takes minutes) in most situations
+} else if (id == R.id.menuShowTerritory) {
+    showTerritory();
+    return true;
+*/
+		} else if (id == R.id.menuShareGame) {
+			gtpShareGame();
+			return true;
+		} else if (id == R.id.menuExit) {
+			System.runFinalizersOnExit(true);
+			System.exit(0);
+			return true;
 		}
-		showChangedGameDialog ();
-		return true;
-	case R.id.menuPass:
-		showMove (_gameInfo._playerBlackMoves, getPassedText (false));
-		nextMove (GameInfo.Passed._Passed);
-		return true;
-	case R.id.menuUndo:
-		showUndoRedoHint (_undoHintText);
-		undo ();
-		return true;
-	case R.id.menuRedo:
-		showUndoRedoHint (_redoHintText);
-		redo ();
-		return true;
-	case R.id.menuSave:
-		saveGame (null);
-		return true;
-	case R.id.menuLoad:
-		loadGame ();
-		return true;
-	case R.id.menuInfo:
-		showInfo ();
-		return true;
-	case R.id.menuToStart:
-		restartGame ();
-		return true;
-	/* too slow (takes minutes) in most situations
-	case R.id.menuShowTerritory:
-		showTerritory ();
-		return true;
-	*/
-	case R.id.menuShareGame:
-		gtpShareGame ();
-		return true;
-	case R.id.menuExit:
-		System.runFinalizersOnExit (true);
-		System.exit (0);
-		return true;
+
+		return false;
 	}
-	return false;
-}
 
 private
 enum SpinnerEnum
