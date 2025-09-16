@@ -66,6 +66,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="newGameDialogStrengthLabel">Сила</string>
 	<string name="newGameDialogKomiLabel">Коми</string>
 	<string name="newGameDialogScoringLabel">Правила</string>
+	<string name="allowResignationLabel">Разрешить сдачу</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText">
 		<b>Новая игра</b>
 	</string>

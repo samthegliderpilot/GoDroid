@@ -67,6 +67,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="newGameDialogStrengthLabel">Erő</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Szabály</string>
+	<string name="allowResignationLabel">Lemondás engedélyezése</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Új játék</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Módosítások alkalmazása</b></string>
 	<string name="yourTurnText">Ön lép</string>

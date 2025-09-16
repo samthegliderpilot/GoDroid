@@ -578,7 +578,7 @@ void handleMessage (
 			lastMove = lastMoves.get (0);
 		}
 		final String move =
-			playMove (genMove, playerBlackMoves, lastMove, gameInfo._boardSize);
+			playMove (genMove, playerBlackMoves, lastMove, gameInfo._boardSize, gameInfo._allowResignation);
 		if (gameInfo._invalid)
 		{
 			return;
@@ -710,19 +710,22 @@ void setLegalMoves (
 			pBlackMoves ? _BLACK : _WHITE), pGameInfo));
 }
 
-static
-String playMove (
-	final boolean pGenMove,
-	final boolean pBlack,
-	final Point pMove,
-	final int pBoardSize
-	)
-{
-	return gtpCommand (pGenMove ? GtpCommand.GEN_MOVE : GtpCommand.PLAY_MOVE,
-		(pBlack ? _BLACK : _WHITE) + (pGenMove ? ""
-			: (" " + (pMove instanceof Passed ? _PASS
-				: point2Vertex (pMove, pBoardSize)))));
+static String playMove(
+		final boolean pGenMove,
+		final boolean pBlack,
+		final Point pMove,
+		final int pBoardSize,
+		final boolean pAllowResignation
+) {
+	return gtpCommand(
+			pGenMove ? GtpCommand.GEN_MOVE : GtpCommand.PLAY_MOVE,
+			(pBlack ? _BLACK : _WHITE)
+					+ (pGenMove ? "" :
+					(" " + (pMove instanceof Passed ? _PASS : point2Vertex(pMove, pBoardSize))))
+					+ " " + Boolean.toString(pAllowResignation)
+	);
 }
+
 
 private
 void reStartGame (

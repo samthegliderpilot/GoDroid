@@ -51,7 +51,8 @@ boolean
 	_DEFAULT_BLACK_HUMAN = true,
 	_DEFAULT_WHITE_HUMAN = false,
 	_DEFAULT_BLACK_MOVES = true,
-	_DEFAULT_CHINESE_RULES = false;
+	_DEFAULT_CHINESE_RULES = false,
+	_DEFAULT_ALLOW_RESIGNATION = true;
 
 static final
 _Logger _SGF_LOGGER = new _Logger ()
@@ -121,7 +122,9 @@ boolean _chineseRules = _DEFAULT_CHINESE_RULES;
 boolean
 	_playerBlackHuman = _DEFAULT_BLACK_HUMAN,
 	_playerWhiteHuman = _DEFAULT_WHITE_HUMAN,
-	_playerBlackMoves = _DEFAULT_BLACK_MOVES;
+	_playerBlackMoves = _DEFAULT_BLACK_MOVES,
+
+	_allowResignation = _DEFAULT_ALLOW_RESIGNATION;
 
 Node _gameNode;
 
@@ -720,7 +723,7 @@ LoadGameStatus loadGame (
 		final int boardSize = _boardSize;
 		for (final Point point : moves)
 		{
-			Gtp.playMove (false, blackMoves, point, boardSize);
+			Gtp.playMove (false, blackMoves, point, boardSize, _allowResignation);
 			blackMoves = !blackMoves;
 			_moveNumber++;
 		}
@@ -813,7 +816,7 @@ void setupStones (
 			fromMovePropertyValue (propertyName, move, new Point ());
 		if (point != null)
 		{
-			Gtp.playMove (false, pBlack, point, boardSize);
+			Gtp.playMove (false, pBlack, point, boardSize, true);
 		}
 	}
 }

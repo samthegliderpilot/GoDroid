@@ -81,6 +81,18 @@
                 android:entries="@array/newGameDialogScoringItems"
                 android:prompt="@string/newGameDialogScoringLabel"/>
 
+			<!-- Allow Resignation -->
+			<TextView
+				android:text="@string/allowResignationLabel"
+				style="@style/TextDialogEntry"/>
+
+			<CheckBox
+				android:id="@+id/newGameDialogAllowResignCheckBox"
+				android:layout_width="wrap_content"
+				android:layout_height="wrap_content"
+				android:checked="true"/>
+
+
         </LinearLayout>
     </ScrollView>
 

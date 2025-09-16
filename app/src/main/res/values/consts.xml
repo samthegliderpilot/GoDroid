@@ -94,6 +94,7 @@
 	<string name="fileNameTemplate">FILE_NAME</string>
 	<string name="fileInfoTemplate">FILE_INFO</string>
 	<string name="fileNameFileInfoTemplate"><b>FILE_NAME</b>\nFILE_INFO</string>
+	<string name="preferenceAllowResignationKey">allowResignation</string>
 
 	<drawable name="newGameMenuIcon">@android:drawable/ic_menu_add</drawable>
 	<drawable name="passMenuIcon">

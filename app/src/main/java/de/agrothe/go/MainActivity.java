@@ -138,7 +138,8 @@ String
 	_preferencesChineseRulesKey,
 	_preferencesLevelKey,
 	_preferencesPlayerBlackHumanKey,
-	_preferencesPlayerWhiteHumanKey;
+	_preferencesPlayerWhiteHumanKey,
+	_preferenceAllowResignationKey;
 
 private
 Looper _gnuGoLooper;
@@ -245,6 +246,8 @@ void onCreate ( // 0
 		R.string.preferencesPlayerBlackHunanKey);
 	_preferencesPlayerWhiteHumanKey = resources.getString (
 		R.string.preferencesPlayerWhiteHunanKey);
+	_preferenceAllowResignationKey = resources.getString (
+			R.string.preferenceAllowResignationKey);
 
 	_undoHintText = resources.getText (R.string.undoHintText);
 	_redoHintText = resources.getText (R.string.redoHintText);
@@ -1668,6 +1671,8 @@ GameInfo storeGameInfo (
 		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
 	editor.putBoolean (
 		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
+	editor.putBoolean(
+			_preferenceAllowResignationKey, pGameInfo._allowResignation);
 	editor.commit ();
 	return pGameInfo;
 }
@@ -1696,6 +1701,8 @@ GameInfo restoreGameInfo (
 		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
 	pGameInfo._playerWhiteHuman = preferences.getBoolean (
 		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
+	pGameInfo._allowResignation = preferences.getBoolean (
+			_preferenceAllowResignationKey, pGameInfo._allowResignation);
 	return pGameInfo;
 }
 
