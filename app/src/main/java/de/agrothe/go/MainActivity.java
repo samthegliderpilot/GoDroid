@@ -139,6 +139,7 @@ String
 	_preferencesLevelKey,
 	_preferencesPlayerBlackHumanKey,
 	_preferencesPlayerWhiteHumanKey,
+	_preferencesAiDelayKey,
 	_preferenceAllowResignationKey;
 
 private
@@ -246,6 +247,9 @@ void onCreate ( // 0
 		R.string.preferencesPlayerBlackHunanKey);
 	_preferencesPlayerWhiteHumanKey = resources.getString (
 		R.string.preferencesPlayerWhiteHunanKey);
+	_preferencesAiDelayKey = resources.getString(
+			R.string.preferencesAiDelayKey
+	);
 	_preferenceAllowResignationKey = resources.getString (
 			R.string.preferenceAllowResignationKey);
 
@@ -620,7 +624,8 @@ enum SpinnerEnum
 		R.array.playerBlackWhiteValues, true),
 	Strength (R.id.newGameDialogStrengthSpinner, R.array.strengths, true),
 	Komi (R.id.newGameDialogKomiSpinner, R.array.komis, true),
-	Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings);
+	Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings),
+	AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true);
 
 	final
 	int _spinnerResId;
@@ -639,6 +644,9 @@ enum SpinnerEnum
 		_values,
 		_playerBlackHumanValues,
 		_playerWhiteHumanValues;
+	private
+	String[]
+	    _stringValues;
 
 	private
 	Map <Object, Integer> _spinnerEntriesMap;
@@ -679,34 +687,47 @@ enum SpinnerEnum
 			spinnerEntriesMap = _spinnerEntriesMap =
 				Generics.newHashMap (numEntries);
 		}
-		for (int idx=0; idx < numEntries; idx++)
-		{
-			Object value = "";
-			switch (values.peekValue (idx).type)
-			{
-			case TypedValue.TYPE_STRING:
-				value = values.getString (idx);
-				break;
-			case TypedValue.TYPE_FLOAT:
-				value = values.getFloat (idx, 0);
-				break;
-			case TypedValue.TYPE_INT_DEC:
-			case TypedValue.TYPE_INT_HEX:
-				value = values.getInt (idx, 0);
-				break;
-			case TypedValue.TYPE_INT_BOOLEAN:
-				value = values.getBoolean (idx, false);
-				break;
+		if (this == AIDelay) {
+			_stringValues = pResources.getStringArray(_valuesResId);
+			int numEntries2 = _stringValues.length;
+			_spinnerEntriesMap = Generics.newHashMap(numEntries);
+			for (int idx = 0; idx < numEntries2; idx++) {
+				Integer value2 = Integer.valueOf(_stringValues[idx]);
+				_spinnerEntriesMap.put(value2, idx);
 			}
-			spinnerEntriesMap.put (value, idx);
+			return;
 		}
-		if (this == PlayerBlackWhite)
-		{
-			_playerBlackHumanValues = pResources.obtainTypedArray (
-				R.array.playerBlackHumanValues);
-			_playerWhiteHumanValues = pResources.obtainTypedArray (
-				R.array.playerWhiteHumanValues);
-		}
+
+			//final TypedArray values = _values = pResources.obtainTypedArray(_valuesResId);
+			//int numEntries = values.length();
+			_spinnerEntriesMap = Generics.newHashMap(numEntries);
+			for (int idx = 0; idx < numEntries; idx++) {
+				Object value = "";
+				switch (values.peekValue(idx).type) {
+					case TypedValue.TYPE_STRING:
+						value = values.getString(idx);
+						break;
+					case TypedValue.TYPE_FLOAT:
+						value = values.getFloat(idx, 0);
+						break;
+					case TypedValue.TYPE_INT_DEC:
+					case TypedValue.TYPE_INT_HEX:
+						value = values.getInt(idx, 0);
+						break;
+					case TypedValue.TYPE_INT_BOOLEAN:
+						value = values.getBoolean(idx, false);
+						break;
+				}
+				_spinnerEntriesMap.put(value, idx);
+			}
+
+			if (this == PlayerBlackWhite) {
+				_playerBlackHumanValues = pResources.obtainTypedArray(
+						R.array.playerBlackHumanValues);
+				_playerWhiteHumanValues = pResources.obtainTypedArray(
+						R.array.playerWhiteHumanValues);
+			}
+
 	}
 
 	void setSpinnerSelection (
@@ -735,6 +756,9 @@ enum SpinnerEnum
 			break;
 		case Scoring:
 			val = pGameInfo._chineseRules;
+			break;
+		case AIDelay:
+			val = pGameInfo._aiDelaySeconds;  // Assuming you'll add this int field
 			break;
 		}
 		_spinner.setSelection (_spinnerEntriesMap.get (val));
@@ -768,6 +792,9 @@ enum SpinnerEnum
 		case Scoring:
 			value = pGameInfo._chineseRules;
 			break;
+		case AIDelay:
+			value = pGameInfo._aiDelaySeconds;
+			break;
 		}
 		_changed = pRow != _spinnerEntriesMap.get (value);
 	}
@@ -799,6 +826,12 @@ enum SpinnerEnum
 			break;
 		case Scoring:
 			pGameInfo._chineseRules = _values.getBoolean (pos, false);
+			break;
+		case AIDelay:
+			if (_stringValues != null) {
+				String selectedValue = _stringValues[pos];
+				pGameInfo._aiDelaySeconds = Integer.parseInt(selectedValue);
+			}
 			break;
 		}
 	}
@@ -1671,6 +1704,9 @@ GameInfo storeGameInfo (
 		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
 	editor.putBoolean (
 		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
+	editor.putInt(
+			_preferencesAiDelayKey, pGameInfo._aiDelaySeconds
+	);
 	editor.putBoolean(
 			_preferenceAllowResignationKey, pGameInfo._allowResignation);
 	editor.commit ();
@@ -1701,6 +1737,7 @@ GameInfo restoreGameInfo (
 		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
 	pGameInfo._playerWhiteHuman = preferences.getBoolean (
 		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
+	pGameInfo._aiDelaySeconds = preferences.getInt(_preferencesAiDelayKey, pGameInfo._aiDelaySeconds);
 	pGameInfo._allowResignation = preferences.getBoolean (
 			_preferenceAllowResignationKey, pGameInfo._allowResignation);
 	return pGameInfo;
@@ -1752,14 +1789,27 @@ void showWait4Move2FinishMessage (
 	}
 }
 
-void nextMove (
-	final Point pPoint
-	)
-{
-	final GameInfo gameInfo = _gameInfo;
-	gameInfo.addMove (pPoint);
-	_gtp.nextMove (_gameInfo);
-}
+	void nextMove(final Point pPoint)
+	{
+		final GameInfo gameInfo = _gameInfo;
+		gameInfo.addMove (pPoint);
+		if (_gameInfo._aiDelaySeconds==0)
+		{
+			_gtp.nextMove (_gameInfo);
+		}
+		else {
+			new Handler(Looper.getMainLooper()).postDelayed(() -> {
+
+				_gtp.nextMove(_gameInfo);
+			}, _gameInfo._aiDelaySeconds * 1000);
+		}
+	}
+
+	void continueAfterMove()
+	{
+		// Continue game logic that follows the AI move here
+		// For example, update UI, allow user input, etc.
+	}
 
 void drawBoard (
 	final boolean pInit

@@ -40,7 +40,8 @@ int
 	_MAX_HISTORY_STONES = 2, // todo settings
 	_DEFAULT_BOARD_SIZE = 9,
 	_DEFAULT_LEVEL = 1,
-	_DEFAULT_HANDICAP = 0;
+	_DEFAULT_HANDICAP = 0,
+	_DEFAULT_AI_DELAY = 0;
 
 static final
 PropertyName.Property _RECENT_MOVE_PROPERTY =
@@ -113,7 +114,8 @@ enum LoadGameStatus
 int
 	_boardSize = _DEFAULT_BOARD_SIZE,
 	_level = _DEFAULT_LEVEL,
-	_handicap = _DEFAULT_HANDICAP;
+	_handicap = _DEFAULT_HANDICAP,
+	_aiDelaySeconds = _DEFAULT_AI_DELAY;
 
 String _komi = _DEFAULT_KOMI;
 
@@ -269,6 +271,7 @@ void restartGame ()
 	setupPlayerBlackMoves ();
 	_moveNumber = 0;
 	_redoPoints = null;
+	_aiDelaySeconds = 0;
 }
 
 List <Point> getPreviousMoves (

@@ -11,6 +11,7 @@
 	<string name="preferencesChineseRulesKey">chineseRules</string>
 	<string name="preferencesPlayerBlackHunanKey">playerBlackHuman</string>
 	<string name="preferencesPlayerWhiteHunanKey">playerWhiteHuman</string>
+	<string name="preferencesAiDelayKey">aiDelay</string>
 	<string name="preferencesLevelKey">level</string>
 	<string name="godroidProjectUrl">
 		http://sourceforge.net/projects/godroid/
@@ -110,4 +111,11 @@
 	</drawable>
 	<drawable name="exitMenuIcon">@android:drawable/ic_menu_delete</drawable>
 	<drawable name="deleteButtonIcon">@android:drawable/ic_delete</drawable>
+
+
+		<integer name="ai_delay_0">0</integer>
+		<integer name="ai_delay_1">1</integer>
+		<integer name="ai_delay_2">2</integer>
+	    <integer name="ai_delay_3">3</integer>
+
 </resources>

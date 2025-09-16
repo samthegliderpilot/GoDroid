@@ -81,6 +81,17 @@
                 android:entries="@array/newGameDialogScoringItems"
                 android:prompt="@string/newGameDialogScoringLabel"/>
 
+<!-- Slow AI Moves -->
+<TextView
+    android:text="@string/newGameDialogAIDelayLabel"
+    style="@style/TextDialogEntry"/>
+
+<Spinner
+    android:id="@+id/newGameDialogAIDelaySpinner"
+    style="@style/SpinnerDialogEntry"
+    android:entries="@array/newGameDialogAIDelayItems"
+    android:prompt="@string/newGameDialogAIDelayLabel"/>
+
 			<!-- Allow Resignation -->
 			<TextView
 				android:text="@string/newGameAllowResignationLabel"
