@@ -2046,10 +2046,11 @@ float calcTextSize (
 	final float pMaxHeight
 	)
 {
+	final float originalTextSize = pMeasureView.getTextSize();
 	final float numLinesMinus1 = pNumLines -1f;
 	while (true)
 	{
-		pMeasureView.setTextSize (TypedValue.COMPLEX_UNIT_PX, pTextSize);
+		pMeasureView.setTextSize (TypedValue.COMPLEX_UNIT_PX, pTextSize); //THIS LINE IN PARTICULAR
 		final TextPaint paint = pMeasureView.getPaint ();
 		final Paint.FontMetrics metrics = paint.getFontMetrics ();
 		final float width = paint.measureText (pMeasureString) + pPadding,
@@ -2071,6 +2072,7 @@ float calcTextSize (
 		pTextSize -= width - pMaxWidth > 100 || height - pMaxHeight > 100 ?
 			4f : 2f;
 	}
+	pMeasureView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
 	return pTextSize;
 }
 

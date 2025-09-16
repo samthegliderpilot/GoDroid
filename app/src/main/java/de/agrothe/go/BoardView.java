@@ -452,20 +452,20 @@ void surfaceChanged ( // 4
 	final Bitmap backgroundBitmap = Bitmap.createBitmap (scoreWidth,
 		scoreHeight, _bitmapConfig);
 	final Resources resources = _resources;
-	final Drawable drawable = resources.getDrawable (R.drawable.painting);
-	final int drawableWidth = drawable.getIntrinsicWidth (),
-		drawableHeight = drawable.getIntrinsicHeight ();
-	drawable.setBounds (0, 0, drawableWidth, drawableHeight);
-	final Canvas canvas = new Canvas (backgroundBitmap);
-	canvas.scale (
-		(float)scoreWidth / drawableWidth, (float)scoreHeight / drawableHeight);
-	drawable.draw (canvas);
-	try
-	{
-		_scoreBackground =
-			new BitmapDrawable (resources, backgroundBitmap);
-	}
-	catch (final Exception e) {}
+	//final Drawable drawable = resources.getDrawable (R.drawable.painting);
+	//final int drawableWidth = drawable.getIntrinsicWidth (),
+	//	drawableHeight = drawable.getIntrinsicHeight ();
+	//drawable.setBounds (0, 0, drawableWidth, drawableHeight);
+	//final Canvas canvas = new Canvas (backgroundBitmap);
+	//canvas.scale (
+	//	(float)scoreWidth / drawableWidth, (float)scoreHeight / drawableHeight);
+	//drawable.draw (canvas);
+	//try
+	//{
+	//	_scoreBackground =
+	//		new BitmapDrawable (resources, backgroundBitmap);
+	//}
+	//catch (final Exception e) {}
 	showScoreBackground (true);
 	mainActivity.sizeScoreViewTexts (scoreWidth, scoreHeight);
 
