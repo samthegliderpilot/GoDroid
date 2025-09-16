@@ -67,7 +67,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="newGameDialogStrengthLabel">Force</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Règles</string>
-	<string name="allowResignationLabel">Autoriser l\'abandon</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameAllowResignationLabel">Autoriser l\'abandon</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Nouvelle Partie</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Modifier</b></string>
 	<string name="yourTurnText">A vous</string>

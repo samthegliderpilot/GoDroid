@@ -71,7 +71,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="newGameDialogStrengthLabel">Stärke</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Regeln</string>
-	<string name="allowResignationLabel">Aufgabe erlauben</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameAllowResignationLabel">Aufgabe erlauben</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Neues Spiel</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Übernehmen</b></string>
 	<string name="yourTurnText">Dein Zug</string>

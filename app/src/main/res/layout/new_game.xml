@@ -83,7 +83,7 @@
 
 			<!-- Allow Resignation -->
 			<TextView
-				android:text="@string/allowResignationLabel"
+				android:text="@string/newGameAllowResignationLabel"
 				style="@style/TextDialogEntry"/>
 
 			<CheckBox

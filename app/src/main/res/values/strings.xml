@@ -68,7 +68,7 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="newGameDialogStrengthLabel">Strength</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Rules</string>
-	<string name="allowResignationLabel">Allow Resignation</string>
+	<string name="newGameAllowResignationLabel">Allow Resignation</string>
 	<string name="newGameDialogStartButtonText"><b>New Game</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Apply Changes</b></string>
 	<string name="yourTurnText">Your turn</string>
