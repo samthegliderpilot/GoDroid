@@ -12,6 +12,7 @@ import android.content.res.Resources;
 import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
+import android.os.Looper;
 import android.os.Message;
 import android.util.Log;
 import android.net.Uri;
@@ -556,7 +557,7 @@ void handleMessage (
 		return;
 	case PLAY_MOVE:
 		showScore (0, 0, null);
-		playerBlackMoves = gameInfo._playerBlackMoves;
+		final boolean playerBlackMovesPlayMove = gameInfo._playerBlackMoves;
 		final boolean playerIsMachine = playerIsMachine (gameInfo),
 			nextPlayerIsMachine = otherPlayerIsMachine (gameInfo),
 			genMove = playerIsMachine && gameInfo._redoPoints == null;
@@ -565,71 +566,93 @@ void handleMessage (
 		{
 			enablePassMenu (false);
 			enableUndoMenu (null);
-			showMove (playerBlackMoves, null);
+			showMove (playerBlackMovesPlayMove, null);
 		}
 		else
 		{
 			final List <Point> lastMoves =
-				gameInfo.getPreviousMoves (playerBlackMoves, 1);
+				gameInfo.getPreviousMoves (playerBlackMovesPlayMove, 1);
 			if (lastMoves == null || lastMoves.size () != 1)
 			{
 				return;
 			}
 			lastMove = lastMoves.get (0);
 		}
-		final String move =
-			playMove (genMove, playerBlackMoves, lastMove, gameInfo._boardSize, gameInfo._allowResignation);
-		if (gameInfo._invalid)
-		{
-			return;
-		}
-		final boolean resigned = _RESIGN.equals (move),
-			passed = _PASS.equals (move) || resigned;
-		if (genMove)
-		{
-			showMove (playerBlackMoves,
-				passed ? _mainActivity.getPassedText (resigned) : move);
-			if (resigned)
+		// START TIMING
+		long startTime = System.currentTimeMillis();
+
+		// Generate move (synchronous)
+		final String move = playMove(genMove, playerBlackMovesPlayMove, lastMove,
+				gameInfo._boardSize, gameInfo._allowResignation);
+
+		// END TIMING
+		long elapsed = System.currentTimeMillis() - startTime;
+		int desiredDelay = gameInfo._aiDelaySeconds * 1000;
+		long remainingDelay = desiredDelay - elapsed;
+
+		Runnable continueRunnable = () -> {
+			if (gameInfo._invalid)
 			{
-				showScore (0, 0, null);
-				finishGame (gameInfo, playerIsMachine, nextPlayerIsMachine);
 				return;
 			}
-			gameInfo.addMove (passed ? Passed._Passed :
-				vertex2Point (move, gameInfo));
-		}
-		gameInfo._playerBlackMoves = !playerBlackMoves;
-		saveGame (gameInfo, true);
-		if (gameInfo.bothPlayersPassed ())
-		{
-			score (gameInfo, true);
-			finishGame (gameInfo, playerIsMachine, nextPlayerIsMachine);
-			return;
-		}
-		if (passed && playerIsMachine && !nextPlayerIsMachine)
-		{
-			_mainActivity.showPassMessage (playerBlackMoves, resigned);
-		}
-		drawBoard (gameInfo);
-		if (nextPlayerIsMachine)
-		{
-			if (gameInfo._redoPoints == null)
+			final boolean resigned = _RESIGN.equals(move),
+					passed = _PASS.equals(move) || resigned;
+			if (genMove)
 			{
-				nextMove (gameInfo);
+				showMove(playerBlackMovesPlayMove,
+						passed ? _mainActivity.getPassedText(resigned) : move);
+				if (resigned)
+				{
+					showScore(0, 0, null);
+					finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+					return;
+				}
+				gameInfo.addMove(passed ? Passed._Passed :
+						vertex2Point(move, gameInfo));
+			}
+			gameInfo._playerBlackMoves = !playerBlackMovesPlayMove;
+			saveGame(gameInfo, true);
+			if (gameInfo.bothPlayersPassed())
+			{
+				score(gameInfo, true);
+				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+				return;
+			}
+			if (passed && playerIsMachine && !nextPlayerIsMachine)
+			{
+				_mainActivity.showPassMessage(playerBlackMovesPlayMove, resigned);
+			}
+			drawBoard(gameInfo);
+			if (nextPlayerIsMachine)
+			{
+				if (gameInfo._redoPoints == null)
+				{
+					nextMove(gameInfo);
+				}
+				else
+				{
+					redoMove(gameInfo);
+				}
 			}
 			else
 			{
-				redoMove (gameInfo);
+				showMove(!playerBlackMovesPlayMove, "");
+				enablePassMenu(true);
+				enableUndoMenu(gameInfo);
+				boardView.lockScreen(false);
 			}
+			gameInfo._redoPoints = null;
+		};
+
+		// Delay if needed
+		if (remainingDelay > 0)
+		{
+			new Handler(Looper.getMainLooper()).postDelayed(continueRunnable, remainingDelay);
 		}
 		else
 		{
-			showMove (!playerBlackMoves, "");
-			enablePassMenu (true);
-			enableUndoMenu (gameInfo);
-			boardView.lockScreen (false);
+			continueRunnable.run();
 		}
-		gameInfo._redoPoints = null;
 		return;
 	case SAVE_GAME:
 		MainActivity mainActivity = _mainActivity;

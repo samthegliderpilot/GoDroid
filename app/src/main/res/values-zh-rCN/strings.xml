@@ -53,6 +53,7 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="newGameDialogStrengthLabel">难度</string>
     <string name="newGameDialogKomiLabel">贴目</string>
     <string name="newGameDialogScoringLabel">计分</string>
+    <string name="newGameDialogAIDelayLabel">延迟AI落子（秒）</string> <!-- Translation Provided by ChatGPT -->
     <string name="newGameAllowResignationLabel">允许认输</string>  <!-- Translation Provided by ChatGPT -->
     <string name="newGameDialogStartButtonText"><b>开始棋局</b></string>
     <string name="newGameDialogApplytButtonText"><b>应用设置</b></string>
@@ -76,6 +77,8 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="newGameDialogHumanPlaysBothListWievItem"><b>两个</b> (棋手 vs. 棋手)</string>
     <string name="newGameDialogHumanPlaysNoneListWievItem"><b>无</b> (电脑 vs. 电脑)</string>
     <string name="none">无</string>
+    <string name="number0">0</string>
+    <string name="number1">1</string>
     <string name="number2">2</string>
     <string name="number3">3</string>
     <string name="number4">4</string>

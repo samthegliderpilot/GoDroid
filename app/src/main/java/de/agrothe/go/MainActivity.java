@@ -977,6 +977,7 @@ void showTerritory ()
 	_gtp.showTerritory (_gameInfo);
 }
 
+
 void shareGame (
 	final Uri pUri
 	)
@@ -1793,16 +1794,7 @@ void showWait4Move2FinishMessage (
 	{
 		final GameInfo gameInfo = _gameInfo;
 		gameInfo.addMove (pPoint);
-		if (_gameInfo._aiDelaySeconds==0)
-		{
-			_gtp.nextMove (_gameInfo);
-		}
-		else {
-			new Handler(Looper.getMainLooper()).postDelayed(() -> {
-
-				_gtp.nextMove(_gameInfo);
-			}, _gameInfo._aiDelaySeconds * 1000);
-		}
+		_gtp.nextMove (_gameInfo);
 	}
 
 	void continueAfterMove()

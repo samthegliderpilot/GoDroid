@@ -67,6 +67,7 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="newGameDialogStrengthLabel">Siła</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">System Punktacji</string>
+	<string name="newGameDialogAIDelayLabel">Opóźnienie ruchów AI (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Zezwól na poddanie się</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Nowa Gra</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Zastosuj Zmiany</b></string>
@@ -109,6 +110,8 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 		<b>Żaden</b> (komputer przeciwko komputerowi)
 	</string>
 	<string name="none">Brak</string>
+	<string name="number0">0</string>
+	<string name="number1">1</string>
 	<string name="number2">2</string>
 	<string name="number3">3</string>
 	<string name="number4">4</string>

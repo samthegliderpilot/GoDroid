@@ -66,6 +66,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="newGameDialogStrengthLabel">Tietokoneen taso</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Pisteytys</string>
+	<string name="newGameDialogAIDelayLabel">Hidasta tekoälyn siirtoja (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Salli luovutus</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Uusi peli</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Toteuta muutokset</b></string>
@@ -108,6 +109,8 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 		<b>Ei kumpikaan</b> (tietokone vastaan tietokone)
 	</string>
 	<string name="none">Ei</string>
+	<string name="number0">0</string>
+	<string name="number1">1</string>
 	<string name="number2">2</string>
 	<string name="number3">3</string>
 	<string name="number4">4</string>

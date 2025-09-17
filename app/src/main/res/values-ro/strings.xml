@@ -67,6 +67,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="newGameDialogStrengthLabel">Tărie</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Calcularea scorului</string>
+	<string name="newGameDialogAIDelayLabel">Întârziere mișcări AI (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Permite renunțarea</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Joc Nou</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Acceptă modificările</b></string>
@@ -109,6 +110,8 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 		<b>Nici unul</b> (calculator versus calculator)
 	</string>
 	<string name="none">Nici unul</string>
+	<string name="number0">0</string>
+	<string name="number1">1</string>
 	<string name="number2">2</string>
 	<string name="number3">3</string>
 	<string name="number4">4</string>

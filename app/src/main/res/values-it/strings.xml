@@ -68,6 +68,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="newGameDialogStrengthLabel">Forza</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Regole Punteggio</string>
+	<string name="newGameDialogAIDelayLabel">Mosse lente dell\'IA (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Consenti la resa</string>  <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogStartButtonText"><b>Nuova Partita</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Applica Cambiamenti</b></string>
@@ -110,6 +111,8 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 		<b>Nessuno</b> (computer vs. computer)
 	</string>
 	<string name="none">Nessuno</string>
+	<string name="number0">0</string>
+	<string name="number1">1</string>
 	<string name="number2">2</string>
 	<string name="number3">3</string>
 	<string name="number4">4</string>
