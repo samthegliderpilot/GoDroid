@@ -143,7 +143,7 @@ class BoardGestureListener
 	extends GestureDetector.SimpleOnGestureListener
 {
 	static final
-	int _HINT_DISPLAY_TIME_MILLIS = 2000;
+	int _HINT_DISPLAY_TIME_MILLIS = 2*60*1000;
 
 	long _lastHintDisplayTime;
 
