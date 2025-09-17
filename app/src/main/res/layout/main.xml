@@ -75,8 +75,7 @@
             </TableRow>
 
             <TableRow
-                android:id="@+id/scoreTableRow"
-                android:visibility="gone">
+                android:id="@+id/scoreTableRow">
                 <TextView
                     android:id="@+id/scoreRowTextView"
                     android:text="@string/scoreLabelText"
@@ -103,11 +102,11 @@
     </de.agrothe.go.ScoreView>
 
     <!-- Go board fills the rest of the screen -->
-    <de.agrothe.go.BoardView
-        android:id="@+id/boardView"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/scoreView"
-        android:layout_alignParentBottom="true" />
+<de.agrothe.go.BoardView
+    android:id="@+id/boardView"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_below="@id/scoreView"
+    android:layout_alignParentBottom="true" />
 
 </RelativeLayout>

@@ -18,7 +18,10 @@
 		</item>
 	</style>
 	<style name="SpinnerDialogEntry" parent="@style/WrapContent">
-		<item name="android:choiceMode">singleChoice</item>
+    <item name="android:choiceMode">singleChoice</item>
+    <item name="android:background">@drawable/spinner_background</item>
+    <item name="android:textColor">?android:textColorPrimary</item> <!-- Theme-aware text -->
+    <item name="android:padding">8dp</item>
 	</style>
 	<style name="TableLayoutTextBase" parent="@style/WrapContent">
 		<item name="android:padding">0px</item>

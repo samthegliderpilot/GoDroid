@@ -422,18 +422,6 @@ void surfaceDestroyed (
 {
 }
 
-int getNavigationBarHeight(View anyAttachedView) {
-	WindowInsetsCompat insets = ViewCompat.getRootWindowInsets(anyAttachedView);
-
-	if (insets != null) {
-		Insets navInsets = insets.getInsets(WindowInsetsCompat.Type.navigationBars());
-		return navInsets.bottom;
-	}
-
-	// Insets not ready yet
-	return 0;
-}
-
 public
 void surfaceChanged ( // 4
 	final SurfaceHolder pHolder,
@@ -452,20 +440,6 @@ void surfaceChanged ( // 4
 	final Bitmap backgroundBitmap = Bitmap.createBitmap (scoreWidth,
 		scoreHeight, _bitmapConfig);
 	final Resources resources = _resources;
-	//final Drawable drawable = resources.getDrawable (R.drawable.painting);
-	//final int drawableWidth = drawable.getIntrinsicWidth (),
-	//	drawableHeight = drawable.getIntrinsicHeight ();
-	//drawable.setBounds (0, 0, drawableWidth, drawableHeight);
-	//final Canvas canvas = new Canvas (backgroundBitmap);
-	//canvas.scale (
-	//	(float)scoreWidth / drawableWidth, (float)scoreHeight / drawableHeight);
-	//drawable.draw (canvas);
-	//try
-	//{
-	//	_scoreBackground =
-	//		new BitmapDrawable (resources, backgroundBitmap);
-	//}
-	//catch (final Exception e) {}
 	showScoreBackground (true);
 	mainActivity.sizeScoreViewTexts (scoreWidth, scoreHeight);
 
@@ -479,7 +453,7 @@ void surfaceChanged ( // 4
 	{
 		_boardBitmap = Bitmap.createBitmap (pWidth, pHeight, _bitmapConfig);
 		_boardWidth = pWidth;
-		_boardHeight = pHeight - getNavigationBarHeight(_boardView);
+		_boardHeight = pHeight;
 		if (isLandscape)
 		{
 			_yBoardOffset = 0;
@@ -487,7 +461,7 @@ void surfaceChanged ( // 4
 		}
 		else
 		{
-			_yBoardOffset = (pHeight - pWidth) / 2;
+			_yBoardOffset = (_boardHeight - pWidth) / 2;
 			_xBoardOffset = 0;
 		}
 		mainActivity.newGame ();

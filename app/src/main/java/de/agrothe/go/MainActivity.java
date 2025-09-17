@@ -135,7 +135,6 @@ SharedPreferences _sharedPreferences;
 
 private
 String
-	_saveLoadGamesDirName,
 	_preferencesBoardSizeKey,
 	_preferencesHandicapKey,
 	_preferencesKomiKey,
@@ -189,7 +188,7 @@ private
 boolean _undoEnabled = false, _redoEnabled = false;
 
 private
-float _3rowsTextSize, _4rowsTextSize;
+float _4rowsTextSize;
 
 private
 Toast _undoRedoHint;
@@ -234,7 +233,7 @@ void onCreate ( // 0
 	_appInfo = new AppInfo ();
 	final Resources resources = _resources = getResources ();
 
-	_saveLoadGamesDirName = resources.getString (R.string.app_name);
+	//_saveLoadGamesDirName = resources.getString (R.string.app_name);
 	_autoSaveGamePathFileName =
 		getFileStreamPath (resources.getString (R.string.autoSaveFileName)).
 			toString ();
@@ -1899,7 +1898,7 @@ void showMove (
 	(pBlack ? _blackMoveProgressBar : _whiteMoveProgressBar).
 		setVisibility (showProgressBar ? View.VISIBLE : View.GONE);
 	final TextView textView = pBlack ? _blackMoveTextView : _whiteMoveTextView;
-	textView.setVisibility (showProgressBar ? View.GONE : View.VISIBLE);
+	textView.setVisibility (showProgressBar ? View.INVISIBLE : View.VISIBLE);
 	final GameInfo gameInfo = _gameInfo;
 	_boardView.showScoreBackground (!showProgressBar
 		&& !(Gtp.otherPlayerIsMachine (gameInfo)
@@ -1946,7 +1945,7 @@ void enableUndoMenu (
 		final int moveNumber = pGameInfo._moveNumber;
 		_undoEnabled = undoEnabled =
 			!(playerIsMaschine && otherPlayerIsMachine)
-			&& (!playerIsMaschine || pGameInfo.bothPlayersPassed ())
+			//&& (!playerIsMaschine || pGameInfo.bothPlayersPassed ())
 			&& !(otherPlayerIsMachine && moveNumber == 1)
 			&& moveNumber > 0;
 		_redoEnabled = redoEnabled = !playerIsMaschine
@@ -1980,7 +1979,7 @@ void showScore (
 	if (pBlackTerritory == _SHOW_MESSAGE)
 	{
 		_scoreTableRow.setVisibility (View.INVISIBLE);
-		_messageTableRow.setVisibility (View.VISIBLE);
+		_messageTableRow.setVisibility (View.GONE);
 		setScoreViewTextSize (_4rowsTextSize);
 		_messageScoreTextView.setText ((String)pStatus);
 		return;
@@ -2106,26 +2105,9 @@ void sizeScoreViewTexts (
 	final int pHeight
 	)
 {
-	final Resources resources = _resources;
-	final float padding =
-		resources.getDimension (R.dimen.scoreViewTextPadding) * 2f,
-		maxLines = resources.getDimension (R.dimen.scoreViewMaxLines),
-		maxLinesMinus1 = maxLines -1f,
-		netHeight = (float)pHeight - padding;
-	final TextView measureView = _capturesRowTextView;
-	final Paint paint = measureView.getPaint ();
-	_3rowsTextSize = calcTextSize (measureView, netHeight / maxLinesMinus1,
-		getLongestString (
-			R.array.scoreView3LinesColumn0Strings,
-			R.array.scoreView3LinesColumns, resources, paint),
-		maxLinesMinus1, padding, pWidth, pHeight);
-	_4rowsTextSize = calcTextSize (measureView, netHeight / maxLines,
-		getLongestString (
-			R.array.scoreView4LinesColumn0Strings,
-			R.array.scoreView4LinesColumns, resources, paint),
-		maxLines, padding, pWidth, pHeight);
+	final View scoreView = _scoreView = findViewById (R.id.scoreView);
+	_4rowsTextSize = scoreView.getHeight();
 	setScoreViewTextSize (_4rowsTextSize);
-	findViewById (R.id.MenuButton);
 }
 
 static
