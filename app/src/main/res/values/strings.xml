@@ -123,8 +123,9 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="number7">7</string>
 	<string name="number8">8</string>
 	<string name="number9">9</string>
-
-
+	<string name="number10">10</string>
+	<string name="yes">Yes</string>
+	<string name="no">No</string>
 	<string name="newGameDialogAIDelayLabel">Slow AI Moves (sec)</string>
 
 

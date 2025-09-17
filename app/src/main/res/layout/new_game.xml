@@ -97,11 +97,11 @@
 				android:text="@string/newGameAllowResignationLabel"
 				style="@style/TextDialogEntry"/>
 
-			<CheckBox
-				android:id="@+id/newGameDialogAllowResignCheckBox"
-				android:layout_width="wrap_content"
-				android:layout_height="wrap_content"
-				android:checked="true"/>
+			<Spinner
+    android:id="@+id/newGameDialogAllowResignSpinner"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:entries="@array/allowResignation"/>
 
 
         </LinearLayout>

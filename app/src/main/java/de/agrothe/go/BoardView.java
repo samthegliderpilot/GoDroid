@@ -483,7 +483,7 @@ void surfaceChanged ( // 4
 		if (isLandscape)
 		{
 			_yBoardOffset = 0;
-			_xBoardOffset = (pWidth - pHeight) / 2;
+			_xBoardOffset = (pWidth - _boardHeight) / 2;
 		}
 		else
 		{

@@ -15,7 +15,7 @@ import android.widget.*;
 
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
-import android.app.Activity;
+
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.app.ProgressDialog;
@@ -56,7 +56,6 @@ import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.MotionEvent;
-import android.view.View;
 import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.Window;
@@ -429,7 +428,7 @@ void onCreate ( // 0
 	getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
-			if (_gameInfo != null && _undoEnabled) {
+			if (_undoEnabled) {
 				undo();
 			}
 		}
@@ -642,7 +641,8 @@ enum SpinnerEnum
 	Strength (R.id.newGameDialogStrengthSpinner, R.array.strengths, true),
 	Komi (R.id.newGameDialogKomiSpinner, R.array.komis, true),
 	Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings),
-	AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true);
+	AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true),
+	AllowResignation(R.id.newGameDialogAllowResignSpinner, R.array.allowResignation, true);
 
 	final
 	int _spinnerResId;
@@ -663,7 +663,8 @@ enum SpinnerEnum
 		_playerWhiteHumanValues;
 	private
 	String[]
-	    _stringValues;
+		_stringValuesForAiDelay,
+		_stringValuesForAllowResignation;
 
 	private
 	Map <Object, Integer> _spinnerEntriesMap;
@@ -705,46 +706,52 @@ enum SpinnerEnum
 				Generics.newHashMap (numEntries);
 		}
 		if (this == AIDelay) {
-			_stringValues = pResources.getStringArray(_valuesResId);
-			int numEntries2 = _stringValues.length;
+			_stringValuesForAiDelay = pResources.getStringArray(_valuesResId);
+			int numEntries2 = _stringValuesForAiDelay.length;
 			_spinnerEntriesMap = Generics.newHashMap(numEntries);
 			for (int idx = 0; idx < numEntries2; idx++) {
-				Integer value2 = Integer.valueOf(_stringValues[idx]);
+				Integer value2 = Integer.valueOf(_stringValuesForAiDelay[idx]);
 				_spinnerEntriesMap.put(value2, idx);
 			}
 			return;
 		}
-
-			//final TypedArray values = _values = pResources.obtainTypedArray(_valuesResId);
-			//int numEntries = values.length();
-			_spinnerEntriesMap = Generics.newHashMap(numEntries);
-			for (int idx = 0; idx < numEntries; idx++) {
-				Object value = "";
-				switch (values.peekValue(idx).type) {
-					case TypedValue.TYPE_STRING:
-						value = values.getString(idx);
-						break;
-					case TypedValue.TYPE_FLOAT:
-						value = values.getFloat(idx, 0);
-						break;
-					case TypedValue.TYPE_INT_DEC:
-					case TypedValue.TYPE_INT_HEX:
-						value = values.getInt(idx, 0);
-						break;
-					case TypedValue.TYPE_INT_BOOLEAN:
-						value = values.getBoolean(idx, false);
-						break;
-				}
+		if (this == AllowResignation) {
+			_stringValuesForAllowResignation = pResources.getStringArray(_valuesResId);
+			int numEntries2 = _stringValuesForAllowResignation.length;
+			_spinnerEntriesMap = Generics.newHashMap(numEntries2);
+			for (int idx = 0; idx < numEntries2; idx++) {
+				String value = _stringValuesForAllowResignation[idx];
 				_spinnerEntriesMap.put(value, idx);
 			}
-
-			if (this == PlayerBlackWhite) {
-				_playerBlackHumanValues = pResources.obtainTypedArray(
-						R.array.playerBlackHumanValues);
-				_playerWhiteHumanValues = pResources.obtainTypedArray(
-						R.array.playerWhiteHumanValues);
+			return;
+		}
+		_spinnerEntriesMap = Generics.newHashMap(numEntries);
+		for (int idx = 0; idx < numEntries; idx++) {
+			Object value = "";
+			switch (values.peekValue(idx).type) {
+				case TypedValue.TYPE_STRING:
+					value = values.getString(idx);
+					break;
+				case TypedValue.TYPE_FLOAT:
+					value = values.getFloat(idx, 0);
+					break;
+				case TypedValue.TYPE_INT_DEC:
+				case TypedValue.TYPE_INT_HEX:
+					value = values.getInt(idx, 0);
+					break;
+				case TypedValue.TYPE_INT_BOOLEAN:
+					value = values.getBoolean(idx, false);
+					break;
 			}
+			_spinnerEntriesMap.put(value, idx);
+		}
 
+		if (this == PlayerBlackWhite) {
+			_playerBlackHumanValues = pResources.obtainTypedArray(
+					R.array.playerBlackHumanValues);
+			_playerWhiteHumanValues = pResources.obtainTypedArray(
+					R.array.playerWhiteHumanValues);
+		}
 	}
 
 	void setSpinnerSelection (
@@ -775,7 +782,13 @@ enum SpinnerEnum
 			val = pGameInfo._chineseRules;
 			break;
 		case AIDelay:
-			val = pGameInfo._aiDelaySeconds;  // Assuming you'll add this int field
+			val = pGameInfo._aiDelaySeconds;
+			break;
+		case AllowResignation:
+			final Resources res = _spinner.getContext().getResources();
+			String yesString = res.getString(R.string.yes);
+			String noString = res.getString(R.string.no);
+			val = pGameInfo._allowResignation ? yesString : noString;
 			break;
 		}
 		_spinner.setSelection (_spinnerEntriesMap.get (val));
@@ -812,6 +825,12 @@ enum SpinnerEnum
 		case AIDelay:
 			value = pGameInfo._aiDelaySeconds;
 			break;
+		case AllowResignation:
+			final Resources res = _spinner.getContext().getResources();
+			String yesString = res.getString(R.string.yes);
+			String noString = res.getString(R.string.no);
+			value = pGameInfo._allowResignation ? yesString : noString;
+			break;
 		}
 		_changed = pRow != _spinnerEntriesMap.get (value);
 	}
@@ -845,9 +864,17 @@ enum SpinnerEnum
 			pGameInfo._chineseRules = _values.getBoolean (pos, false);
 			break;
 		case AIDelay:
-			if (_stringValues != null) {
-				String selectedValue = _stringValues[pos];
+			if (_stringValuesForAiDelay != null) {
+				String selectedValue = _stringValuesForAiDelay[pos];
 				pGameInfo._aiDelaySeconds = Integer.parseInt(selectedValue);
+			}
+			break;
+		case AllowResignation:
+			if(_stringValuesForAllowResignation !=null) {
+				String selectedValue = _stringValuesForAllowResignation[pos];
+				pGameInfo._allowResignation = selectedValue.equals(
+						_resources.getString(R.string.yes)
+				);
 			}
 			break;
 		}
