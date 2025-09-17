@@ -726,7 +726,7 @@ LoadGameStatus loadGame (
 		final int boardSize = _boardSize;
 		for (final Point point : moves)
 		{
-			Gtp.playMove (false, blackMoves, point, boardSize, _allowResignation);
+			Gtp.playMove (false, blackMoves, point, boardSize);
 			blackMoves = !blackMoves;
 			_moveNumber++;
 		}
@@ -819,7 +819,7 @@ void setupStones (
 			fromMovePropertyValue (propertyName, move, new Point ());
 		if (point != null)
 		{
-			Gtp.playMove (false, pBlack, point, boardSize, true);
+			Gtp.playMove (false, pBlack, point, boardSize);
 		}
 	}
 }

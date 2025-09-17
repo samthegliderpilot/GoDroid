@@ -79,6 +79,7 @@ enum GtpCommand
 	SET_BOARDSIZE ("boardsize "),
 	SET_LEVEL ("level "),
 	SET_KOMI ("komi "),
+	SET_RESIGN("set_resign_option "),
 	SHOWBOARD ("showboard"),
 	PLAY_MOVE ("play "),
 	GEN_MOVE ("genmove "),
@@ -583,7 +584,7 @@ void handleMessage (
 
 		// Generate move (synchronous)
 		final String move = playMove(genMove, playerBlackMovesPlayMove, lastMove,
-				gameInfo._boardSize, gameInfo._allowResignation);
+				gameInfo._boardSize);
 
 		// END TIMING
 		long elapsed = System.currentTimeMillis() - startTime;
@@ -737,15 +738,13 @@ static String playMove(
 		final boolean pGenMove,
 		final boolean pBlack,
 		final Point pMove,
-		final int pBoardSize,
-		final boolean pAllowResignation
+		final int pBoardSize
 ) {
 	return gtpCommand(
 			pGenMove ? GtpCommand.GEN_MOVE : GtpCommand.PLAY_MOVE,
 			(pBlack ? _BLACK : _WHITE)
 					+ (pGenMove ? "" :
 					(" " + (pMove instanceof Passed ? _PASS : point2Vertex(pMove, pBoardSize))))
-					+ " " + Boolean.toString(pAllowResignation)
 	);
 }
 
@@ -758,6 +757,8 @@ void reStartGame (
 {
 	gtpCommand (GtpCommand.SET_LEVEL, String.valueOf (pGameInfo._level));
 	gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi);
+	gtpCommand (GtpCommand.SET_RESIGN, pGameInfo._allowResignation ? "1" : "0");
+
 	final int chineseRules = pGameInfo._chineseRules ? 1 : 0;
 	MainActivity.setRules (chineseRules);
 	if (isEnabledFor (_LOG_TAG, Log.DEBUG))

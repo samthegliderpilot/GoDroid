@@ -157,6 +157,7 @@ DECLARE(gtp_restricted_genmove);
 DECLARE(gtp_same_dragon);
 DECLARE(gtp_set_boardsize);
 DECLARE(gtp_set_free_handicap);
+DECLARE(gtp_set_resign_option);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_set_orientation);
@@ -299,6 +300,7 @@ static struct gtp_command commands[] = {
   {"reset_trymove_counter",   gtp_reset_trymove_counter},
   {"restricted_genmove",      gtp_restricted_genmove},
   {"same_dragon",    	      gtp_same_dragon},
+  {"set_resign_option",        gtp_set_resign_option },
   {"set_free_handicap",       gtp_set_free_handicap},
   {"set_random_seed",  	      gtp_set_random_seed},
   {"set_search_diamond",      gtp_set_search_diamond},
@@ -589,6 +591,26 @@ gtp_set_komi(char *s)
   return gtp_success("");
 }
 
+
+/***************************
+ * Setting resign threshold *
+ ***************************/
+
+/* Function:  Set the resign threshold.
+ * Arguments: int
+ * Fails:     incorrect argument
+ * Returns:   nothing
+ *
+ * Status:    Custom GTP command.
+ */
+static int
+gtp_set_resign_option(char *s)
+{
+  if (sscanf(s, "%d", &resign_allowed) < 1)
+    return gtp_failure("resign allowed not an int");
+
+  return gtp_success("");
+}
 
 /***************************
  * Getting komi            *
