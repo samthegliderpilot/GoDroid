@@ -10,6 +10,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.view.View;
+import android.widget.*;
+
+import androidx.activity.OnBackPressedCallback;
+import androidx.appcompat.app.AppCompatActivity;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -77,7 +82,7 @@ import static de.agrothe.util.Logging.log;
 
 public
 class MainActivity
-	extends Activity
+	extends AppCompatActivity
 {
 public static final
 String
@@ -300,18 +305,21 @@ void onCreate ( // 0
 		_messageScoreTextView
 	};
 
-	findViewById (R.id.MenuButton).setOnClickListener (
-		new View.OnClickListener ()
-		{
-			@Override
-			public
-			void onClick (final View pView)
-			{
-				invalidateOptionsMenu();
-				openOptionsMenu ();
-			}
+	View menuButton = findViewById(R.id.MenuButton);
+	menuButton.setOnClickListener(new View.OnClickListener() {
+		@Override
+		public void onClick(View v) {
+			PopupMenu popup = new PopupMenu(MainActivity.this, v);
+			popup.getMenuInflater().inflate(R.menu.menu, popup.getMenu());
+			popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
+				@Override
+				public boolean onMenuItemClick(MenuItem item) {
+					return onOptionsItemSelected(item);  // Delegate to existing logic
+				}
+			});
+			popup.show();
 		}
-	);
+	});
 
 	final View scoreView = _scoreView = findViewById (R.id.scoreView);
 	((ScoreView)scoreView)._gestureDetector =
@@ -417,6 +425,15 @@ void onCreate ( // 0
 				_gtp.handleMessage (pMessage);
 			}
 		});
+
+	getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
+		@Override
+		public void handleOnBackPressed() {
+			if (_gameInfo != null && _undoEnabled) {
+				undo();
+			}
+		}
+	});
 }
 
 @Override

@@ -1,6 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<style name="Theme.NoBackground" parent="android:Theme.Holo.NoActionBar"/>
+	<style name="AppTheme" parent="Theme.AppCompat.DayNight.NoActionBar">
+		<item name="android:windowBackground">@android:color/black</item>
+        -->
+	</style>
 	<style name="FillParent">
 		<item name="android:layout_width">match_parent</item>
 		<item name="android:layout_height">match_parent</item>
