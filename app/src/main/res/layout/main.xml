@@ -14,7 +14,7 @@
 	
 
     <!-- Top panel with score and menu -->
-    <de.agrothe.go.ScoreView
+    <com.samthegliderpilot.godroid.ScoreView
         android:id="@+id/scoreView"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -99,10 +99,10 @@
 
 
         </TableLayout>
-    </de.agrothe.go.ScoreView>
+    </com.samthegliderpilot.godroid.ScoreView>
 
     <!-- Go board fills the rest of the screen -->
-<de.agrothe.go.BoardView
+<com.samthegliderpilot.godroid.BoardView
     android:id="@+id/boardView"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"

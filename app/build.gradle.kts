@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace = "de.agrothe.go"
+    namespace = "com.samthegliderpilot.godroid"
     compileSdk = 36
 
     defaultConfig {
@@ -17,15 +17,12 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
-        // Set ABI filters (choose what you really want)
         ndk {
             abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
         }
 
         externalNativeBuild {
             ndkBuild {
-                // Optional: You can pass compiler flags here
-                // cppFlags += "-DDEBUG"
             }
         }
     }
@@ -52,7 +49,7 @@ android {
         }
     }
 
-    // ✅ Use ndkBuild and point to Android.mk
+    // using original ndk build, I tried cmake and almost got it working...
     externalNativeBuild {
         ndkBuild {
             path = file("src/main/cpp/Android.mk")
@@ -73,14 +70,14 @@ android {
 
 }
 
-// Clean up gnugo sources before copy (optional, but safe)
+// Clean up gnugo sources before copy
 tasks.named("clean") {
     doFirst {
         delete("$projectDir/src/main/cpp/gnugo-3.8")
     }
 }
 
-// Copy base gnugo + patches
+// Copy base gnugo
 tasks.register<Copy>("copyGnugoSources") {
     from("$rootDir/third_party/gnugo-3.8")
     into("$projectDir/src/main/cpp/gnugo-3.8")
@@ -105,5 +102,5 @@ dependencies {
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation("androidx.appcompat:appcompat:1.7.1")
+    implementation(libs.appcompat)
 }

@@ -9,7 +9,7 @@ char gtp_input_line[100];
 char gtp_output_line[GTP_BUFSIZE*2];
 
 void
-Java_de_agrothe_go_MainActivity_initGTP (
+Java_com_samthegliderpilot_godroid_MainActivity_initGTP (
 	JNIEnv*	env,
 	jclass clasz,
 	jfloat memory
@@ -19,7 +19,7 @@ Java_de_agrothe_go_MainActivity_initGTP (
 }
 
 void 
-Java_de_agrothe_go_MainActivity_setRules (
+Java_com_samthegliderpilot_godroid_MainActivity_setRules (
 	JNIEnv*	env,
 	jclass clasz,
 	jint chineseRules
@@ -29,7 +29,7 @@ Java_de_agrothe_go_MainActivity_setRules (
 }
 
 jstring
-Java_de_agrothe_go_MainActivity_playGTP (
+Java_com_samthegliderpilot_godroid_MainActivity_playGTP (
 	JNIEnv*	env,
 	jclass clasz,
 	jstring input
@@ -47,7 +47,7 @@ Java_de_agrothe_go_MainActivity_playGTP (
 FILE *to_gnugo_stream, *from_gnugo_stream;
 
 jint
-Java_de_agrothe_go_MainActivity_initGTP (
+Java_com_samthegliderpilot_godroid_MainActivity_initGTP (
 	JNIEnv*	env,
 	jclass clasz,
 	jobject toGnuGoFd,
@@ -78,7 +78,7 @@ Java_de_agrothe_go_MainActivity_initGTP (
 }
 
 void
-Java_de_agrothe_go_MainActivity_playGTP (
+Java_com_samthegliderpilot_godroid_MainActivity_playGTP (
 	JNIEnv*	env,
 	jclass clasz
 	)

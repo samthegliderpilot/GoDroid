@@ -36,7 +36,8 @@
 		a:title="@string/menuShowTerritoryLabel"/>
 	-->
 	<item a:id="@+id/menuShareGame"
-		a:title="@string/menuShareGameLabel"/>
+		a:title="@string/menuShareGameLabel"
+		a:visible="false"/>
 	<item a:id="@+id/menuInfo"
 		a:title="@string/menuInfoLabel"
 		a:alphabeticShortcut="@string/menuInfoShortcut"
