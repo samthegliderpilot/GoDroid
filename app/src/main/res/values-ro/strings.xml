@@ -121,6 +121,9 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="number7">7</string>
 	<string name="number8">8</string>
 	<string name="number9">9</string>
+	<string name="number10">10</string>
+	<string name="yes">Da</string> <!-- Translation Provided by ChatGPT -->
+	<string name="no">Nu</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogHandicapListWievItem0">@string/none</string>
 	<string name="newGameDialogHandicapListWievItem2">@string/number2</string>
 	<string name="newGameDialogHandicapListWievItem3">@string/number3</string>

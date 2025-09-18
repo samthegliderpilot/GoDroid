@@ -121,6 +121,9 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="number7">7</string>
 	<string name="number8">8</string>
 	<string name="number9">9</string>
+	<string name="number10">10</string>
+	<string name="yes">Tak</string> <!-- Translation Provided by ChatGPT -->
+	<string name="no">Nie</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameDialogHandicapListWievItem0">@string/none</string>
 	<string name="newGameDialogHandicapListWievItem2">@string/number2</string>
 	<string name="newGameDialogHandicapListWievItem3">@string/number3</string>
