@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Translated into Japanese by ChatGPT -->
+<resources>
+    <string name="app_name">GOdroid</string>
+    <string name="app_description">
+        <![CDATA[
+戦略ボードゲーム。
+
+古典的な碁（囲碁、碁、バドク）のゲームをコンピューターと対戦できます。
+
+GNU Go（バージョン3.8を含む）のユーザーインターフェースです。
+GNU Go は、およそ8〜12級の強さで碁を打つAIです。
+        ]]>
+    </string>
+    <string name="blackColorText">黒</string>
+    <string name="whiteColorText">白</string>
+    <string name="capturesLabelText">取った石</string>
+    <string name="stonesLabelText">石</string>
+    <string name="moveLabelText">着手</string>
+    <string name="territoryLabelText">地</string>
+    <string name="scoreLabelText">勝敗点数</string>
+    <string name="tapHintText">石をタップして打つ。\n長押しで拡大。</string>
+    <string name="menuNewGameLabel">新局</string>
+    <string name="menuNewGameShortcut">N</string>
+    <string name="menuPassLabel">パス</string>
+    <string name="menuPassShortcut">P</string>
+    <string name="menuUndoLabel">取り消し</string>
+    <string name="menuUndoShortcut">U</string>
+    <string name="menuRedoLabel">やり直し</string>
+    <string name="menuRedoShortcut">R</string>
+    <string name="menuSaveLoadLabel">保存／読み込み</string>
+    <string name="menuSaveLoadShortcut">S</string>
+    <string name="menuSaveLabel">局を保存</string>
+    <string name="menuLoadLabel">局を読み込む</string>
+    <string name="menuInfoLabel">情報</string>
+    <string name="menuInfoShortcut">I</string>
+    <string name="menuExitLabel">終了</string>
+    <string name="menuExitShortcut">E</string>
+    <string name="menuToStartShortcut">1</string>
+    <string name="accessFailedAlertMessage">’%s’ へのアクセスに失敗しました。</string>
+    <string name="sdCardName">SDカード</string>
+    <string name="invalidFileNameAlertMessage">ファイル名 \'%s\' は無効です。</string>
+    <string name="fileAlreadyExistsMessage" formatted="false">ファイル \'%s\' は既に存在します。 %s?</string>
+    <string name="loadGameFailedAlertMessage" formatted="false">ファイル \'%s\' の読み込みに失敗しました。</string>
+    <string name="overwriteButtonLabel">上書き</string>
+    <string name="gameSavedInFileMessage" formatted="false">ファイル \'%s\' に局を保存しました。</string>
+    <string name="deleteFileMessage" formatted="false">ファイル \'%s\' を削除しますか？</string>
+    <string name="deleteButtonLabel">削除</string>
+    <string name="failedLoadingGameAlertMessage" formatted="false">ファイル \'%s\' の読み込みに失敗しました。</string>
+    <string name="noFiles2load" formatted="false">フォルダー \'%s\' に .sgf ファイルが見つかりません。</string>
+    <string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+    <string name="newGameDialogHumanPlaysLabelText">人間が先手</string>
+    <string name="newGameDialogBoardSizeLabel">盤のサイズ</string>
+    <string name="newGameDialogHandicapLabel">ハンディキャップ</string>
+    <string name="newGameDialogStrengthLabel">強さ</string>
+    <string name="newGameDialogKomiLabel">コミ</string>
+    <string name="newGameDialogScoringLabel">ルール</string>
+    <string name="newGameAllowResignationLabel">投了を許可</string>
+    <string name="newGameDialogStartButtonText"><b>新局開始</b></string>
+    <string name="newGameDialogApplytButtonText"><b>変更を適用</b></string>
+    <string name="yourTurnText">あなたの手番</string>
+    <string name="resignedText">投了</string>
+    <string name="passedText">パス</string>
+    <string name="noUndoHintText">取り消し不可</string>
+    <string name="noRedoHintText">やり直し不可</string>
+    <string name="undoHintText">左にスワイプして取り消し</string>
+    <string name="redoHintText">右にスワイプしてやり直し</string>
+    <string name="passedDialogMessageText" formatted="false">%s %s。</string>
+    <string name="waitProgressLastMoveMessage">最後の手の処理を待っています…</string>
+    <string name="waitProgressFinalScoreMessage">地の計算中…</string>
+    <string name="waitProgressEstimatingScoreMessage">勝敗点の見積中…</string>
+    <string name="BYauthorText">作者</string>
+    <string name="RefreshedByAuthorText">更新者</string>
+    <string name="goRulesText">碁のルール</string>
+    <string name="goRulesUrl" formatted="false">http://ja.wikipedia.org/wiki/囲碁</string>
+    <string name="projectHomepageText">プロジェクト ホームページ</string>
+    <string name="gnuGoHomepageText">GNU Go ホームページ</string>
+
+    <string name="newGameDialogBoardSizeListWievItemSize9">9 × 9</string>
+    <string name="newGameDialogBoardSizeListWievItemSize13">13 × 13</string>
+    <string name="newGameDialogBoardSizeListWievItemSize19">19 × 19</string>
+    <string name="newGameDialogHumanPlaysBlackListWievItem"><b>黒</b>（相手 白）</string>
+    <string name="newGameDialogHumanPlaysWhiteListWievItem"><b>白</b>（相手 黒）</string>
+    <string name="newGameDialogHumanPlaysBothListWievItem"><b>両方</b>（人間対人間）</string>
+    <string name="newGameDialogHumanPlaysNoneListWievItem"><b>なし</b>（コンピュータ対コンピュータ）</string>
+    <string name="none">なし</string>
+    <string name="number0">0</string>
+    <string name="number1">1</string>
+    <string name="number2">2</string>
+    <string name="number3">3</string>
+    <string name="number4">4</string>
+    <string name="number5">5</string>
+    <string name="number6">6</string>
+    <string name="number7">7</string>
+    <string name="number8">8</string>
+    <string name="number9">9</string>
+    <string name="number10">10</string>
+    <string name="yes">はい</string>
+    <string name="no">いいえ</string>
+    <string name="newGameDialogAIDelayLabel">AIの手を遅くする（秒）</string>
+
+    <string name="newGameDialogHandicapListWievItem0">@string/none</string>
+    <string name="newGameDialogHandicapListWievItem2">@string/number2</string>
+    <string name="newGameDialogHandicapListWievItem3">@string/number3</string>
+    <string name="newGameDialogHandicapListWievItem4">@string/number4</string>
+    <string name="newGameDialogHandicapListWievItem5">@string/number5</string>
+    <string name="newGameDialogHandicapListWievItem6">@string/number6</string>
+    <string name="newGameDialogHandicapListWievItem7">@string/number7</string>
+    <string name="newGameDialogHandicapListWievItem8">@string/number8</string>
+    <string name="newGameDialogHandicapListWievItem9">@string/number9</string>
+
+    <string name="newGameDialogStrengthListWievItem1">1（高速）</string>
+    <string name="newGameDialogStrengthListWievItem2">@string/number2</string>
+    <string name="newGameDialogStrengthListWievItem3">@string/number3</string>
+    <string name="newGameDialogStrengthListWievItem4">@string/number4</string>
+    <string name="newGameDialogStrengthListWievItem5">@string/number5</string>
+    <string name="newGameDialogStrengthListWievItem6">@string/number6</string>
+    <string name="newGameDialogStrengthListWievItem7">@string/number7</string>
+    <string name="newGameDialogStrengthListWievItem8">@string/number8</string>
+    <string name="newGameDialogStrengthListWievItem9">@string/number9</string>
+    <string name="newGameDialogStrengthListWievItem10">10（強）</string>
+
+    <string name="newGameDialogKomiListWievItem1">@string/none</string>
+    <string name="newGameDialogKomiListWievItem2">0.5</string>
+    <string name="newGameDialogKomiListWievItem3">5.5</string>
+    <string name="newGameDialogKomiListWievItem4">6.5</string>
+
+    <string name="newGameDialogScoringJapaneseListWievItem">日本式</string>
+    <string name="newGameDialogScoringChineseListWievItem">中国式</string>
+    <string name="saveGameFailedAlertMessage" formatted="false">ファイル \'%s\' への保存に失敗しました。</string>
+    <string name="chooseVariationText">変化図を選択</string>
+    <string name="menuToStartLabel">初手へ</string>
+    <string name="goProblemFileInfo">問題 (Go)</string>
+    <string name="menuShowTerritoryLabel">@string/territoryLabelText</string>
+    <string name="menuShareGameLabel">局を共有</string>
+</resources>
