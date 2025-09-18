@@ -5,7 +5,7 @@
 -- The word "Capture" is now always the right size
 -- MainActivity is now an AppCompactActivity
 -- Can only save/load to app specific directory
-- Fixed layout issues (some self infliced from other changes)
+- Fixed layout issues (some self inflicted from other changes)
 -- score row is always taking up space even if empty
 -- Scaling and sizing updates (it looks right on a foldable phone)
 - Adding 'do not resign' option
