@@ -94,6 +94,7 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	</string>
 	<string name="BYauthorText">av</string>
 	<!-- game BY author-->
+	<string name="RefreshedByAuthorText">Oppdatert av</string> <!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Spilleregler</string>
 	<string name="goRulesUrl" formatted="false"><![CDATA[\
 http://gobase.org/studying/rules/?id=11&ln=no

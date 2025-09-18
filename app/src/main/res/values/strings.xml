@@ -90,6 +90,7 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 		Estimating score…
 	</string>
 	<string name="BYauthorText">by</string><!-- game BY author-->
+	<string name="RefreshedByAuthorText">Refreshed by</string>
 	<string name="goRulesText">Game rules</string>
 	<string name="goRulesUrl" formatted="false">
 		http://en.wikipedia.org/wiki/Go_%28game%29#Basic_rules

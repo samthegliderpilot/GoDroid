@@ -94,6 +94,7 @@ GNU Go это искусственный интеллект (бот), котор
 	</string>
 	<string name="BYauthorText">от</string>
 	<!-- game BY author-->
+	<string name="RefreshedByAuthorText">Обновлено</string> <!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Правила игры</string>
 	<string name="goRulesUrl" formatted="false">
 		http://playgo.to/interactive/russian/

@@ -94,6 +94,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 		Schätzt Spielergebnis…
 	</string>
 	<string name="BYauthorText">von</string><!-- game BY author-->
+	<string name="RefreshedByAuthorText">Aktualisiert von</string> <!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Spielregeln</string>
 	<string name="goRulesUrl" formatted="false">
 		http://de.wikipedia.org/wiki/Go_%28Spiel%29#Regeln_in_K.C3.BCrze

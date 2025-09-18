@@ -21,36 +21,46 @@
 	</string>
 	<string name="authorName">Andreas Grothe</string>
 	<string name="authorMailUrl">mailto:a@b.com</string>
-	<string name="infoDialogText" formatted="false">
-		<![CDATA[
-<html>
-<head>
-	<style type="text/css">
-		body { color: white }
-		a { color: white }
-	</style>
-</head>
-<body>
-	<center>
-	<p>
-		%s %s<br/>
-		%s<br/>
-		<a href="%s">%s</a>
-	</p>
-	<p>
-		<a href="%s">%s</a>
-	</p>
-	<p>
-		<a href="%s">%s</a>
-	</p>
-	<p>
-		<a href="%s">%s</a>
-	</p>
-	</center>
-</body>
-</html>
-		]]>
-	</string>
+	<string name="refresherName">Sam Gilbert</string>
+	<string name="refresherUrl">mailto:c@d.com</string>
+	<string name="infoDialogText" formatted="false"><![CDATA[
+		<html>
+		<head>
+			<style type="text/css">
+				body {
+					background-color: #202020;
+					color: #FFFFFF;
+				}
+				a {
+					color: #FFFFFF;
+				}
+			</style>
+		</head>
+		<body>
+			<center>
+			<p>
+				%s %s<br/>
+				%s<br/>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				%s<br/>
+				<a href="%s">%s</a>
+			</p>
+			</center>
+		</body>
+		</html>
+		]]></string>
+
 
 	<color name="transparentColor">@android:color/transparent</color>
 	<color name="textColor">@android:color/white</color>

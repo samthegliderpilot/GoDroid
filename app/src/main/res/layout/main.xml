@@ -3,7 +3,7 @@
     android:fitsSystemWindows="true"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
-	<!-- TODO: Is this height ok in the image view?-->
+	
 		<ImageView
 			android:id="@+id/topArtImage"
 			android:layout_width="match_parent"

@@ -2026,18 +2026,22 @@ void showInfo ()
 		final WebView webView = new WebView (this);
 		webView.loadDataWithBaseURL (null,
 			resources.getString (R.string.infoDialogText,
-				appInfo._appName,
-				appInfo._appVersion,
-				resources.getString (R.string.BYauthorText),
-				resources.getString (R.string.authorMailUrl),
-				resources.getString (R.string.authorName),
-				resources.getString (R.string.goRulesUrl),
-				resources.getString (R.string.goRulesText),
-				resources.getString (R.string.godroidProjectUrl),
-				resources.getString (R.string.projectHomepageText),
-				resources.getString (R.string.gnugoProjectUrl),
-				resources.getString (R.string.gnuGoHomepageText)),
-			"text/html", "utf-8", null);
+			appInfo._appName,                            // %s 1
+			appInfo._appVersion,                         // %s 2
+			resources.getString(R.string.BYauthorText),  // %s 3
+			resources.getString(R.string.authorMailUrl), // %s 4
+			resources.getString(R.string.authorName),    // %s 5
+			resources.getString(R.string.goRulesUrl),    // %s 6
+			resources.getString(R.string.goRulesText),   // %s 7
+			resources.getString(R.string.godroidProjectUrl), // %s 8
+			resources.getString(R.string.projectHomepageText), // %s 9
+			resources.getString(R.string.gnugoProjectUrl), // %s 10
+			resources.getString(R.string.gnuGoHomepageText), // %s 11
+			resources.getString(R.string.RefreshedByAuthorText), // %s 12
+			resources.getString(R.string.refresherUrl),  // %s 13
+			resources.getString(R.string.refresherName)),  // %s 14
+				"text/html", "utf-8", null);
+
 		webView.setNetworkAvailable (false);
 		webView.setBackgroundColor (Color.TRANSPARENT);
 		new AlertDialog.Builder (this).

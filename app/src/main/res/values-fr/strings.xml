@@ -90,6 +90,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 		Calcul du score…
 	</string>
 	<string name="BYauthorText">par</string><!-- game BY author-->
+	<string name="RefreshedByAuthorText">Mis à jour par</string> <!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Régle du Jeu</string>
 	<string name="goRulesUrl" formatted="false">
 		http://fr.wikipedia.org/wiki/Jeu_de_go#Abr.C3.A9g.C3.A9_des_r.C3.A8gles_du_jeu
