@@ -1,3 +1,17 @@
+2025-09-17 GOdroid v1.4.0
+- Updated to work in modern Android Ecosystems
+-- gnugo compiled to 64 bit
+-- set the 16kb alignment fix
+-- The word "Capture" is now always the right size
+-- MainActivity is now an AppCompactActivity
+-- Can only save/load to app specific directory
+- Fixed layout issues (some self infliced from other changes)
+-- score row is always taking up space even if empty
+-- Scaling and sizing updates (it looks right on a foldable phone)
+- Adding 'do not resign' option
+- Adding AI Delay option
+- Adding Japanese Localization (Chat GPT)
+
 2013-05-14 GOdroid v1.3.8
 - Fix for some tablet devices (menu button without function)
 
