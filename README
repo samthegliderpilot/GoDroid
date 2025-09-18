@@ -11,6 +11,7 @@
 - Adding 'do not resign' option
 - Adding AI Delay option
 - Adding Japanese Localization (Chat GPT)
+##NOTE: You must set gradle in Android Studio to use a Java version between 17 and 23 (inclusive)
 
 2013-05-14 GOdroid v1.3.8
 - Fix for some tablet devices (menu button without function)
