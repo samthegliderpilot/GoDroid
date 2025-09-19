@@ -89,13 +89,14 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="waitProgressEstimatingScoreMessage">
 		Eredmény becslés…
 	</string>
-	<string name="BYauthorText">írta</string><!-- game BY author-->
-	<string name="RefreshedByAuthorText">Frissítette</string> <!-- Translation Provided by ChatGPT -->
+	<string name="BYauthorText">Eredetileg</string><!-- Translation Provided by ChatGPT -->
+	<string name="RefreshedByAuthorText">Fentartja</string><!-- Translation Provided by ChatGPT -->
+	<string name="oldProjectHomepageText">Eredeti projekt honlapja</string><!-- Translation Provided by ChatGPT -->
+	<string name="currentProjectHomepageText">Jelenlegi projekt honlapja</string><!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Játékszabályok</string>
 	<string name="goRulesUrl" formatted="false">
 		http://hu.wikipedia.org/wiki/Go#J.C3.A1t.C3.A9kszab.C3.A1lyok
 	</string>
-	<string name="oldProjectHomepageText">Projekt honlap</string>
 	<string name="gnuGoHomepageText">GNU Go honlap</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

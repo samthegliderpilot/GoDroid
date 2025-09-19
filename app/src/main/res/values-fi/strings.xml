@@ -88,13 +88,14 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="waitProgressEstimatingScoreMessage">
 		Arvioidaan pistetilannetta…
 	</string>
-	<string name="BYauthorText">-</string><!-- game BY author-->
-	<string name="RefreshedByAuthorText">Päivittänyt</string> <!-- Translation Provided by ChatGPT -->
+	<string name="BYauthorText">Alun perin</string><!-- Translation Provided by ChatGPT -->
+	<string name="RefreshedByAuthorText">Ylläpitää</string><!-- Translation Provided by ChatGPT -->
+	<string name="oldProjectHomepageText">Alkuperäinen projektin kotisivu</string><!-- Translation Provided by ChatGPT -->
+	<string name="currentProjectHomepageText">Nykyinen projektin kotisivu</string><!-- Translation Provided by ChatGPT -->
 	<string name="goRulesText">Pelin säännöt</string>
 	<string name="goRulesUrl" formatted="false">
 		https://fi.wikipedia.org/wiki/Gon_s%C3%A4%C3%A4nn%C3%B6t
 	</string>
-	<string name="oldProjectHomepageText">Projektin kotisivu</string>
 	<string name="gnuGoHomepageText">GNU Go:n kotisivu</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

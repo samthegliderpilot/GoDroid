@@ -68,10 +68,11 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="waitProgressLastMoveMessage">等待最後壹步完成 …</string>
     <string name="waitProgressFinalScoreMessage">計算實地 …</string>
     <string name="waitProgressEstimatingScoreMessage">估算得分 …</string>
-    <string name="BYauthorText">by</string>
-    <string name="RefreshedByAuthorText">更新者</string> <!-- Translation Provided by ChatGPT -->
+    <string name="BYauthorText">原始作者：</string><!-- Translation Provided by ChatGPT -->
+    <string name="RefreshedByAuthorText">維護者：</string><!-- Translation Provided by ChatGPT -->
+    <string name="oldProjectHomepageText">專案原始主頁</string><!-- Translation Provided by ChatGPT -->
+    <string name="currentProjectHomepageText">專案目前主頁</string><!-- Translation Provided by ChatGPT -->
     <string name="goRulesText">規則</string>
-    <string name="oldProjectHomepageText">項目主頁</string>
     <string name="gnuGoHomepageText">GNU圍棋主頁</string>
     <string name="newGameDialogHumanPlaysBlackListWievItem"><b>黑棋</b> (電腦 白棋)</string>
     <string name="newGameDialogHumanPlaysWhiteListWievItem"><b>白棋</b> (電腦 黑棋)</string>

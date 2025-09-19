@@ -89,14 +89,14 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="waitProgressEstimatingScoreMessage">
 		Estimating score…
 	</string>
-	<string name="BYauthorText">by</string><!-- game BY author-->
-	<string name="RefreshedByAuthorText">Refreshed by</string>
+	<string name="BYauthorText">Originally By</string><!-- game BY author-->
+	<string name="RefreshedByAuthorText">Maintained By</string>
 	<string name="goRulesText">Game rules</string>
 	<string name="goRulesUrl" formatted="false">
 		http://en.wikipedia.org/wiki/Go_%28game%29#Basic_rules
 	</string>
-	<string name="oldProjectHomepageText">Original Project homepage</string>
-	<string name="currentProjectHomepageText">Current Project homepage</string>
+	<string name="oldProjectHomepageText">Original Project Homepage</string>
+	<string name="currentProjectHomepageText">Current Project Homepage</string>
 	<string name="gnuGoHomepageText">GNU Go homepage</string>
 
 	<string name="newGameDialogBoardSizeListWievItemSize9">9 × 9</string>

@@ -1991,15 +1991,18 @@ void showInfo ()
 			resources.getString(R.string.BYauthorText),  // %s 3
 			resources.getString(R.string.authorMailUrl), // %s 4
 			resources.getString(R.string.authorName),    // %s 5
-			resources.getString(R.string.goRulesUrl),    // %s 6
-			resources.getString(R.string.goRulesText),   // %s 7
-			resources.getString(R.string.godroidProjectUrl), // %s 8
-			resources.getString(R.string.oldProjectHomepageText), // %s 9
-			resources.getString(R.string.gnugoProjectUrl), // %s 10
-			resources.getString(R.string.gnuGoHomepageText), // %s 11
-			resources.getString(R.string.RefreshedByAuthorText), // %s 12
-			resources.getString(R.string.refresherUrl),  // %s 13
-			resources.getString(R.string.refresherName)),  // %s 14
+			resources.getString(R.string.RefreshedByAuthorText), // %s 6
+			resources.getString(R.string.refresherUrl),  // %s 7
+			resources.getString(R.string.refresherName), //8
+			resources.getString(R.string.currentGodroidProjectUrl), //9
+			resources.getString(R.string.currentProjectHomepageText), //10
+			resources.getString(R.string.goRulesUrl),    // %s 11
+			resources.getString(R.string.goRulesText),   // %s 12
+			resources.getString(R.string.godroidProjectUrl), // %s 13
+			resources.getString(R.string.oldProjectHomepageText), // %s 14
+			resources.getString(R.string.gnugoProjectUrl), // %s 15
+			resources.getString(R.string.gnuGoHomepageText) // %s 16
+			),
 				"text/html", "utf-8", null);
 
 		webView.setNetworkAvailable (false);

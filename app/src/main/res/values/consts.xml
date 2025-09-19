@@ -17,7 +17,7 @@
 		http://sourceforge.net/projects/godroid/
 	</string>
 	<string name="currentGodroidProjectUrl">
-		http://sourceforge.net/projects/godroid/
+		https://github.com/samthegliderpilot/GoDroid
 	</string>
 	<string name="gnugoProjectUrl">
 		http://www.gnu.org/software/gnugo/
@@ -47,23 +47,25 @@
 				<a href="%s">%s</a>
 			</p>
 			<p>
-				<a href="%s">%s</a>
-			</p>
-			<p>
-				<a href="%s">%s</a>
-			</p>
-			<p>
-				<a href="%s">%s</a>
-			</p>
-			<p>
 				%s<br/>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
+				<a href="%s">%s</a>
+			</p>
+			<p>
 				<a href="%s">%s</a>
 			</p>
 			</center>
 		</body>
 		</html>
 		]]></string>
-
 
 	<color name="transparentColor">@android:color/transparent</color>
 	<color name="textColor">@android:color/white</color>
