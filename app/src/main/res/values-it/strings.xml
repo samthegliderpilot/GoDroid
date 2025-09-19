@@ -96,7 +96,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="goRulesUrl" formatted="false">
 		http://it.wikipedia.org/wiki/Go_(gioco)#Regole_di_base
 	</string>
-	<string name="projectHomepageText">Homepage progetto</string>
+	<string name="oldProjectHomepageText">Homepage progetto</string>
 	<string name="gnuGoHomepageText">Homepage GNU Go</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

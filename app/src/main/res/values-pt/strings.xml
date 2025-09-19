@@ -96,7 +96,7 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="goRulesUrl" formatted="false">
 		http://go.alamino.net/aprendajogargo/regras-basicas
 	</string>
-	<string name="projectHomepageText">Homepage do projeto</string>
+	<string name="oldProjectHomepageText">Homepage do projeto</string>
 	<string name="gnuGoHomepageText">Homepage do GNU Go</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

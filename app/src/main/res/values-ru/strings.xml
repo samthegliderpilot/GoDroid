@@ -99,7 +99,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="goRulesUrl" formatted="false">
 		http://playgo.to/interactive/russian/
 	</string>
-	<string name="projectHomepageText">Главная страница проекта</string>
+	<string name="oldProjectHomepageText">Главная страница проекта</string>
 	<string name="gnuGoHomepageText">Главная страница GNU Go</string>
 	<string name="newGameDialogHumanPlaysBlackListWievItem">
 		<b>Черными</b> (компьютер белыми)

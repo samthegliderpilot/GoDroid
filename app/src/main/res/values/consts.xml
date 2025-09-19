@@ -16,6 +16,9 @@
 	<string name="godroidProjectUrl">
 		http://sourceforge.net/projects/godroid/
 	</string>
+	<string name="currentGodroidProjectUrl">
+		http://sourceforge.net/projects/godroid/
+	</string>
 	<string name="gnugoProjectUrl">
 		http://www.gnu.org/software/gnugo/
 	</string>

@@ -95,7 +95,7 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="goRulesUrl" formatted="false">
 		http://go.art.pl/kurs
 	</string>
-	<string name="projectHomepageText">Strona projektu</string>
+	<string name="oldProjectHomepageText">Strona projektu</string>
 	<string name="gnuGoHomepageText">Strona GNU Go</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

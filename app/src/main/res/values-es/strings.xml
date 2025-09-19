@@ -95,7 +95,7 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="goRulesUrl" formatted="false">
 		http://es.wikipedia.org/wiki/Go#Las_seis_reglas_b.C3.A1sicas_del_go
 	</string>
-	<string name="projectHomepageText">Página principal del proyecto</string>
+	<string name="oldProjectHomepageText">Página principal del proyecto</string>
 	<string name="gnuGoHomepageText">Página principal de GNU Go</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

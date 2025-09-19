@@ -95,7 +95,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="goRulesUrl" formatted="false">
 		http://ro.wikipedia.org/wiki/Go_(joc)#Reguli
 	</string>
-	<string name="projectHomepageText">Pagina de web a proiectului</string>
+	<string name="oldProjectHomepageText">Pagina de web a proiectului</string>
 	<string name="gnuGoHomepageText">Pagina de web a programului GNU Go</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

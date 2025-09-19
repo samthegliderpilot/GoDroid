@@ -73,7 +73,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="RefreshedByAuthorText">更新者</string>
     <string name="goRulesText">碁のルール</string>
     <string name="goRulesUrl" formatted="false">http://ja.wikipedia.org/wiki/囲碁</string>
-    <string name="projectHomepageText">プロジェクト ホームページ</string>
+    <string name="oldProjectHomepageText">プロジェクト ホームページ</string>
     <string name="gnuGoHomepageText">GNU Go ホームページ</string>
 
     <string name="newGameDialogBoardSizeListWievItemSize9">9 × 9</string>

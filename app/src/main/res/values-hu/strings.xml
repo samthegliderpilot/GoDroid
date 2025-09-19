@@ -95,7 +95,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="goRulesUrl" formatted="false">
 		http://hu.wikipedia.org/wiki/Go#J.C3.A1t.C3.A9kszab.C3.A1lyok
 	</string>
-	<string name="projectHomepageText">Projekt honlap</string>
+	<string name="oldProjectHomepageText">Projekt honlap</string>
 	<string name="gnuGoHomepageText">GNU Go honlap</string>
 
 	<string name="newGameDialogHumanPlaysBlackListWievItem">

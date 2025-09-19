@@ -1994,7 +1994,7 @@ void showInfo ()
 			resources.getString(R.string.goRulesUrl),    // %s 6
 			resources.getString(R.string.goRulesText),   // %s 7
 			resources.getString(R.string.godroidProjectUrl), // %s 8
-			resources.getString(R.string.projectHomepageText), // %s 9
+			resources.getString(R.string.oldProjectHomepageText), // %s 9
 			resources.getString(R.string.gnugoProjectUrl), // %s 10
 			resources.getString(R.string.gnuGoHomepageText), // %s 11
 			resources.getString(R.string.RefreshedByAuthorText), // %s 12
