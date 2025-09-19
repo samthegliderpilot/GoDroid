@@ -6,7 +6,7 @@
 -- MainActivity is now an AppCompactActivity
 -- Can only save/load to app specific directory
 - Fixed layout issues (some self inflicted from other changes)
--- score row is always taking up space even if empty
+-- Score row is always taking up space even if empty
 -- Scaling and sizing updates (it looks right on a foldable phone)
 - Adding 'do not resign' option
 - Adding AI Delay option
