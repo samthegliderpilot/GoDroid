@@ -18,7 +18,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="territoryLabelText">Alue</string>
 	<string name="scoreLabelText">Tulos</string>
 	<string name="tapHintText">Paina kiveä pelataksesi.\nPaina pitkään zoomataksesi.</string>
-	<string name="menuNewGameLabel">Uusi peli</string>
+	<string name="menuNewEditGameLabel">Uusi/Muokkaa Peliä</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Passaa</string>
 	<string name="menuPassShortcut">P</string>
@@ -59,7 +59,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="noFiles2load" formatted="false">
 		Ei löytynyt .sgf-tiedostoa \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Ihminen pelaa</string>
 	<string name="newGameDialogBoardSizeLabel">Laudan koko</string>
 	<string name="newGameDialogHandicapLabel">Tasoitus</string>

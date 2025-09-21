@@ -19,7 +19,7 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="territoryLabelText">Terytorium</string>
 	<string name="scoreLabelText">Wynik</string>
 	<string name="tapHintText">Dotknij kamień by zagrać.\nPrzytrzymaj by powiększyć.</string>
-	<string name="menuNewGameLabel">Nowa Gra</string>
+	<string name="menuNewEditGameLabel">Nowa/Edytuj Grę</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Pas</string>
 	<string name="menuPassShortcut">R</string>
@@ -60,7 +60,7 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="noFiles2load" formatted="false">
 		Nie znaleziono plików .sgf w \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Kolor kamieni gracza</string>
 	<string name="newGameDialogBoardSizeLabel">Wielkość Planszy</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>

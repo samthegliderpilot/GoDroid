@@ -20,7 +20,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="territoryLabelText">地</string>
     <string name="scoreLabelText">勝敗点数</string>
     <string name="tapHintText">石をタップして打つ。\n長押しで拡大。</string>
-    <string name="menuNewGameLabel">新局</string>
+    <string name="menuNewEditGameLabel">新規／編集対局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
     <string name="menuPassLabel">パス</string>
     <string name="menuPassShortcut">P</string>
@@ -48,7 +48,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="deleteButtonLabel">削除</string>
     <string name="failedLoadingGameAlertMessage" formatted="false">ファイル \'%s\' の読み込みに失敗しました。</string>
     <string name="noFiles2load" formatted="false">フォルダー \'%s\' に .sgf ファイルが見つかりません。</string>
-    <string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+    <string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
     <string name="newGameDialogHumanPlaysLabelText">人間が先手</string>
     <string name="newGameDialogBoardSizeLabel">盤のサイズ</string>
     <string name="newGameDialogHandicapLabel">ハンディキャップ</string>

@@ -18,7 +18,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="territoryLabelText">Terület</string>
 	<string name="scoreLabelText">Eredmény</string>
 	<string name="tapHintText">Érintse meg a követ a lépéshez.\nHosszú érintéssel nagyíthat.</string>
-	<string name="menuNewGameLabel">Új játék</string>
+	<string name="menuNewEditGameLabel">Új/Játék Szerkesztése</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">U</string>
 	<string name="menuPassLabel">Passz</string>
 	<string name="menuPassShortcut">P</string>
@@ -60,7 +60,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="noFiles2load" formatted="false">
 		Nincs .sgf file a  \'%s\' könyvtárban.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Az Ön színe</string>
 	<string name="newGameDialogBoardSizeLabel">Táblaméret</string>
 	<string name="newGameDialogHandicapLabel">Előnykő</string>

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:a="http://schemas.android.com/apk/res/android">
 	<item a:id="@+id/menuNewGame"
-		a:title="@string/menuNewGameLabel"
+		a:title="@string/menuNewEditGameLabel"
 		a:alphabeticShortcut="@string/menuNewGameShortcut"
 		a:icon="@drawable/newGameMenuIcon"/>
 	<item a:id="@+id/menuUndo"

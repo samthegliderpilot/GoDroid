@@ -19,7 +19,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="territoryLabelText">Teritoriu</string>
 	<string name="scoreLabelText">Scor</string>
 	<string name="tapHintText">Apăsati de două ori în acelaşi loc pentru a juca o piesă.\nŢine apăsat lung pentru a mări.</string>
-	<string name="menuNewGameLabel">Joc nou</string>
+	<string name="menuNewEditGameLabel">Joc Nou/Editare</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Pas</string>
 	<string name="menuPassShortcut">P</string>
@@ -60,7 +60,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="noFiles2load" formatted="false">
 		Nu am gasit nici un fişier cu extensia .sgf în directorul \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Omul joacă cu</string>
 	<string name="newGameDialogBoardSizeLabel">Dimensiunea tablei</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>

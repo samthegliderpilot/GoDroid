@@ -19,7 +19,7 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="territoryLabelText">實地</string>
     <string name="scoreLabelText">得分</string>
     <string name="tapHintText">點棋落子\n長按放大</string>
-    <string name="menuNewGameLabel">新棋局</string>
+    <string name="menuNewEditGameLabel">新增/編輯對局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
     <string name="menuPassLabel">虛手</string>
     <string name="menuPassShortcut">P</string>
@@ -46,7 +46,7 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="deleteButtonLabel">刪除</string>
     <string name="failedLoadingGameAlertMessage" formatted="false">載入 \'%s\'.文件失敗</string>
     <string name="noFiles2load">\'%s\'.裏沒有 .sgf 文件</string>
-    <string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+    <string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
     <string name="newGameDialogHumanPlaysLabelText">棋手</string>
     <string name="newGameDialogBoardSizeLabel">棋盤</string>
     <string name="newGameDialogHandicapLabel">讓子</string>

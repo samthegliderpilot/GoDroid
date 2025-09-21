@@ -590,7 +590,10 @@ void handleMessage (
 		long elapsed = System.currentTimeMillis() - startTime;
 		int desiredDelay = gameInfo._aiDelaySeconds * 1000;
 		long remainingDelay = desiredDelay - elapsed;
-
+		if (!genMove)
+		{
+			remainingDelay = 0;
+		}
 		Runnable continueRunnable = () -> {
 			if (gameInfo._invalid)
 			{

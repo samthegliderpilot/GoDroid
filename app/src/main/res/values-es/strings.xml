@@ -19,7 +19,7 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="territoryLabelText">Territorio</string>
 	<string name="scoreLabelText">Puntuación</string>
 	<string name="tapHintText">Pulsa sobre una piedra para jugar.\nLong pulsa para acercar.</string>
-	<string name="menuNewGameLabel">Nueva Partida</string>
+	<string name="menuNewEditGameLabel">Nuevo/Editar Partida</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Pasar</string>
 	<string name="menuPassShortcut">P</string>
@@ -60,7 +60,7 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="noFiles2load" formatted="false">
 		Sin ficheros .sgf encontrados en \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Jugador juega</string>
 	<string name="newGameDialogBoardSizeLabel">Tamaño del tablero</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>

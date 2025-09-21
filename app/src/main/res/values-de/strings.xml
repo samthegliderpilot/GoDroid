@@ -21,7 +21,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="tapHintText">
 		Tippen zum Setzen\nDrücken für Zoom
 	</string>
-	<string name="menuNewGameLabel">Neues Spiel</string>
+	<string name="menuNewEditGameLabel">Neu/Spiel Bearbeiten</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Passen</string>
 	<string name="menuPassShortcut">P</string>
@@ -64,7 +64,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="noFiles2load" formatted="false">
 		Keine .sgf Dateien in \'%s\' gefunden.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Du spielst</string>
 	<string name="newGameDialogBoardSizeLabel">Brettgröße</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>

@@ -18,7 +18,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="territoryLabelText">Territoire</string>
 	<string name="scoreLabelText">Score</string>
 	<string name="tapHintText">Tapoter la pierre pour valider.\nAppuie long pour zoomer.</string>
-	<string name="menuNewGameLabel">Nouvelle Partie</string>
+	<string name="menuNewEditGameLabel">Nouveau/Modifier Partie</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Passer</string>
 	<string name="menuPassShortcut">P</string>
@@ -60,7 +60,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="noFiles2load" formatted="false">
 		Aucun fichier .sgf trouvé dans \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Le Joueur joue les</string>
 	<string name="newGameDialogBoardSizeLabel">Taille du plateau</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>

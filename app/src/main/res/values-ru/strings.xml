@@ -17,7 +17,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="territoryLabelText">Территория</string>
 	<string name="scoreLabelText">Очки</string>
 	<string name="tapHintText">Коснитесь камня для игры.\nДлинное нажатие для масштаба.</string>
-	<string name="menuNewGameLabel">Новая игра</string>
+	<string name="menuNewEditGameLabel">Новая/Редактировать игру</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
 	<string name="menuPassLabel">Пас</string>
 	<string name="menuPassShortcut">P</string>
@@ -59,7 +59,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="noFiles2load" formatted="false">
 		Не найдено .sgf файлов в \'%s\'.
 	</string>
-	<string name="newGameDialogTitle">@string/menuNewGameLabel</string>
+	<string name="newGameDialogTitle">@string/menuNewEditGameLabel</string>
 	<string name="newGameDialogHumanPlaysLabelText">Играет человек</string>
 	<string name="newGameDialogBoardSizeLabel">Размер доски</string>
 	<string name="newGameDialogHandicapLabel">Фора</string>

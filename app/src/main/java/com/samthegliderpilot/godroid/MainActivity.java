@@ -10,11 +10,21 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import android.animation.AnimatorSet;
+import android.animation.ObjectAnimator;
+import android.animation.ValueAnimator;
+import android.content.res.Configuration;
 import android.view.View;
+import android.view.WindowManager;
+import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
 
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -256,6 +266,9 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
+	EdgeToEdge.enable(this);
+
+
 	// 2
 
 	final String textViewTag = resources.getString (R.string.moveTextViewTag),
@@ -296,7 +309,8 @@ void onCreate ( // 0
 			popup.show();
 		}
 	});
-
+	//animatePulse(menuButton);
+	menuButton.post(() -> animatePulse(menuButton));
 	final View scoreView = _scoreView = findViewById (R.id.scoreView);
 	((ScoreView)scoreView)._gestureDetector =
 		new GestureDetector (this,
@@ -422,6 +436,20 @@ void onStart ()
 		onNewIntent (getIntent ());
 	}
 }
+	@Override
+	protected void onResume() {
+		super.onResume();
+
+		Window window = getWindow();
+		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+		window.setStatusBarColor(Color.BLACK); // or a dark color from your resources
+
+		WindowInsetsControllerCompat insetsController =
+				WindowCompat.getInsetsController(window, window.getDecorView());
+
+		// Because background is dark, force light icons
+		insetsController.setAppearanceLightStatusBars(false);
+	}
 
 @Override
 public
@@ -489,6 +517,24 @@ void onDestroy ()
 	}
 	super.onDestroy ();
 }
+
+	private void animatePulse(View view) {
+		ObjectAnimator scaleX = ObjectAnimator.ofFloat(view, "scaleX", 1f, 1.5f, 1f);
+		ObjectAnimator scaleY = ObjectAnimator.ofFloat(view, "scaleY", 1f, 1.5f, 1f);
+
+		// Set repeat count individually
+		scaleX.setRepeatCount(10);  // Number of *extra* repetitions
+		scaleY.setRepeatCount(10);
+		scaleX.setRepeatMode(ValueAnimator.RESTART);
+		scaleY.setRepeatMode(ValueAnimator.RESTART);
+
+		AnimatorSet pulse = new AnimatorSet();
+		pulse.playTogether(scaleX, scaleY);
+		pulse.setDuration(2000);
+		pulse.setInterpolator(new AccelerateDecelerateInterpolator());
+		pulse.start();
+	}
+
 
 public
 boolean onCreateOptionsMenu (
