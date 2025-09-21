@@ -13,7 +13,6 @@ import java.util.Set;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.res.Configuration;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -21,9 +20,11 @@ import android.widget.*;
 
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
-import androidx.annotation.ColorInt;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.app.AlertDialog;
@@ -50,7 +51,6 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
-import android.preference.PreferenceManager;
 import android.text.Editable;
 import android.text.Layout;
 import android.text.StaticLayout;
@@ -167,7 +167,7 @@ private
 List <File> _goProblems;
 
 private
-ProgressDialog _progressDialog;
+AlertDialog  _progressDialog;
 
 private
 TextView
@@ -423,6 +423,24 @@ void onCreate ( // 0
 				undo();
 			}
 		}
+	});
+
+
+	View rootView = findViewById(R.id.root_layout); // Set an ID to your root layout
+
+	ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
+		// Get the insets for system bars (status bar + nav bar)
+		Insets systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+
+		// Apply top padding equal to status bar height (like fitsSystemWindows used to)
+		v.setPadding(
+				v.getPaddingLeft(),
+				systemInsets.top,
+				v.getPaddingRight(),
+				systemInsets.bottom
+		);
+
+		return insets;
 	});
 }
 
@@ -1130,8 +1148,7 @@ void saveGame (
 					if (saveLoadGamesDir == null
 						|| inputText == null
 						|| ((sgfFileName = inputText.toString ()) == null)
-						|| ((sgfFileName = formatFileName (sgfFileName.trim ()))
-							.length () == 0))
+						|| ((sgfFileName = formatFileName(sgfFileName.trim())).isEmpty()))
 					{
 						final String fileName = sgfFileName;
 						showMessage (resources.getString (
@@ -1567,7 +1584,7 @@ void showCollectionList ()
 			if (pCachedView == null)
 			{
 				pCachedView = layoutInflater.
-					inflate (R.layout.load_game_list_entry, null);
+					inflate (R.layout.load_game_list_entry, pParent, false);
 				gameNameViews.add (pCachedView);
 				pCachedView.setOnClickListener (selectOnClickListener);
 				gameNameView = pCachedView.
@@ -1728,14 +1745,36 @@ showWaitProgress (
 {
 	if (_progressDialog == null)
 	{
-		_progressDialog = ProgressDialog.show (this, null, pMessage, true);
+		LinearLayout layout = new LinearLayout(this);
+		layout.setOrientation(LinearLayout.HORIZONTAL);
+		layout.setPadding(50, 50, 50, 50);
+		layout.setGravity(Gravity.CENTER_VERTICAL);
+
+		ProgressBar progressBar = new ProgressBar(this);
+		progressBar.setIndeterminate(true);
+		layout.addView(progressBar);
+
+		TextView message = new TextView(this);
+		message.setText(pMessage);
+		message.setPadding(50, 0, 0, 0);
+		message.setLayoutParams(new ViewGroup.LayoutParams(
+				ViewGroup.LayoutParams.WRAP_CONTENT,
+				ViewGroup.LayoutParams.WRAP_CONTENT));
+		layout.addView(message);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setCancelable(false);  // Blocks user interaction
+		builder.setView(layout);
+
+		_progressDialog = builder.create();
+		_progressDialog.show();
 		_gtp.hideWaitProgress ();
 	}
 }
 
 void hideWaitProgress ()
 {
-	final ProgressDialog progressDialog = _progressDialog;
+	final AlertDialog progressDialog = _progressDialog;
 	if (progressDialog != null)
 	{
 		progressDialog.dismiss ();
@@ -2086,7 +2125,7 @@ String getLongestString (
 		for (int colIdx = 0; colIdx < numCols; colIdx += 2)
 		{
 			final String column1 = columns[colIdx];
-			final boolean emptyCol = column1.length () == 0;
+			final boolean emptyCol = column1.isEmpty();
 			final String measureString =
 				column0String + (emptyCol ? ""
 					: (COLUMN_SEPARATOR + column1 + COLUMN_SEPARATOR))
