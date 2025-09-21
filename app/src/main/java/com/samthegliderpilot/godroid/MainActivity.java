@@ -29,7 +29,6 @@ import androidx.core.view.WindowInsetsControllerCompat;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
-import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
@@ -672,251 +671,257 @@ void enableMenuItem (
 		return false;
 	}
 
-private
-enum SpinnerEnum
-{
-	BoardSize (R.id.newGameDialogBoardSizeSpinner, R.array.boardSizes),
-	Handicap (R.id.newGameDialogHandicapSpinner, R.array.handicaps),
-	PlayerBlackWhite (R.id.newGameDialogHumanPlaysSpinner,
-		R.array.playerBlackWhiteValues, true),
-	Strength (R.id.newGameDialogStrengthSpinner, R.array.strengths, true),
-	Komi (R.id.newGameDialogKomiSpinner, R.array.komis, true),
-	Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings),
-	AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true),
-	AllowResignation(R.id.newGameDialogAllowResignSpinner, R.array.allowResignation, true);
-
-	final
-	int _spinnerResId;
-
-	private final
-	int _valuesResId;
-
-	final
-	boolean _mustChange;
-
 	private
-	Spinner _spinner;
-
-	private
-	TypedArray
-		_values,
-		_playerBlackHumanValues,
-		_playerWhiteHumanValues;
-	private
-	String[]
-		_stringValuesForAiDelay,
-		_stringValuesForAllowResignation;
-
-	private
-	Map <Object, Integer> _spinnerEntriesMap;
-
-	boolean _changed;
-
-	SpinnerEnum (
-		final int pSpinnerResId,
-		final int pResId
-		)
+	enum SpinnerEnum
 	{
-		this (pSpinnerResId, pResId, false);
-	}
+		BoardSize (R.id.newGameDialogBoardSizeSpinner, R.array.boardSizes),
+		Handicap (R.id.newGameDialogHandicapSpinner, R.array.handicaps),
+		PlayerBlackWhite (R.id.newGameDialogHumanPlaysSpinner,
+				R.array.playerBlackWhiteValues, true),
+		Strength (R.id.newGameDialogStrengthSpinner, R.array.strengths, true),
+		Komi (R.id.newGameDialogKomiSpinner, R.array.komis, true),
+		Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings),
+		AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true),
+		AllowResignation(R.id.newGameDialogAllowResignSpinner, R.array.allowResignation, true);
 
-	SpinnerEnum (
-		final int pSpinnerResId,
-		final int pResId,
-		final boolean pMustChange
-		)
-	{
-		_spinnerResId = pSpinnerResId;
-		_valuesResId = pResId;
-		_mustChange = pMustChange;
-	}
+		final
+		int _spinnerResId;
 
-	void init (
-		final Resources pResources,
-		final Spinner pSpinner
+		private final
+		int _valuesResId;
+
+		final
+		boolean _mustChange;
+
+		// Removed this field to fix memory leak
+		// private Spinner _spinner;
+
+		private
+		TypedArray
+				_values,
+				_playerBlackHumanValues,
+				_playerWhiteHumanValues;
+		private
+		String[]
+				_stringValuesForAiDelay,
+				_stringValuesForAllowResignation;
+
+		private
+		Map <Object, Integer> _spinnerEntriesMap;
+
+		boolean _changed;
+
+		SpinnerEnum (
+				final int pSpinnerResId,
+				final int pResId
 		)
-	{
-		_spinner = pSpinner;
-		final TypedArray values = _values =
-			pResources.obtainTypedArray (_valuesResId);
-		int numEntries = values.length ();
-		if (_spinnerEntriesMap == null)
 		{
-			_spinnerEntriesMap = Generics.newHashMap (numEntries);
+			this (pSpinnerResId, pResId, false);
 		}
-		if (this == AIDelay) {
-			_stringValuesForAiDelay = pResources.getStringArray(_valuesResId);
-			int numEntries2 = _stringValuesForAiDelay.length;
-			_spinnerEntriesMap = Generics.newHashMap(numEntries);
-			for (int idx = 0; idx < numEntries2; idx++) {
-				Integer value2 = Integer.valueOf(_stringValuesForAiDelay[idx]);
-				_spinnerEntriesMap.put(value2, idx);
+
+		SpinnerEnum (
+				final int pSpinnerResId,
+				final int pResId,
+				final boolean pMustChange
+		)
+		{
+			_spinnerResId = pSpinnerResId;
+			_valuesResId = pResId;
+			_mustChange = pMustChange;
+		}
+
+		void init (
+				final Resources pResources,
+				final Spinner pSpinner
+		)
+		{
+			// replaced usage of _spinner field by passed-in pSpinner where needed
+			final TypedArray values = _values =
+					pResources.obtainTypedArray (_valuesResId);
+			int numEntries = values.length ();
+			if (_spinnerEntriesMap == null)
+			{
+				_spinnerEntriesMap = Generics.newHashMap (numEntries);
 			}
-			return;
-		}
-		if (this == AllowResignation) {
-			_stringValuesForAllowResignation = pResources.getStringArray(_valuesResId);
-			int numEntries2 = _stringValuesForAllowResignation.length;
-			_spinnerEntriesMap = Generics.newHashMap(numEntries2);
-			for (int idx = 0; idx < numEntries2; idx++) {
-				String value = _stringValuesForAllowResignation[idx];
+			if (this == AIDelay) {
+				_stringValuesForAiDelay = pResources.getStringArray(_valuesResId);
+				int numEntries2 = _stringValuesForAiDelay.length;
+				_spinnerEntriesMap = Generics.newHashMap(numEntries);
+				for (int idx = 0; idx < numEntries2; idx++) {
+					Integer value2 = Integer.valueOf(_stringValuesForAiDelay[idx]);
+					_spinnerEntriesMap.put(value2, idx);
+				}
+				return;
+			}
+			if (this == AllowResignation) {
+				_stringValuesForAllowResignation = pResources.getStringArray(_valuesResId);
+				int numEntries2 = _stringValuesForAllowResignation.length;
+				_spinnerEntriesMap = Generics.newHashMap(numEntries2);
+				for (int idx = 0; idx < numEntries2; idx++) {
+					String value = _stringValuesForAllowResignation[idx];
+					_spinnerEntriesMap.put(value, idx);
+				}
+				return;
+			}
+			_spinnerEntriesMap = Generics.newHashMap(numEntries);
+			for (int idx = 0; idx < numEntries; idx++) {
+				Object value = "";
+				switch (values.peekValue(idx).type) {
+					case TypedValue.TYPE_STRING:
+						value = values.getString(idx);
+						break;
+					case TypedValue.TYPE_FLOAT:
+						value = values.getFloat(idx, 0);
+						break;
+					case TypedValue.TYPE_INT_DEC:
+					case TypedValue.TYPE_INT_HEX:
+						value = values.getInt(idx, 0);
+						break;
+					case TypedValue.TYPE_INT_BOOLEAN:
+						value = values.getBoolean(idx, false);
+						break;
+				}
 				_spinnerEntriesMap.put(value, idx);
 			}
-			return;
+
+			if (this == PlayerBlackWhite) {
+				_playerBlackHumanValues = pResources.obtainTypedArray(
+						R.array.playerBlackHumanValues);
+				_playerWhiteHumanValues = pResources.obtainTypedArray(
+						R.array.playerWhiteHumanValues);
+			}
 		}
-		_spinnerEntriesMap = Generics.newHashMap(numEntries);
-		for (int idx = 0; idx < numEntries; idx++) {
-			Object value = "";
-			switch (values.peekValue(idx).type) {
-				case TypedValue.TYPE_STRING:
-					value = values.getString(idx);
+
+		void setSpinnerSelection (
+				final GameInfo pGameInfo,
+				final Spinner pSpinner,
+				final Resources resources
+		)
+		{
+			Object val = 0;
+			switch (this)
+			{
+				case BoardSize:
+					val = pGameInfo._boardSize;
 					break;
-				case TypedValue.TYPE_FLOAT:
-					value = values.getFloat(idx, 0);
+				case Handicap:
+					val = pGameInfo._handicap;
 					break;
-				case TypedValue.TYPE_INT_DEC:
-				case TypedValue.TYPE_INT_HEX:
-					value = values.getInt(idx, 0);
+				case PlayerBlackWhite:
+					pSpinner.setSelection (_values.getInteger (
+							(pGameInfo._playerBlackHuman ? 2 : 0)
+									+ (pGameInfo._playerWhiteHuman ? 1 : 0), 0));
+					return;
+				case Strength:
+					val = pGameInfo._level;
 					break;
-				case TypedValue.TYPE_INT_BOOLEAN:
-					value = values.getBoolean(idx, false);
+				case Komi:
+					val = pGameInfo._komi;
+					break;
+				case Scoring:
+					val = pGameInfo._chineseRules;
+					break;
+				case AIDelay:
+					val = pGameInfo._aiDelaySeconds;
+					break;
+				case AllowResignation:
+					String yesString = resources.getString (R.string.yes);
+					String noString = resources.getString (R.string.no);
+					val = pGameInfo._allowResignation ? yesString : noString;
 					break;
 			}
-			_spinnerEntriesMap.put(value, idx);
+			pSpinner.setSelection (_spinnerEntriesMap.get (val));
 		}
 
-		if (this == PlayerBlackWhite) {
-			_playerBlackHumanValues = pResources.obtainTypedArray(
-					R.array.playerBlackHumanValues);
-			_playerWhiteHumanValues = pResources.obtainTypedArray(
-					R.array.playerWhiteHumanValues);
-		}
-	}
-
-	void setSpinnerSelection (
-		final GameInfo pGameInfo
+		void setHideStatus (
+				final GameInfo pGameInfo,
+				int pRow,
+				final Resources resources
 		)
-	{
-		Object val = 0;
-		switch (this)
 		{
-		case BoardSize:
-			val = pGameInfo._boardSize;
-			break;
-		case Handicap:
-			val = pGameInfo._handicap;
-			break;
-		case PlayerBlackWhite:
-			_spinner.setSelection (_values.getInteger (
-				(pGameInfo._playerBlackHuman ? 2 : 0)
-					+ (pGameInfo._playerWhiteHuman ? 1 : 0), 0));
-			return;
-		case Strength:
-			val = pGameInfo._level;
-			break;
-		case Komi:
-			val = pGameInfo._komi;
-			break;
-		case Scoring:
-			val = pGameInfo._chineseRules;
-			break;
-		case AIDelay:
-			val = pGameInfo._aiDelaySeconds;
-			break;
-		case AllowResignation:
-			String yesString = _resources.getString (R.string.yes);
-			String noString = _resources.getString (R.string.no);
-			val = pGameInfo._allowResignation ? yesString : noString;
-			break;
-		}
-		_spinner.setSelection (_spinnerEntriesMap.get (val));
-	}
-
-	void setHideStatus (
-		final GameInfo pGameInfo,
-		int pRow
-		)
-	{
-		Object value = 0;
-		switch (this)
-		{
-		case BoardSize:
-			value = pGameInfo._boardSize;
-			break;
-		case Handicap:
-			value = pGameInfo._handicap;
-			break;
-		case PlayerBlackWhite:
-			value = pRow;
-			pRow = (pGameInfo._playerBlackHuman ? 2 : 0)
-				+ (pGameInfo._playerWhiteHuman ? 1 : 0);
-			break;
-		case Strength:
-			value = pGameInfo._level;
-			break;
-		case Komi:
-			value = pGameInfo._komi;
-			break;
-		case Scoring:
-			value = pGameInfo._chineseRules;
-			break;
-		case AIDelay:
-			value = pGameInfo._aiDelaySeconds;
-			break;
-		case AllowResignation:
-			String yesString = _resources.getString (R.string.yes);
-			String noString = _resources.getString (R.string.no);
-			value = pGameInfo._allowResignation ? yesString : noString;
-			break;
-		}
-		_changed = pRow != _spinnerEntriesMap.get (value);
-	}
-
-	void setGameInfoValue (
-		final GameInfo pGameInfo
-		)
-	{
-		final int pos = _spinner.getSelectedItemPosition ();
-		switch (this)
-		{
-		case BoardSize:
-			pGameInfo._boardSize = _values.getInteger (pos, 0);
-			break;
-		case Handicap:
-			pGameInfo._handicap = _values.getInteger (pos, 0);
-			break;
-		case PlayerBlackWhite:
-			pGameInfo._playerBlackHuman =
-				_playerBlackHumanValues.getBoolean (pos, true);
-			pGameInfo._playerWhiteHuman =
-				_playerWhiteHumanValues.getBoolean (pos, true);
-			break;
-		case Strength:
-			pGameInfo._level = _values.getInteger (pos, 0);
-			break;
-		case Komi:
-			pGameInfo._komi = _values.getString (pos);
-			break;
-		case Scoring:
-			pGameInfo._chineseRules = _values.getBoolean (pos, false);
-			break;
-		case AIDelay:
-			if (_stringValuesForAiDelay != null) {
-				String selectedValue = _stringValuesForAiDelay[pos];
-				pGameInfo._aiDelaySeconds = Integer.parseInt(selectedValue);
+			Object value = 0;
+			switch (this)
+			{
+				case BoardSize:
+					value = pGameInfo._boardSize;
+					break;
+				case Handicap:
+					value = pGameInfo._handicap;
+					break;
+				case PlayerBlackWhite:
+					value = pRow;
+					pRow = (pGameInfo._playerBlackHuman ? 2 : 0)
+							+ (pGameInfo._playerWhiteHuman ? 1 : 0);
+					break;
+				case Strength:
+					value = pGameInfo._level;
+					break;
+				case Komi:
+					value = pGameInfo._komi;
+					break;
+				case Scoring:
+					value = pGameInfo._chineseRules;
+					break;
+				case AIDelay:
+					value = pGameInfo._aiDelaySeconds;
+					break;
+				case AllowResignation:
+					String yesString = resources.getString (R.string.yes);
+					String noString = resources.getString (R.string.no);
+					value = pGameInfo._allowResignation ? yesString : noString;
+					break;
 			}
-			break;
-		case AllowResignation:
-			if(_stringValuesForAllowResignation !=null) {
-				String selectedValue = _stringValuesForAllowResignation[pos];
-				pGameInfo._allowResignation = selectedValue.equals(
-						_resources.getString (R.string.yes)
-				);
+			_changed = pRow != _spinnerEntriesMap.get (value);
+		}
+
+		void setGameInfoValue (
+				final GameInfo pGameInfo,
+				final Spinner pSpinner,
+				final Resources resources
+		)
+		{
+			final int pos = pSpinner.getSelectedItemPosition ();
+			switch (this)
+			{
+				case BoardSize:
+					pGameInfo._boardSize = _values.getInteger (pos, 0);
+					break;
+				case Handicap:
+					pGameInfo._handicap = _values.getInteger (pos, 0);
+					break;
+				case PlayerBlackWhite:
+					pGameInfo._playerBlackHuman =
+							_playerBlackHumanValues.getBoolean (pos, true);
+					pGameInfo._playerWhiteHuman =
+							_playerWhiteHumanValues.getBoolean (pos, true);
+					break;
+				case Strength:
+					pGameInfo._level = _values.getInteger (pos, 0);
+					break;
+				case Komi:
+					pGameInfo._komi = _values.getString (pos);
+					break;
+				case Scoring:
+					pGameInfo._chineseRules = _values.getBoolean (pos, false);
+					break;
+				case AIDelay:
+					if (_stringValuesForAiDelay != null) {
+						String selectedValue = _stringValuesForAiDelay[pos];
+						pGameInfo._aiDelaySeconds = Integer.parseInt(selectedValue);
+					}
+					break;
+				case AllowResignation:
+					if(_stringValuesForAllowResignation !=null) {
+						String selectedValue = _stringValuesForAllowResignation[pos];
+						pGameInfo._allowResignation = selectedValue.equals(
+								resources.getString (R.string.yes)
+						);
+					}
+					break;
 			}
-			break;
 		}
 	}
-}
+
 
 private
 void initChangeGameDialog ()
@@ -959,7 +964,7 @@ void initChangeGameDialog ()
 				}
 				//noinspection SuspiciousMethodCalls
 				spinnerSpinnerEnumMap.get (pAdapterView).setHideStatus (
-					gameInfo, (int)pRow);
+					gameInfo, (int)pRow, _resources);
 				boolean showApplyButton = false;
 				for (final SpinnerEnum item : spinnerEnums)
 				{
@@ -1003,7 +1008,8 @@ void initChangeGameDialog ()
 				final GameInfo gameInfo = new GameInfo ();
 				for (final SpinnerEnum spinnerEnum : spinnerEnums)
 				{
-					spinnerEnum.setGameInfoValue (gameInfo);
+					final Spinner spinner = _changeGameDialog.findViewById(spinnerEnum._spinnerResId);
+					spinnerEnum.setGameInfoValue (gameInfo, spinner, _resources);
 				}
 				newGame (storeGameInfo (gameInfo), pView != applyButton);
 				dialog.dismiss ();
@@ -1031,7 +1037,8 @@ void showChangedGameDialog ()
 	final GameInfo gameInfo = _gameInfo;
 	for (final SpinnerEnum item : SpinnerEnum.values ())
 	{
-		item.setSpinnerSelection (gameInfo);
+		final Spinner spinner = _changeGameDialog.findViewById(item._spinnerResId);
+		item.setSpinnerSelection (gameInfo, spinner, _resources);
 	}
 	_changeGameDialog.show ();
 }
@@ -1063,15 +1070,22 @@ void shareGame (
 	final Uri pUri
 	)
 {
+
 	if (pUri == null)
 	{
 		return;
 	}
 	final Intent shareIntent = new Intent (Intent.ACTION_SEND);
-    //shareIntent.addFlags (Intent.FLAG_ACTIVITY_CLEAR_WHEN_TASK_RESET);
+	shareIntent.setType("application/x-go-sgf");
+	shareIntent.putExtra(Intent.EXTRA_STREAM, pUri);
+	shareIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
 	shareIntent.addFlags(Intent.FLAG_ACTIVITY_NEW_DOCUMENT);
-    shareIntent.setType ("text/*");
-    shareIntent.putExtra (Intent.EXTRA_STREAM, pUri);
+//    shareIntent.putExtra (Intent.EXTRA_STREAM, pUri);
+//	if (shareIntent.resolveActivity(getPackageManager()) != null) {
+//		startActivity(Intent.createChooser(shareIntent, "Share game via"));
+//	} else {
+//		Toast.makeText(this, "No app found to share the game", Toast.LENGTH_SHORT).show();
+	//}
 	startActivity (shareIntent);
 }
 
@@ -1767,7 +1781,7 @@ showWaitProgress (
 		builder.setView(layout);
 
 		_progressDialog = builder.create();
-		_progressDialog.show();
+		_progressDialog.show();	
 		_gtp.hideWaitProgress ();
 	}
 }

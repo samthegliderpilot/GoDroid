@@ -27,6 +27,8 @@ import com.samthegliderpilot.util.AssetsManager;
 import static com.samthegliderpilot.util.Logging.isEnabledFor;
 import static com.samthegliderpilot.util.Logging.log;
 
+import androidx.core.content.FileProvider;
+
 public
 class Gtp
 {
@@ -708,14 +710,19 @@ void handleMessage (
 			AssetsManager.copyFile (
 				new FileInputStream (_autoSaveGamePathFileName),
 				mainActivity.openFileOutput (
-					fileName, Context.MODE_WORLD_READABLE));
+					fileName, Context.MODE_PRIVATE));
 			final File copiedFile = mainActivity.getFileStreamPath (fileName);
 			if (copiedFile != null)
 			{
 				copiedFile.deleteOnExit ();
 			}
-			shareGameMain (
-				Uri.fromFile (mainActivity.getFileStreamPath (fileName)));
+			File file = mainActivity.getFileStreamPath(fileName);
+			Uri contentUri = FileProvider.getUriForFile(
+					mainActivity,
+					"com.samthegliderpilot.godroid.fileprovider", // must match manifest `authorities`
+					file
+			);
+			shareGameMain (	contentUri);
 		}
 		catch (final Exception ignored) {}
 		hideWaitProgress ();
