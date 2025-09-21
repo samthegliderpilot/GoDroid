@@ -29,4 +29,11 @@ boolean onTouchEvent (
 	_gestureDetector.onTouchEvent (pEvent);
 	return true;
 }
+
+	@Override
+	public boolean performClick() {
+		super.performClick();
+		// Handle click behavior here, or just leave it empty if no extra action needed
+		return true;
+	}
 }

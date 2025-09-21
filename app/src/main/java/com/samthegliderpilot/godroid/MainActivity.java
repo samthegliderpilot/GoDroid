@@ -310,7 +310,7 @@ void onCreate ( // 0
 	});
 	//animatePulse(menuButton);
 	menuButton.post(() -> animatePulse(menuButton));
-	final View scoreView = _scoreView = findViewById (R.id.scoreView);
+	final View scoreView = findViewById (R.id.scoreView);
 	((ScoreView)scoreView)._gestureDetector =
 		new GestureDetector (this,
 			new GestureDetector.SimpleOnGestureListener ()

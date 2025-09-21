@@ -55,8 +55,5 @@ String
 	_externalInputPathFileName;
 
 static
-View _scoreView;
-
-static
 Handler _mainHandler;
 }

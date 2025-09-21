@@ -25,8 +25,8 @@ import android.view.GestureDetector;
 import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.view.View;
 import android.widget.Toast;
-import static com.samthegliderpilot.godroid.Globals._scoreView;
 import static com.samthegliderpilot.godroid.Globals.*;
 
 import androidx.annotation.NonNull;
@@ -1142,7 +1142,8 @@ void showScoreBackground (
 	final boolean pShow
 	)
 {
-	_scoreView.setBackground (null);
+	final View scoreView = _mainActivity.findViewById(R.id.scoreView);
+	scoreView.setBackground (null);
 }
 
 public
