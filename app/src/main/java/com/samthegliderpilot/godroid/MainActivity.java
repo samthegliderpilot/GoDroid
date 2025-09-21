@@ -458,6 +458,7 @@ void onStart ()
 		super.onResume();
 
 		Window window = getWindow();
+		WindowCompat.setDecorFitsSystemWindows(window, false); //Maybe will fix deprecated warning in play store?
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 		window.setStatusBarColor(Color.BLACK); // or a dark color from your resources
 
@@ -1930,18 +1931,42 @@ AlertDialog showMessage (
 		show ();
 }
 
-void showPassMessage (
-	final boolean pColorBlack,
-	final boolean pResigned
-	)
-{
-	final Resources resources = _resources;
-	showMessage (
-		resources.getString (R.string.passedDialogMessageText,
-			resources.getString (pColorBlack ?
-				R.string.blackColorText : R.string.whiteColorText),
-			getPassedText (pResigned)));
-}
+	void showPassMessage(
+			final boolean pColorBlack,
+			final boolean pResigned
+	) {
+		final Resources resources = _resources;
+
+		String message = resources.getString(
+				R.string.passedDialogMessageText,
+				resources.getString(pColorBlack ? R.string.blackColorText : R.string.whiteColorText),
+				getPassedText(pResigned)
+		);
+
+		AlertDialog.Builder builder = new AlertDialog.Builder(this);
+		builder.setMessage(message);
+		builder.setCancelable(false);
+
+		// Play a Stone button (just dismiss)
+		builder.setPositiveButton("Play a stone", new DialogInterface.OnClickListener() {
+			public void onClick(DialogInterface dialog, int id) {
+				dialog.dismiss();
+				// Player will now place a move
+			}
+		});
+
+		// Pass button (triggers the same logic used for human passing)
+		builder.setNegativeButton(resources.getString(R.string.menuPassLabel), (dialog, id) -> {
+			dialog.dismiss();
+			runOnUiThread(() -> {
+				showMove(_gameInfo._playerBlackMoves, getPassedText(false));
+				nextMove(GameInfo.Passed._Passed);
+			});
+		});
+
+		AlertDialog alert = builder.create();
+		alert.show();
+	}
 
 String getPassedText (
 	final boolean pResigned
