@@ -113,8 +113,11 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="newGameDialogStrengthListWievItem10">10 (更強)</string>
     <string name="newGameDialogKomiListWievItem1">@string/none</string>
     <string name="newGameDialogKomiListWievItem2">0.5</string>
-    <string name="newGameDialogKomiListWievItem3">5.5</string>
-    <string name="newGameDialogKomiListWievItem4">6.5</string>
+    <string name="newGameDialogKomiListWievItem3">4.5</string>
+    <string name="newGameDialogKomiListWievItem4">5.5</string>
+    <string name="newGameDialogKomiListWievItem5">6.5</string>
+    <string name="newGameDialogKomiListWievItem6">7.5</string>
+    <string name="newGameDialogKomiListWievItem7">8.5</string>
     <string name="newGameDialogScoringJapaneseListWievItem">日（數目）</string>
     <string name="newGameDialogScoringChineseListWievItem">中（數子）</string>
 </resources>

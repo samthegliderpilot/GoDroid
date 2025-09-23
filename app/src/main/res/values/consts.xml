@@ -103,8 +103,11 @@
 
 	<string name="float0">0</string>
 	<string name="float0_5">0.5</string>
+	<string name="float4_5">4.5</string>
 	<string name="float5_5">5.5</string>
 	<string name="float6_5">6.5</string>
+	<string name="float7_5">7.5</string>
+	<string name="float8_5">8.5</string>
 
 	<string name="emptyString"></string>
 	<string name="fileNameTemplate">FILE_NAME</string>

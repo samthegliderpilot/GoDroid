@@ -93,12 +93,18 @@
 		<item>@string/newGameDialogKomiListWievItem2</item>
 		<item>@string/newGameDialogKomiListWievItem3</item>
 		<item>@string/newGameDialogKomiListWievItem4</item>
+		<item>@string/newGameDialogKomiListWievItem5</item>
+		<item>@string/newGameDialogKomiListWievItem6</item>
+		<item>@string/newGameDialogKomiListWievItem7</item>
 	</array>
 	<array name="komis">
 		<item>@string/float0</item>
 		<item>@string/float0_5</item>
+		<item>@string/float4_5</item>
 		<item>@string/float5_5</item>
 		<item>@string/float6_5</item>
+		<item>@string/float7_5</item>
+		<item>@string/float8_5</item>
 	</array>
 	<array name="newGameDialogScoringItems">
 		<item>@string/newGameDialogScoringJapaneseListWievItem</item>

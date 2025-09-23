@@ -149,9 +149,11 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 
 	<string name="newGameDialogKomiListWievItem1">@string/none</string>
 	<string name="newGameDialogKomiListWievItem2">0.5</string>
-	<string name="newGameDialogKomiListWievItem3">5.5</string>
-	<string name="newGameDialogKomiListWievItem4">6.5</string>
-
+	<string name="newGameDialogKomiListWievItem3">4.5</string>
+	<string name="newGameDialogKomiListWievItem4">5.5</string>
+	<string name="newGameDialogKomiListWievItem5">6.5</string>
+	<string name="newGameDialogKomiListWievItem6">7.5</string>
+	<string name="newGameDialogKomiListWievItem7">8.5</string>
 	<string name="newGameDialogScoringJapaneseListWievItem">Japonesa</string>
 	<string name="newGameDialogScoringChineseListWievItem">Chinesa</string>
 	<string name="saveGameFailedAlertMessage" formatted="false">
