@@ -4,7 +4,7 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
 }
-
+apply(from = "$rootDir/prepareGnugo.gradle.kts")
 android {
     namespace = "com.samthegliderpilot.godroid"
     compileSdk = 36
@@ -64,36 +64,6 @@ android {
     buildFeatures {
         compose = true
     }
-
-
-
-
-}
-
-// Clean up gnugo sources before copy
-tasks.named("clean") {
-    doFirst {
-        delete("$projectDir/src/main/cpp/gnugo-3.8")
-    }
-}
-
-// Copy base gnugo
-tasks.register<Copy>("copyGnugoSources") {
-    from("$rootDir/third_party/gnugo-3.8")
-    into("$projectDir/src/main/cpp/gnugo-3.8")
-}
-
-tasks.register<Copy>("copyGnugoPatches") {
-    from("$rootDir/patches/gnugo-3.8")
-    into("$projectDir/src/main/cpp/gnugo-3.8")
-    duplicatesStrategy = DuplicatesStrategy.INCLUDE
-}
-
-tasks.named("preBuild") {
-    dependsOn("copyGnugoPatches")
-}
-tasks.named("copyGnugoPatches") {
-    dependsOn("copyGnugoSources")
 }
 
 dependencies {
