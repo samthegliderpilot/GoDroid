@@ -4,7 +4,7 @@ import java.io.FileInputStream
 plugins {
     alias(libs.plugins.android.application)
 }
-apply(from = "$rootDir/prepareGnugo.gradle.kts")
+apply(from = "$rootDir/app/prepareGnugo.gradle.kts")
 android {
     namespace = "com.samthegliderpilot.godroid"
     compileSdk = 36
