@@ -421,6 +421,7 @@ void handleMessage (
 		return;
 	}
 	final BoardView boardView = _boardView;
+	boolean playerBlackMoves = gameInfo._playerBlackMoves;
 	switch (cmd)
 	{
 	case INIT_BOARD:
@@ -437,7 +438,7 @@ void handleMessage (
 			enableUndoMenu (gameInfo);
 			return;
 		}
-		boolean playerBlackMoves = gameInfo._playerBlackMoves;
+
 		Point undoPoint = null;
 		for (int numUndos = otherPlayerIsMachine (gameInfo) ? 2 : 1;
 			numUndos > 0; numUndos--)
@@ -532,7 +533,6 @@ void handleMessage (
 		reStartGame (((GameInfo [])pMessage.obj)[1].copy (gameInfo), false);
 		return;
 	case DRAW_BOARD:
-		playerBlackMoves = gameInfo._playerBlackMoves;
 		final List <Point> blackMoves = getStones (true, gameInfo),
 			whiteMoves = getStones (false, gameInfo),
 			redoPoints = gameInfo.getRedoPoints ();
@@ -587,7 +587,38 @@ void handleMessage (
 		// Generate move (synchronous)
 		final String move = playMove(genMove, playerBlackMovesPlayMove, lastMove,
 				gameInfo._boardSize);
+		if (gameInfo._invalid)
+		{
+			return;
+		}
 
+		final boolean resigned = _RESIGN.equals(move),
+				passed = _PASS.equals(move) || resigned;
+		if (genMove)
+		{
+			showMove(playerBlackMovesPlayMove,
+					passed ? _mainActivity.getPassedText(resigned) : move);
+			if (resigned)
+			{
+				showScore(0, 0, null);
+				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+				return;
+			}
+			gameInfo.addMove(passed ? Passed._Passed :
+					vertex2Point(move, gameInfo));
+		}
+		gameInfo._playerBlackMoves = !playerBlackMovesPlayMove;
+		saveGame(gameInfo, true);
+		if (gameInfo.bothPlayersPassed())
+		{
+			score(gameInfo, true);
+			finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+			return;
+		}
+		if (passed && playerIsMachine && !nextPlayerIsMachine)
+		{
+			_mainActivity.showPassMessage(playerBlackMovesPlayMove, resigned);
+		}
 		// END TIMING
 		long elapsed = System.currentTimeMillis() - startTime;
 		int desiredDelay = gameInfo._aiDelaySeconds * 1000;
@@ -597,37 +628,6 @@ void handleMessage (
 			remainingDelay = 0;
 		}
 		Runnable continueRunnable = () -> {
-			if (gameInfo._invalid)
-			{
-				return;
-			}
-			final boolean resigned = _RESIGN.equals(move),
-					passed = _PASS.equals(move) || resigned;
-			if (genMove)
-			{
-				showMove(playerBlackMovesPlayMove,
-						passed ? _mainActivity.getPassedText(resigned) : move);
-				if (resigned)
-				{
-					showScore(0, 0, null);
-					finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
-					return;
-				}
-				gameInfo.addMove(passed ? Passed._Passed :
-						vertex2Point(move, gameInfo));
-			}
-			gameInfo._playerBlackMoves = !playerBlackMovesPlayMove;
-			saveGame(gameInfo, true);
-			if (gameInfo.bothPlayersPassed())
-			{
-				score(gameInfo, true);
-				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
-				return;
-			}
-			if (passed && playerIsMachine && !nextPlayerIsMachine)
-			{
-				_mainActivity.showPassMessage(playerBlackMovesPlayMove, resigned);
-			}
 			drawBoard(gameInfo);
 			if (nextPlayerIsMachine)
 			{
