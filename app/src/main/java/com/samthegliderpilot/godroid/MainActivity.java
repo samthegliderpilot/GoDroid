@@ -458,9 +458,8 @@ void onStart ()
 		super.onResume();
 
 		Window window = getWindow();
-		WindowCompat.setDecorFitsSystemWindows(window, false); //Maybe will fix deprecated warning in play store?
+		WindowCompat.setDecorFitsSystemWindows(window, true);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
-		window.setStatusBarColor(Color.BLACK); // or a dark color from your resources
 
 		WindowInsetsControllerCompat insetsController =
 				WindowCompat.getInsetsController(window, window.getDecorView());

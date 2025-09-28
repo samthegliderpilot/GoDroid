@@ -12,8 +12,8 @@ android {
     defaultConfig {
         minSdk = 21
         targetSdk = 36
-        versionCode = 12
-        versionName = "1.4.0-RC3"
+        versionCode = 13
+        versionName = "1.4.0-RC4"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
@@ -104,4 +104,5 @@ dependencies {
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
     implementation(libs.appcompat)
+    implementation(libs.activity)
 }
