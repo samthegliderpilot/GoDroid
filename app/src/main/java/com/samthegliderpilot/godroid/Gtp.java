@@ -42,7 +42,7 @@ String
 	_WHITE_TERRITORY = "white_territory",
 	_DEAD = "dead";
 
-private static
+private
 enum Command
 {
 	DRAW_BOARD,
@@ -75,7 +75,6 @@ static
 	}
 }
 
-static
 enum GtpCommand
 {
 	SET_BOARDSIZE ("boardsize "),
@@ -614,15 +613,16 @@ void handleMessage (
 			score(gameInfo, true);
 			finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
 			return;
-		}
-		if (passed && playerIsMachine && !nextPlayerIsMachine)
-		{
-			_mainActivity.showPassMessage(playerBlackMovesPlayMove, resigned);
-		}
-		// END TIMING
+		}// END TIMING
 		long elapsed = System.currentTimeMillis() - startTime;
 		int desiredDelay = gameInfo._aiDelaySeconds * 1000;
 		long remainingDelay = desiredDelay - elapsed;
+		if (passed && playerIsMachine && !nextPlayerIsMachine)
+		{
+			_mainActivity.showPassMessage(playerBlackMovesPlayMove, resigned);
+			remainingDelay = 0;
+		}
+
 		if (!genMove)
 		{
 			remainingDelay = 0;
