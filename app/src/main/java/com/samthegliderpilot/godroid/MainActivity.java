@@ -18,7 +18,6 @@ import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
 
-import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -265,10 +264,6 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
-	EdgeToEdge.enable(this);
-
-
-	// 2
 
 	final String textViewTag = resources.getString (R.string.moveTextViewTag),
 		progressBarViewTag = resources.getString (R.string.moveProgressBarTag);
