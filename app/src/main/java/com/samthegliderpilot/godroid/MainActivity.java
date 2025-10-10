@@ -459,7 +459,7 @@ void onStart ()
 		super.onResume();
 
 		Window window = getWindow();
-		WindowCompat.setDecorFitsSystemWindows(window, true);
+		//WindowCompat.setDecorFitsSystemWindows(window, true);
 		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
 		WindowInsetsControllerCompat insetsController =

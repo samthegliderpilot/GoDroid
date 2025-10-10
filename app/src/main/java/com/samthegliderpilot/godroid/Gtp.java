@@ -2,6 +2,7 @@ package com.samthegliderpilot.godroid;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.StringTokenizer;
@@ -334,10 +335,12 @@ void shareGameMain (
 	executeMainCommand (MainCommand.SHARE_GAME, 0, 0, pUri);
 }
 
-static
-List <Point> getMarkers ()
-{
-	return _markers;
+static List<Point> getMarkers() {
+	List<Point> copy = new ArrayList<>();
+	for (Point p : _markers) {
+		copy.add(new Point(p)); // Deep copy
+	}
+	return copy;
 }
 
 static
