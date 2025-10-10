@@ -267,9 +267,9 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
-	if (Build.VERSION.SDK_INT >= 34) {
-		EdgeToEdge.enable(this);
-	}
+	//if (Build.VERSION.SDK_INT >= 34) {
+	//	EdgeToEdge.enable(this);
+	//}
 
 	final String textViewTag = resources.getString (R.string.moveTextViewTag),
 		progressBarViewTag = resources.getString (R.string.moveProgressBarTag);
@@ -426,13 +426,25 @@ void onCreate ( // 0
 	});
 
 
-	View rootView = findViewById(R.id.root_layout); // Set an ID to your root layout
+	Window window = getWindow();
 
+	// Opt-in to edge-to-edge layout (required for Android 14+ best practices)
+	WindowCompat.setDecorFitsSystemWindows(window, false);
+
+	// Draw behind system bars, but we'll add padding ourselves
+	window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+
+	WindowInsetsControllerCompat insetsController =
+			WindowCompat.getInsetsController(window, window.getDecorView());
+
+	// Make status bar icons light (dark background)
+	insetsController.setAppearanceLightStatusBars(false);
+
+	// Manually pad your root layout to avoid overlap
+	View rootView = findViewById(R.id.root_layout);
 	ViewCompat.setOnApplyWindowInsetsListener(rootView, (v, insets) -> {
-		// Get the insets for system bars (status bar + nav bar)
 		Insets systemInsets = insets.getInsets(WindowInsetsCompat.Type.systemBars());
 
-		// Apply top padding equal to status bar height (like fitsSystemWindows used to)
 		v.setPadding(
 				systemInsets.left,
 				systemInsets.top,
@@ -454,20 +466,20 @@ void onStart ()
 		onNewIntent (getIntent ());
 	}
 }
-	@Override
-	protected void onResume() {
-		super.onResume();
 
-		Window window = getWindow();
-		//WindowCompat.setDecorFitsSystemWindows(window, true);
-		window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
+@Override
+protected void onResume() {
+	super.onResume();
 
-		WindowInsetsControllerCompat insetsController =
-				WindowCompat.getInsetsController(window, window.getDecorView());
+	Window window = getWindow();
+	window.addFlags(WindowManager.LayoutParams.FLAG_DRAWS_SYSTEM_BAR_BACKGROUNDS);
 
-		// Because background is dark, force light icons
-		insetsController.setAppearanceLightStatusBars(false);
-	}
+	WindowInsetsControllerCompat insetsController =
+			WindowCompat.getInsetsController(window, window.getDecorView());
+
+	// Because background is dark, force light icons
+	insetsController.setAppearanceLightStatusBars(false);
+}
 
 @Override
 public
