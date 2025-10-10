@@ -13,11 +13,14 @@ import java.util.Set;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.os.Build;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
 import android.widget.*;
 
+//import androidx.activity.EdgeToEdge;
+import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
@@ -264,6 +267,9 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
+	if (Build.VERSION.SDK_INT >= 34) {
+		EdgeToEdge.enable(this);
+	}
 
 	final String textViewTag = resources.getString (R.string.moveTextViewTag),
 		progressBarViewTag = resources.getString (R.string.moveProgressBarTag);
@@ -428,9 +434,9 @@ void onCreate ( // 0
 
 		// Apply top padding equal to status bar height (like fitsSystemWindows used to)
 		v.setPadding(
-				v.getPaddingLeft(),
+				systemInsets.left,
 				systemInsets.top,
-				v.getPaddingRight(),
+				systemInsets.right,
 				systemInsets.bottom
 		);
 
