@@ -12,10 +12,10 @@ Major features include:
 - 9x9, 13x13 and 19x19 boards
 - Great touch controls for playing stones
 - Save and load SFG's
-- Localizted to many languages (some translations were made with ChatGPT)
+- Localized to many languages (some translations were made with ChatGPT)
 
 Besides updating API calls, recently added features are:
 - Disallowing the AI from resigning
 - Delaying the AI by some seconds (I don't like the games feeling frantic)
 
-I am not an Android developer, but I was able to fumble through the updaets that were needed.  If anyone has requests for new features, I'll do what I can.  Likewise, if anyone wants to fork this library, go right ahead, but I would also be willing to share this repo with you.
+I am not an Android developer, but I was able to fumble through the updates that were needed.  If anyone has requests for new features, I'll do what I can.  Likewise, if anyone wants to fork this library, go right ahead, but I would also be willing to share this repo with you.
