@@ -1,4 +1,8 @@
-2025-09-17 GOdroid v1.4.0
+2025-10-16 GoDroid 1.4.1
+- Fixing star points not showing up when resuming a session
+- Maybe fixing all edge-to-edge and depreceated api calls
+
+2025-09-17 GoDroid v1.4.0
 - Updated to work in modern Android Ecosystems
 -- gnugo compiled to 64 bit
 -- set the 16kb alignment fix
