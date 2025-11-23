@@ -168,5 +168,5 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="menuToStartLabel">To first move</string>
 	<string name="goProblemFileInfo">Go problem</string>
 	<string name="menuShowTerritoryLabel">@string/territoryLabelText</string>
-	<string name="menuShareGameLabel">Share game</string>
+	<string name="menuShareGameLabel">Share SGF</string>
 </resources>

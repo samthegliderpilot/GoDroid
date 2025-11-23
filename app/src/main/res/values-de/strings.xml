@@ -166,6 +166,6 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="chooseVariationText">Wähle Variante</string>
 	<string name="menuToStartLabel">Zum Anfang</string>
 	<string name="menuShowTerritoryLabel">Gebiet anzeigen</string>
-	<string name="menuShareGameLabel">Spiel teilen</string>
+	<string name="menuShareGameLabel">SGF teilen</string>
 	<string name="goProblemFileInfo">Go-Problem</string>
 </resources>

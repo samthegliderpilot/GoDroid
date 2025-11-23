@@ -163,4 +163,5 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="chooseVariationText">Scegli variazione</string>
 	<string name="menuToStartLabel">Replay</string>
 	<string name="goProblemFileInfo">Tsumego</string>
+    <string name="menuShareGameLabel">Condividi SGF</string>
 </resources>

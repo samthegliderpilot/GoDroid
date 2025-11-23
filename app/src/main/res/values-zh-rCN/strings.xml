@@ -30,6 +30,7 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="menuSaveLoadLabel">保存/载入</string>
     <string name="menuSaveLoadShortcut">S</string>
     <string name="menuSaveLabel">保存棋局</string>
+    <string name="menuShareGameLabel">分享 SGF</string>
     <string name="menuLoadLabel">载入棋局</string>
     <string name="menuInfoLabel">关于</string>
     <string name="menuInfoShortcut">I</string>

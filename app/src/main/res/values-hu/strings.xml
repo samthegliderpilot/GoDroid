@@ -162,4 +162,5 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="chooseVariationText">Változat választása</string>
 	<string name="menuToStartLabel">Ugrás az első lépéshez</string>
 	<string name="goProblemFileInfo">Go feladvány</string>
+    <string name="menuShareGameLabel">SGF megosztása</string>
 </resources>

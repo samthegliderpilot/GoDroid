@@ -155,4 +155,5 @@ http://gobase.org/studying/rules/?id=11&ln=no
 	<string name="newGameDialogKomiListWievItem7">8.5</string>
 	<string name="newGameDialogScoringJapaneseListWievItem">Japansk</string>
 	<string name="newGameDialogScoringChineseListWievItem">Kinesisk</string>
+    <string name="menuShareGameLabel">Del SGF</string>
 </resources>

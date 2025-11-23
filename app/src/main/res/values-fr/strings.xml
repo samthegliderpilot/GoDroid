@@ -162,5 +162,5 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="chooseVariationText">Choisir la variation</string>
 	<string name="menuToStartLabel">Aller au premier coup</string>
 	<string name="goProblemFileInfo">Exercise de Go</string>
-	<string name="menuShareGameLabel">Partager la partie</string>
+    <string name="menuShareGameLabel">Partager la partie</string>
 </resources>

@@ -161,4 +161,5 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	</string>
 	<string name="chooseVariationText">Escolha a variação</string>
 	<string name="menuToStartLabel">Replay</string>
+    <string name="menuShareGameLabel">Compartilhar SGF</string>
 </resources>

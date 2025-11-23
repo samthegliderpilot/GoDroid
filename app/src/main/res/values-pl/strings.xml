@@ -156,4 +156,5 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 
 	<string name="newGameDialogScoringJapaneseListWievItem">Japoński</string>
 	<string name="newGameDialogScoringChineseListWievItem">Chiński</string>
+    <string name="menuShareGameLabel">Udostępnij SGF</string>
 </resources>

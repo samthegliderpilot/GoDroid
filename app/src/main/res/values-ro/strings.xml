@@ -30,6 +30,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="menuSaveLoadLabel">Salvează/Încarcă</string>
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Salvează Jocul</string>
+    <string name="menuShareGameLabel">Partajează SGF</string>
 	<string name="menuLoadLabel">Încarcă Jocul</string>
 	<string name="menuInfoLabel">Informaţii</string>
 	<string name="menuInfoShortcut">I</string>

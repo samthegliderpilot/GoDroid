@@ -159,4 +159,5 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 		Tallentaminen tiedostaan \'%s\' epäonnistui.
 	</string>
 	<string name="chooseVariationText">Valitse variaatio</string>
+    <string name="menuShareGameLabel">Jaa SGF</string>
 </resources>
