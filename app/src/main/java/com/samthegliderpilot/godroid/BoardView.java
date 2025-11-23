@@ -504,7 +504,7 @@ void initBoard (
 	final List <Point> markers = _markers;
 	markers.clear ();
 	markers.addAll (points2Coords (Gtp.getMarkers ()));
-	final float markerRadius = 36 * shapeFactor/pSize,
+	final float markerRadius = 52 * shapeFactor/pSize,
 		markerOffset = cellWidthDIV2 + shapeFactor / 2,
 		xBoardOffset = _xBoardOffset * shapeFactor,
 		yBoardOffest = _yBoardOffset * shapeFactor;
