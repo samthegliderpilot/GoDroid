@@ -1229,7 +1229,7 @@ class MainActivity
                 }
                 out.flush();
 
-                //Toast.makeText(this, "Game saved!", Toast.LENGTH_SHORT).show();
+                Toast.makeText(this, "Game saved!", Toast.LENGTH_SHORT).show();
 
             } catch (IOException e) {
                 e.printStackTrace();
