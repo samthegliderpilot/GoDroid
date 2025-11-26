@@ -2,6 +2,11 @@ package com.samthegliderpilot.godroid;
 
 import java.io.File;
 import java.io.FileFilter;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -13,7 +18,9 @@ import java.util.Set;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.database.Cursor;
 import android.os.Build;
+import android.provider.OpenableColumns;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -22,6 +29,8 @@ import android.widget.*;
 //import androidx.activity.EdgeToEdge;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -1122,125 +1131,148 @@ String getDateFileName ()
 		+ " " + DateFormat.getTimeFormat (this).format (now));
 }
 
-private
-void saveGame (
-	final String pFilename
-	)
-{
-	final Resources resources = _resources;
-	final EditText input = new EditText (this);
-	input.setLayoutParams (new ViewGroup.LayoutParams (
-		ViewGroup.LayoutParams.MATCH_PARENT,
-		ViewGroup.LayoutParams.MATCH_PARENT));
-	input.setSelectAllOnFocus (true);
-	final View focusView = input.focusSearch (View.FOCUS_LEFT);
-	if (focusView != null)
-	{
-		focusView.requestFocus ();
-	}
-	final String sgfExtension = getSgfFileExtension ();
-	final GameInfo gameInfo = _gameInfo;
-	String fileName = pFilename;
-	if (fileName == null && !gameInfo._isCollection)
-	{
-		final String sgfFileName = gameInfo._sgfFileName;
-		if (sgfFileName != null)
-		{
-			fileName = sgfFileName.substring (
-				sgfFileName.lastIndexOf (File.separator) +1);
-			fileName = fileName.substring (0, fileName.indexOf (sgfExtension));
-		}
-	}
-	if (fileName == null)
-	{
-		fileName = getDateFileName ();
-	}
-	input.setText (fileName);
-	new AlertDialog.Builder (this).
-		setTitle (R.string.menuSaveLabel).
-		setIcon (R.drawable.saveLoadMenuIcon).
-		setView (input).
-		setPositiveButton (R.string.menuSaveLabel,
-			new DialogInterface.OnClickListener ()
-			{
-				public
-				void onClick (
-					final DialogInterface pDialogInterface,
-					final int pWhichButton
-					)
-				{
-					final File saveLoadGamesDir = getSaveLoadGamesDir ();
-					final Editable inputText = input.getText ();
-					String sgfFileName = null;
-					if (saveLoadGamesDir == null
-						|| inputText == null
-						|| ((sgfFileName = inputText.toString ()) == null)
-						|| ((sgfFileName = formatFileName(sgfFileName.trim())).isEmpty()))
-					{
-						final String fileName = sgfFileName;
-						showMessage (resources.getString (
-							R.string.invalidFileNameAlertMessage,
-							(saveLoadGamesDir == null ?
-								"" : saveLoadGamesDir + "/")
-							+ (sgfFileName == null ? "" : sgfFileName))).
-								setOnDismissListener (
-									new DialogInterface.OnDismissListener ()
-									{
-										public
-										void onDismiss (
-											final DialogInterface
-												pDialogInterface)
-										{
-											saveGame (fileName);
-										}
-									}
-								);
-						return;
-					}
-					final File sgfFile = new File (saveLoadGamesDir,
-						sgfFileName + sgfExtension);
-					final String path = sgfFile.getAbsolutePath ();
-					if (sgfFile.exists ())
-					{
-						final String fileName = sgfFileName;
-						final DialogInterface.OnClickListener clickListener =
-							new DialogInterface.OnClickListener ()
-							{
-								public
-								void onClick (
-									final DialogInterface pDialogInterface,
-									final int pWhichButton
-									)
-								{
-									if (pWhichButton ==
-										DialogInterface.BUTTON_POSITIVE)
-									{
-										gtpSaveGame (path);
-									}
-									else
-									{
-										saveGame (fileName);
-									}
-								}
-							};
-						new AlertDialog.Builder (MainActivity.this).
-							setTitle (R.string.menuSaveLabel).
-							setIcon (R.drawable.saveLoadMenuIcon).
-							setMessage (resources.getString (
-								R.string.fileAlreadyExistsMessage, path,
-								resources.getString (
-									R.string.overwriteButtonLabel))).
-							setNegativeButton (android.R.string.cancel,
-								clickListener).
-							setPositiveButton (R.string.overwriteButtonLabel,
-								clickListener).
-							show ();
-						return;
-					}
-					gtpSaveGame (path);
-				}}).
-		show ();
-}
+    private void saveGame(@Nullable String suggestedName) {
+        // 1) Build a base name (similar logic as before)
+        String baseName = buildDefaultFileName(suggestedName);
+        baseName = formatFileName(baseName.trim());
+        if (baseName.isEmpty()) {
+            baseName = getDateFileName();
+        }
+
+        final String sgfExtension = getSgfFileExtension();
+        final File saveDir = getSaveLoadGamesDir();
+        if (saveDir == null) {
+            // Can't save anywhere; you might want a toast here.
+            Toast.makeText(this, "Save directory unavailable", Toast.LENGTH_LONG).show();
+            return;
+        }
+
+        // 2) This is your app's internal SGF file (like before, pre-SAF)
+        File internalFile = new File(saveDir, baseName + sgfExtension);
+        final String internalPath = internalFile.getAbsolutePath();
+
+        // 3) Let the engine write the game out now, same as original code
+        gtpSaveGame(internalPath);
+
+        // 4) Remember this info for the SAF callback
+        _pendingSuggestedFileName = baseName;
+        _pendingInternalSgfPath = internalPath;
+
+        // 5) Launch system "Save As..." so user picks where to export this SGF
+        launchSavePicker(baseName);
+    }
+
+
+    private void launchSavePicker(@NonNull String suggestedFileName) {
+        Intent intent = new Intent(Intent.ACTION_CREATE_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+        intent.setType("application/x-go-sgf");
+        intent.putExtra(Intent.EXTRA_TITLE, suggestedFileName + getSgfFileExtension());
+        startActivityForResult(intent, CREATE_FILE_REQUEST_CODE);
+    }
+
+
+    @NonNull
+    private String buildDefaultFileName(@Nullable String suggestedName) {
+        final GameInfo gameInfo = _gameInfo;
+        final String sgfExtension = getSgfFileExtension();
+
+        // 1. If caller provided a name, prefer that.
+        if (suggestedName != null && !suggestedName.trim().isEmpty()) {
+            return suggestedName;
+        }
+
+        // 2. If current game came from a single SGF file, derive name from it.
+        if (gameInfo != null && !gameInfo._isCollection) {
+            final String sgfFileName = gameInfo._sgfFileName;
+            if (sgfFileName != null) {
+                // Take basename (strip directories)
+                String fileName = sgfFileName.substring(
+                        sgfFileName.lastIndexOf(File.separator) + 1
+                );
+                // Strip extension if present
+                int extIndex = fileName.indexOf(sgfExtension);
+                if (extIndex > 0) {
+                    fileName = fileName.substring(0, extIndex);
+                }
+                return fileName;
+            }
+        }
+
+        // 3. Fallback: date-based filename
+        return getDateFileName(); // this already runs through formatFileName()
+    }
+
+    /** Creates and configures the EditText used for the filename. */
+    @NonNull
+    private EditText createFileNameInput(@NonNull String defaultFileName) {
+        final EditText input = new EditText(this);
+        input.setLayoutParams(new ViewGroup.LayoutParams(
+                ViewGroup.LayoutParams.MATCH_PARENT,
+                ViewGroup.LayoutParams.MATCH_PARENT));
+        input.setSelectAllOnFocus(true);
+        input.setText(defaultFileName);
+
+        final View focusView = input.focusSearch(View.FOCUS_LEFT);
+        if (focusView != null) {
+            focusView.requestFocus();
+        }
+        return input;
+    }
+
+    /** Safely get text from the EditText as a String, or null if missing. */
+    @Nullable
+    private String getInputText(@NonNull EditText input) {
+        Editable editable = input.getText();
+        return editable != null ? editable.toString() : null;
+    }
+
+    /** Show "invalid filename" message and re-open save dialog on dismiss. */
+    private void showInvalidFileNameMessage(
+            @NonNull Resources resources,
+            @Nullable File saveDir,
+            @Nullable String rawInput,
+            @NonNull String retryName
+    ) {
+        String dirPrefix = (saveDir == null ? "" : saveDir + "/");
+        String namePart = (rawInput == null ? "" : rawInput);
+
+        showMessage(resources.getString(
+                R.string.invalidFileNameAlertMessage,
+                dirPrefix + namePart
+        )).setOnDismissListener(dialog ->
+                saveGame(retryName)
+        );
+    }
+
+    /** Show overwrite confirmation dialog and either overwrite or reopen save dialog. */
+    private void showOverwriteDialog(
+            @NonNull Resources resources,
+            @NonNull File sgfFile,
+            @NonNull String baseName,
+            @NonNull String path
+    ) {
+        DialogInterface.OnClickListener clickListener = (dialog, whichButton) -> {
+            if (whichButton == DialogInterface.BUTTON_POSITIVE) {
+                // Overwrite
+                gtpSaveGame(path);
+            } else {
+                // Cancel -> re-open save dialog with same name
+                saveGame(baseName);
+            }
+        };
+
+        new AlertDialog.Builder(MainActivity.this)
+                .setTitle(R.string.menuSaveLabel)
+                .setIcon(R.drawable.saveLoadMenuIcon)
+                .setMessage(resources.getString(
+                        R.string.fileAlreadyExistsMessage,
+                        path,
+                        resources.getString(R.string.overwriteButtonLabel)))
+                .setNegativeButton(android.R.string.cancel, clickListener)
+                .setPositiveButton(R.string.overwriteButtonLabel, clickListener)
+                .show();
+    }
 
 private
 void gtpSaveGame (
@@ -1265,255 +1297,393 @@ String getSgfFileExtension ()
 {
 	return _resources.getString (R.string.sgfFileExtension);
 }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+        if (requestCode == CREATE_FILE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri == null || _pendingInternalSgfPath == null) {
+                return;
+            }
 
-private
-void loadGame ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	if (gameInfo._isCollection)
-	{
-		showCollectionList ();
-		return;
-	}
-	final File saveLoadGamesDir = getSaveLoadGamesDir ();
-	if (saveLoadGamesDir == null)
-	{
-		return;
-	}
-	final Resources resources = _resources;
-	if (_goProblems == null)
-	{
-		_goProblems = AssetsManager.extractAssetFiles (
-			getAssets (), null, saveLoadGamesDir,
-			resources.getString (R.string.goProblemsAssetFolderName));
-	}
-	final List <File> goProblems = _goProblems;
+            File sourceFile = new File(_pendingInternalSgfPath);
+            if (!sourceFile.exists()) {
+                Toast.makeText(this,
+                        "Error saving: internal SGF file not found",
+                        Toast.LENGTH_LONG).show();
+                _pendingSuggestedFileName = null;
+                _pendingInternalSgfPath = null;
+                return;
+            }
 
-	final FileFilter sgfFileFilter = _sgfFileFilter;
-	final String sgfSuffix = getSgfFileExtension ();
-	final File [] files =
-		saveLoadGamesDir.listFiles (sgfFileFilter != null ? sgfFileFilter
-		: (_sgfFileFilter = new FileFilter ()
-			{
-				public
-				boolean accept (
-					final File pFile
-					)
-				{
-					return !pFile.isDirectory ()
-						&& pFile.getName ().endsWith (sgfSuffix);
-				}
-			}));
-	if (files.length == 0)
-	{
-		showMessage (resources.getString (R.string.noFiles2load,
-			saveLoadGamesDir.getAbsolutePath ()));
-		return;
-	}
-	Arrays.sort (files,
-		new Comparator <File> ()
-		{
-			public
-			int compare (
-				final File pFile1,
-				final File pFile2
-				)
-			{
-				return pFile1.lastModified () < pFile2.lastModified () ? 1 : -1;
-			}
-		});
+            try (InputStream in = new FileInputStream(sourceFile);
+                 OutputStream out = getContentResolver().openOutputStream(uri)) {
 
-	final String filePath = gameInfo._sgfFileName;
-	final File [] checkedFile = new File [1];
-	int selectedPos = -1, fileIdx = 0;
-	for (final File file : files)
-	{
-		if (file.getAbsolutePath ().equals (filePath))
-		{
-			selectedPos = fileIdx;
-			checkedFile [0] = file;
-			break;
-		}
-		fileIdx++;
-	}
+                if (out == null) {
+                    throw new IOException("Unable to open output stream for Uri: " + uri);
+                }
 
-	final ViewStub viewStub = new ViewStub (this, R.layout.load_game);
-	final Dialog dialog = new Dialog (this);
-	dialog.getWindow ().requestFeature (Window.FEATURE_NO_TITLE);
-	dialog.setContentView (viewStub);
-	final View view = viewStub.inflate ();
+                byte[] buffer = new byte[8192];
+                int read;
+                while ((read = in.read(buffer)) != -1) {
+                    out.write(buffer, 0, read);
+                }
+                out.flush();
 
-	final Map <View, File> fileNameViewFileMap =
-			Generics.newHashMap (),
-		deleteButtonViewFileMap = Generics.newHashMap ();
-	final Set <View> fileNameViews = Generics.newHashSet ();
-	final View loadButton = view.findViewById (R.id.loadGameDialogButton);
-	loadButton.setOnClickListener (
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				dialog.dismiss ();
-				newGame (restoreGameInfo (new GameInfo ()), null);
-				final GameInfo gameInfo = _gameInfo;
-				gameInfo._sgfFileName = checkedFile [0].getAbsolutePath ();
-				_gtp.loadGame (
-					gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
-			}
-		});
+                //Toast.makeText(this, "Game saved!", Toast.LENGTH_SHORT).show();
 
-	final View.OnClickListener selectOnClickListener =
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				loadButton.setEnabled (true);
-				for (final View view : fileNameViews)
-				{
-					final boolean checked = view == pView;
-					final CompoundButton fileNameView = view.
-						findViewById (R.id.fileNameTextView);
-					fileNameView.setChecked (checked);
-					if (checked)
-					{
-						checkedFile [0] =
-							fileNameViewFileMap.get (fileNameView);
-					}
-				}
-			}
-		};
-	@SuppressWarnings ("unchecked")
-	final ArrayAdapter <File> [] arrayAdapter = new ArrayAdapter [1];
-	final View.OnClickListener deleteOnClickListener =
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				final File deleteFile = deleteButtonViewFileMap.get (pView);
-				final DialogInterface.OnClickListener clickListener =
-					new DialogInterface.OnClickListener ()
-					{
-						public
-						void onClick (
-							final DialogInterface pDialogInterface,
-							final int pWhichButton
-							)
-						{
-							if (!deleteFile.delete ())
-							{
-								return;
-							}
-							if (saveLoadGamesDir.listFiles (_sgfFileFilter).
-								length == 0)
-							{
-								dialog.dismiss ();
-							}
-							arrayAdapter [0].remove (deleteFile);
-							final View parentView = (View)pView.getParent ();
-							loadButton.setEnabled (loadButton.isEnabled ()
-								&& !((CompoundButton)parentView.
-									findViewById (R.id.fileNameTextView)).
-										isChecked ());
-						}
-					};
-				new AlertDialog.Builder (MainActivity.this).
-					setTitle (R.string.deleteButtonLabel).
-					setIcon (android.R.drawable.ic_dialog_alert).
-					setMessage (resources.getString (
-						R.string.deleteFileMessage,
-						deleteFile.getAbsolutePath ())).
-					setNegativeButton (android.R.string.cancel, null).
-					setPositiveButton (R.string.deleteButtonLabel,
-						clickListener).
-					show ();
-			}
-		};
-	final ListView filesView =
-            view.findViewById (R.id.fileListView);
-	final LayoutInflater layoutInflater = getLayoutInflater ();
-	final CharSequence fileNameInfoTemplate =
-		resources.getText (R.string.fileNameFileInfoTemplate);
-	final String [] fileNameInfoSources = new String []
-		{
-			resources.getString (R.string.fileNameTemplate),
-			resources.getString (R.string.fileInfoTemplate),
-		};
-	final CharSequence [] fileNameInfoDestinations = new CharSequence [2];
-	filesView.setAdapter (
-		arrayAdapter [0] = new ArrayAdapter <File> (this, 0,
-			Generics.newArrayList (Arrays.asList (files)))
-	{
-		public
-		View getView (
-			final int pPosition,
-			View pCachedView,
-			final ViewGroup pParent
-			)
-		{
-			final CompoundButton fileNameView;
-			final View deleteButtonView;
-			if (pCachedView == null)
-			{
-				pCachedView = layoutInflater.
-					inflate (R.layout.load_game_list_entry, null);
-				fileNameViews.add (pCachedView);
-				pCachedView.setOnClickListener (selectOnClickListener);
-				fileNameView = pCachedView.
-					findViewById (R.id.fileNameTextView);
-				fileNameView.setClickable (false);
-				deleteButtonView = pCachedView.
-					findViewById (R.id.fileDeleteButton);
-				deleteButtonView.setOnClickListener (deleteOnClickListener);
-			}
-			else
-			{
-				fileNameView = pCachedView.
-					findViewById (R.id.fileNameTextView);
-				deleteButtonView = pCachedView.
-					findViewById (R.id.fileDeleteButton);
-			}
-			final File file = getItem (pPosition);
-			fileNameView.setChecked (checkedFile [0] == file);
-			fileNameViewFileMap.put (fileNameView, file);
-			final boolean isGoProblem = goProblems.contains (file);
-			deleteButtonView.setVisibility (
-				isGoProblem ? View.GONE : View.VISIBLE);
-			if (isGoProblem)
-			{
-				fileNameInfoDestinations[1] =
-					resources.getString (R.string.goProblemFileInfo);
-			}
-			else
-			{
-				deleteButtonViewFileMap.put (deleteButtonView, file);
-				final Date date = new Date (file.lastModified ());
-				fileNameInfoDestinations[1] =
-					DateFormat.getDateFormat (
-						MainActivity.this).format (date) + " "
-					+ DateFormat.getTimeFormat (
-						MainActivity.this).format (date);
-			}
-			final String name = file.getName ();
-			fileNameInfoDestinations[0] =
-				name.substring (0, name.lastIndexOf (sgfSuffix));
-			fileNameView.setText (TextUtils.replace (fileNameInfoTemplate,
-				fileNameInfoSources, fileNameInfoDestinations));
-			return pCachedView;
-		}
-	});
-	filesView.setSelection (selectedPos);
-	loadButton.setEnabled (selectedPos != -1);
-	dialog.show ();
-}
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this,
+                        "Error saving game: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            } finally {
+                _pendingSuggestedFileName = null;
+                _pendingInternalSgfPath = null;
+            }
+        }
+        else if (requestCode == OPEN_FILE_REQUEST_CODE && resultCode == RESULT_OK && data != null) {
+            Uri uri = data.getData();
+            if (uri == null) {
+                return;
+            }
+
+            try {
+                // Copy SAF Uri into app dir, then load it just like any other SGF
+                File destFile = copySgfFromUriToAppDir(uri);
+                loadGameFromFile(destFile);
+            } catch (IOException e) {
+                e.printStackTrace();
+                Toast.makeText(this,
+                        "Error loading game: " + e.getMessage(),
+                        Toast.LENGTH_LONG).show();
+            }
+        }
+
+        // If you later add SAF for save-as, or already have other request codes,
+        // keep their branches here too.
+    }
+
+
+    private @NonNull File copySgfFromUriToAppDir(@NonNull Uri uri) throws IOException {
+        // 1) Derive a reasonable base name from the picked document
+        String displayName = null;
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        if (cursor != null) {
+            try {
+                if (cursor.moveToFirst()) {
+                    int nameIndex = cursor.getColumnIndex(OpenableColumns.DISPLAY_NAME);
+                    if (nameIndex != -1) {
+                        displayName = cursor.getString(nameIndex);
+                    }
+                }
+            } finally {
+                cursor.close();
+            }
+        }
+
+        final String sgfExtension = getSgfFileExtension();
+        String baseName;
+
+        if (displayName != null) {
+            // Strip .sgf if it’s already there
+            if (displayName.endsWith(sgfExtension)) {
+                baseName = displayName.substring(0, displayName.length() - sgfExtension.length());
+            } else {
+                // Strip whatever extension it has (if any)
+                int dot = displayName.lastIndexOf('.');
+                baseName = (dot > 0) ? displayName.substring(0, dot) : displayName;
+            }
+        } else {
+            // Fallback if we can’t get a display name
+            baseName = getDateFileName();
+        }
+
+        baseName = formatFileName(baseName.trim());
+        if (baseName.isEmpty()) {
+            baseName = getDateFileName();
+        }
+
+        // 2) Decide where in your app to put the file
+        File saveDir = getSaveLoadGamesDir();
+        if (saveDir == null) {
+            throw new IOException("Save directory unavailable");
+        }
+
+        File destFile = new File(saveDir, baseName + sgfExtension);
+
+        // You can choose to overwrite silently or generate a unique name.
+        // For now, overwrite is fine for a local working copy.
+        try (InputStream in = getContentResolver().openInputStream(uri);
+             OutputStream out = new FileOutputStream(destFile)) {
+            byte[] buffer = new byte[8192];
+            int read;
+            while ((read = in.read(buffer)) != -1) {
+                out.write(buffer, 0, read);
+            }
+        }
+
+        return destFile;
+    }
+
+
+    private static final int OPEN_FILE_REQUEST_CODE = 2001;
+    private static final int CREATE_FILE_REQUEST_CODE = 1001;
+    private String _pendingSuggestedFileName = null;
+    private String _pendingInternalSgfPath = null;
+
+    private void loadGame() {
+        final GameInfo gameInfo = _gameInfo;
+
+        // Keep the existing behavior: if you're *already* in a collection,
+        // just show the collection list instead of asking for another file.
+        if (gameInfo._isCollection) {
+            showCollectionList();
+            return;
+        }
+
+        // Launch the system file picker (SAF)
+        Intent intent = new Intent(Intent.ACTION_OPEN_DOCUMENT);
+        intent.addCategory(Intent.CATEGORY_OPENABLE);
+
+        // SGF is not standardized as a MIME type, so be flexible
+        intent.setType("*/*");
+        intent.putExtra(Intent.EXTRA_MIME_TYPES, new String[]{
+                "application/x-go-sgf",
+                "application/octet-stream",
+                "text/plain"
+        });
+
+        startActivityForResult(intent, OPEN_FILE_REQUEST_CODE);
+    }
+
+
+    /** Ensure go problem files are extracted to the save dir; return cached list. */
+    @NonNull
+    private List<File> ensureGoProblemsLoaded(@NonNull File saveDir, @NonNull Resources resources) {
+        if (_goProblems == null) {
+            _goProblems = AssetsManager.extractAssetFiles(
+                    getAssets(),
+                    null,
+                    saveDir,
+                    resources.getString(R.string.goProblemsAssetFolderName)
+            );
+        }
+        return _goProblems;
+    }
+
+    /** Lazily initialize the SGF file filter and list SGF files in the given directory. */
+    @Nullable
+    private File[] listSgfFiles(@NonNull File saveDir) {
+        final String sgfSuffix = getSgfFileExtension();
+
+        if (_sgfFileFilter == null) {
+            _sgfFileFilter = new FileFilter() {
+                @Override
+                public boolean accept(File pFile) {
+                    return !pFile.isDirectory()
+                            && pFile.getName().endsWith(sgfSuffix);
+                }
+            };
+        }
+
+        return saveDir.listFiles(_sgfFileFilter);
+    }
+
+    /** Sort files by lastModified, newest first. */
+    private void sortFilesByLastModifiedDesc(@NonNull File[] files) {
+        Arrays.sort(files, (f1, f2) ->
+                (f1.lastModified() < f2.lastModified()) ? 1 : -1
+        );
+    }
+
+    /**
+     * Find the index of the file whose absolute path equals the given path.
+     * Also sets checkedFile[0] if found.
+     */
+    private int findSelectedFileIndex(
+            @NonNull File[] files,
+            @Nullable String currentPath,
+            @NonNull File[] checkedFileOut
+    ) {
+        if (currentPath == null) {
+            return -1;
+        }
+
+        int index = 0;
+        for (File file : files) {
+            if (file.getAbsolutePath().equals(currentPath)) {
+                checkedFileOut[0] = file;
+                return index;
+            }
+            index++;
+        }
+        return -1;
+    }
+
+    /** Build and show the "Load Game" dialog with file list and delete actions. */
+    private void showLoadGameDialog(
+            @NonNull File[] files,
+            @NonNull List<File> goProblems,
+            @NonNull File[] checkedFile,
+            int selectedPos,
+            @NonNull File saveLoadGamesDir,
+            @NonNull Resources resources
+    ) {
+        final ViewStub viewStub = new ViewStub(this, R.layout.load_game);
+        final Dialog dialog = new Dialog(this);
+        dialog.getWindow().requestFeature(Window.FEATURE_NO_TITLE);
+        dialog.setContentView(viewStub);
+        final View rootView = viewStub.inflate();
+
+        final Map<View, File> fileNameViewFileMap = Generics.newHashMap();
+        final Map<View, File> deleteButtonViewFileMap = Generics.newHashMap();
+        final Set<View> fileNameViews = Generics.newHashSet();
+
+        final View loadButton = rootView.findViewById(R.id.loadGameDialogButton);
+        loadButton.setOnClickListener(v -> {
+            dialog.dismiss();
+            newGame(restoreGameInfo(new GameInfo()), null);
+            final GameInfo gameInfo = _gameInfo;
+            gameInfo._sgfFileName = checkedFile[0].getAbsolutePath();
+            _gtp.loadGame(gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+        });
+
+        // Listener for selecting a file row
+        final View.OnClickListener selectOnClickListener = v -> {
+            loadButton.setEnabled(true);
+            for (View view : fileNameViews) {
+                final boolean checked = (view == v);
+                final CompoundButton fileNameView = view.findViewById(R.id.fileNameTextView);
+                fileNameView.setChecked(checked);
+                if (checked) {
+                    checkedFile[0] = fileNameViewFileMap.get(fileNameView);
+                }
+            }
+        };
+
+        @SuppressWarnings("unchecked")
+        final ArrayAdapter<File>[] arrayAdapter = new ArrayAdapter[1];
+
+        // Listener for delete button
+        final View.OnClickListener deleteOnClickListener = v -> {
+            final File deleteFile = deleteButtonViewFileMap.get(v);
+            if (deleteFile == null) return;
+
+            final DialogInterface.OnClickListener clickListener =
+                    (dialogInterface, whichButton) -> {
+                        if (!deleteFile.delete()) {
+                            return;
+                        }
+
+                        File[] remaining = saveLoadGamesDir.listFiles(_sgfFileFilter);
+                        if (remaining == null || remaining.length == 0) {
+                            dialog.dismiss();
+                        }
+
+                        arrayAdapter[0].remove(deleteFile);
+
+                        final View parentView = (View) v.getParent();
+                        boolean stillEnabled = loadButton.isEnabled()
+                                && !((CompoundButton) parentView
+                                .findViewById(R.id.fileNameTextView))
+                                .isChecked();
+                        loadButton.setEnabled(stillEnabled);
+                    };
+
+            new AlertDialog.Builder(MainActivity.this)
+                    .setTitle(R.string.deleteButtonLabel)
+                    .setIcon(android.R.drawable.ic_dialog_alert)
+                    .setMessage(resources.getString(
+                            R.string.deleteFileMessage,
+                            deleteFile.getAbsolutePath()))
+                    .setNegativeButton(android.R.string.cancel, null)
+                    .setPositiveButton(R.string.deleteButtonLabel, clickListener)
+                    .show();
+        };
+
+        final ListView filesView = rootView.findViewById(R.id.fileListView);
+        final LayoutInflater layoutInflater = getLayoutInflater();
+        final CharSequence fileNameInfoTemplate =
+                resources.getText(R.string.fileNameFileInfoTemplate);
+        final String[] fileNameInfoSources = new String[]{
+                resources.getString(R.string.fileNameTemplate),
+                resources.getString(R.string.fileInfoTemplate),
+        };
+        final CharSequence[] fileNameInfoDestinations = new CharSequence[2];
+        final String sgfSuffix = getSgfFileExtension();
+
+        filesView.setAdapter(
+                arrayAdapter[0] = new ArrayAdapter<File>(
+                        this,
+                        0,
+                        Generics.newArrayList(Arrays.asList(files))
+                ) {
+                    @Override
+                    public View getView(int position, View convertView, ViewGroup parent) {
+                        final CompoundButton fileNameView;
+                        final View deleteButtonView;
+
+                        if (convertView == null) {
+                            convertView = layoutInflater.inflate(
+                                    R.layout.load_game_list_entry,
+                                    parent,
+                                    false
+                            );
+                            fileNameViews.add(convertView);
+                            convertView.setOnClickListener(selectOnClickListener);
+
+                            fileNameView = convertView.findViewById(R.id.fileNameTextView);
+                            fileNameView.setClickable(false);
+
+                            deleteButtonView = convertView.findViewById(R.id.fileDeleteButton);
+                            deleteButtonView.setOnClickListener(deleteOnClickListener);
+                        } else {
+                            fileNameView = convertView.findViewById(R.id.fileNameTextView);
+                            deleteButtonView = convertView.findViewById(R.id.fileDeleteButton);
+                        }
+
+                        final File file = getItem(position);
+                        fileNameView.setChecked(checkedFile[0] == file);
+                        fileNameViewFileMap.put(fileNameView, file);
+
+                        final boolean isGoProblem = goProblems.contains(file);
+                        deleteButtonView.setVisibility(
+                                isGoProblem ? View.GONE : View.VISIBLE
+                        );
+
+                        if (isGoProblem) {
+                            fileNameInfoDestinations[1] =
+                                    resources.getString(R.string.goProblemFileInfo);
+                        } else {
+                            deleteButtonViewFileMap.put(deleteButtonView, file);
+                            final Date date = new Date(file.lastModified());
+                            fileNameInfoDestinations[1] =
+                                    DateFormat.getDateFormat(MainActivity.this).format(date)
+                                            + " "
+                                            + DateFormat.getTimeFormat(MainActivity.this).format(date);
+                        }
+
+                        final String name = file.getName();
+                        fileNameInfoDestinations[0] =
+                                name.substring(0, name.lastIndexOf(sgfSuffix));
+
+                        fileNameView.setText(TextUtils.replace(
+                                fileNameInfoTemplate,
+                                fileNameInfoSources,
+                                fileNameInfoDestinations
+                        ));
+
+                        return convertView;
+                    }
+                }
+        );
+
+        filesView.setSelection(selectedPos);
+        loadButton.setEnabled(selectedPos != -1);
+        dialog.show();
+    }
+
 
 void showCollectionList ()
 {
@@ -1638,6 +1808,19 @@ void showCollectionList ()
 		selectedPos != GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 	dialog.show ();
 }
+
+    private void loadGameFromFile(@NonNull File file) {
+        // This is the core behavior your old dialog eventually did.
+        newGame(restoreGameInfo(new GameInfo()), null);
+        final GameInfo gameInfo = _gameInfo;
+        gameInfo._sgfFileName = file.getAbsolutePath();
+        _gtp.loadGame(gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+
+        // After loading, if the SGF is a collection, show the collection UI
+        if (gameInfo._isCollection) {
+            showCollectionList(); // or displayCollection() if you rename it
+        }
+    }
 
 static private
 boolean storageCardMounted ()

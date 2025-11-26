@@ -424,7 +424,8 @@ void handleMessage (
 	}
 	final BoardView boardView = _boardView;
 	boolean playerBlackMoves = gameInfo._playerBlackMoves;
-	switch (cmd)
+    final MainActivity mainActivity = _mainActivity;
+    switch (cmd)
 	{
 	case INIT_BOARD:
 		boardView.initBoard (gameInfo._boardSize);
@@ -664,17 +665,16 @@ void handleMessage (
 		}
 		return;
 	case SAVE_GAME:
-		MainActivity mainActivity = _mainActivity;
-		mainActivity.showMessage (_resources.getString (
-			(saveGame (gameInfo, false) ? R.string.gameSavedInFileMessage
-				: R.string.saveGameFailedAlertMessage),
-			gameInfo._sgfFileName));
+        saveGame (gameInfo, false); // for when I don't want the message
+		//mainActivity.showMessage (_resources.getString (
+		//	(saveGame (gameInfo, false) ? R.string.gameSavedInFileMessage
+		//		: R.string.saveGameFailedAlertMessage),
+        //  new File(gameInfo._sgfFileName).getName()));
 		return;
 	case LOAD_GAME:
 		switch (loadSavedGame (gameInfo, false, pMessage.arg1))
 		{
 		case FAIL:
-			mainActivity = _mainActivity;
 			mainActivity.showMessage (_resources.getString (
 				R.string.loadGameFailedAlertMessage, gameInfo._sgfFileName));
 			return;
@@ -704,7 +704,6 @@ void handleMessage (
 		saveGame (gameInfo , true);
 		try
 		{
-			mainActivity = _mainActivity;
 			String fileName = gameInfo._sgfFileName;
 			fileName = fileName == null ?
 				mainActivity.getDateFileName ()
