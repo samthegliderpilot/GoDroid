@@ -361,6 +361,7 @@ void storeMarkers ()
 		{
 		case '+':
 			markers.add (new Point (x, y));
+			// fall through — '+' is also an intersection, so x increments
 		case '.':
 			x += 1;
 			break;
@@ -897,11 +898,10 @@ void removeDeadStones (
 
 void deleteAutoSaveFile ()
 {
-	final String autoSavePathFileName = _autoSaveGamePathFileName;
-	final File autoSaveFile = new File (autoSavePathFileName);
+	final File autoSaveFile = new File (_autoSaveGamePathFileName);
 	if (autoSaveFile.exists ())
 	{
-		synchronized (autoSavePathFileName)
+		synchronized (_autoSaveLock)
 		{
 			autoSaveFile.delete ();
 		}
@@ -995,7 +995,7 @@ boolean saveGame (
 	{
 		final File file = new File (pAutoSave ? _autoSaveGamePathFileName :
 			pGameInfo._sgfFileName);
-		if (file.isFile () && file.exists ())
+		if (file.isFile ())
 		{
 			file.delete ();
 		}
@@ -1028,8 +1028,15 @@ int getCaptures (
 	final boolean pBlack
 	)
 {
-	return Integer.parseInt (
-		gtpCommand (GtpCommand.GET_CAPTURES, pBlack ? _BLACK : _WHITE));
+	try
+	{
+		return Integer.parseInt (
+			gtpCommand (GtpCommand.GET_CAPTURES, pBlack ? _BLACK : _WHITE));
+	}
+	catch (final NumberFormatException e)
+	{
+		return 0;
+	}
 }
 
 private static

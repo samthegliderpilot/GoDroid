@@ -712,11 +712,11 @@ LoadGameStatus loadGame (
 		}
 		PropertyNode currentNode = recentNode;
 		final List <Point> moves = Generics.newArrayList ();
+		PropertyNode prevMove;
 		//noinspection StatementWithEmptyBody
-		while ((currentNode = previousMove (
-			currentNode, blackMoves = !blackMoves, moves).
-				previousPropertyNode ())
-					!= null && currentNode != setupNode);
+		while ((prevMove = previousMove (currentNode, blackMoves = !blackMoves, moves)) != null
+				&& (currentNode = prevMove.previousPropertyNode ()) != null
+				&& currentNode != setupNode);
 		if (currentNode == null || blackMoves != playerBlack)
 		{
 			return LoadGameStatus.SUCCESS;
@@ -920,7 +920,7 @@ Point fromMovePropertyValue (
 		final int x = posLetters.indexOf (pValue.charAt (0)),
 			y = posLetters.indexOf (pValue.charAt (1)),
 			boardsizePlus1 = _boardSize + 1;
-		if (x > boardsizePlus1 || y > boardsizePlus1)
+		if (x < 0 || y < 0 || x > boardsizePlus1 || y > boardsizePlus1)
 		{
 			return null;
 		}

@@ -194,6 +194,9 @@ MenuItem
 private
 boolean _undoEnabled = false, _redoEnabled = false;
 
+private
+int _blackCaptures = 0, _whiteCaptures = 0;
+
     private
 Toast _undoRedoHint;
 
@@ -1304,7 +1307,7 @@ void loadGame ()
 						&& pFile.getName ().endsWith (sgfSuffix);
 				}
 			}));
-	if (files.length == 0)
+	if (files == null || files.length == 0)
 	{
 		showMessage (resources.getString (R.string.noFiles2load,
 			saveLoadGamesDir.getAbsolutePath ()));
@@ -1794,7 +1797,10 @@ showWaitProgress (
 		builder.setView(layout);
 
 		_progressDialog = builder.create();
-		_progressDialog.show();	
+		_progressDialog.show();
+		// Queue dismissal on the GTP thread so it fires after the pending work completes,
+		// not immediately. The GTP thread processes messages in order, so HIDE_WAIT_PROGRESS
+		// will run after whatever command triggered this dialog.
 		_gtp.hideWaitProgress ();
 	}
 }
@@ -1915,12 +1921,6 @@ void showWait4Move2FinishMessage (
 		_gtp.nextMove (_gameInfo);
 	}
 
-	void continueAfterMove()
-	{
-		// Continue game logic that follows the AI move here
-		// For example, update UI, allow user input, etc.
-	}
-
 void drawBoard (
 	final boolean pInit
 	)
@@ -2019,6 +2019,8 @@ void showCaptures (
 	final int pWhite
 	)
 {
+	_blackCaptures = pBlack;
+	_whiteCaptures = pWhite;
 	_blackCapturesTextView.setText (String.valueOf (pBlack));
 	_whiteCapturesTextView.setText (String.valueOf (pWhite));
 }
@@ -2077,7 +2079,7 @@ void showScore (
 	if (pBlackTerritory == _SHOW_MESSAGE)
 	{
 		_scoreTableRow.setVisibility (View.INVISIBLE);
-		_messageTableRow.setVisibility (View.GONE);
+		_messageTableRow.setVisibility (View.VISIBLE);
 		_messageScoreTextView.setText ((String)pStatus);
 		return;
 	}
@@ -2104,12 +2106,9 @@ void showScore (
 	_moveRowTextView.setText (R.string.territoryLabelText);
 	_blackMoveTextView.setText (String.valueOf (pBlackTerritory));
 	_whiteMoveTextView.setText (String.valueOf (pWhiteTerritory));
-	_blackScoreTextView.setText (String.valueOf (
-		Integer.parseInt (_blackCapturesTextView.getText ().toString ()) +
-		pBlackTerritory + 0f));
+	_blackScoreTextView.setText (String.valueOf (_blackCaptures + pBlackTerritory));
 	_whiteScoreTextView.setText (String.valueOf (
-		Integer.parseInt (_whiteCapturesTextView.getText ().toString ()) +
-		pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
+		_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
 }
 
 private
@@ -2252,15 +2251,6 @@ Toast makeToast (
 {
 	final Toast toast = Toast.makeText (pContext, pText, Toast.LENGTH_SHORT);
 	toast.setGravity (Gravity.TOP, 0, 0);
-	final View hintView = toast.getView ();
-	if (hintView instanceof LinearLayout)
-	{
-		final View textView = ((LinearLayout)hintView).getChildAt (0);
-		if (textView != null && textView instanceof TextView)
-		{
-			((TextView)textView).setGravity (Gravity.CENTER_HORIZONTAL);
-		}
-	}
 	return toast;
 }
 }

@@ -160,7 +160,7 @@ class BoardGestureListener
 		)
 	{
 		_cellWidthDIV2 = pCellWidth / 2;
-		_cellWidthDIV3 = pCellWidth / 2*3; // todo: no effect ?
+		_cellWidthDIV3 = pCellWidth / 3f;
 		_lastX = _lastY = -pCellWidth -1;
 		_lastPoint = null;
 		_stonePositionChanged = false;
