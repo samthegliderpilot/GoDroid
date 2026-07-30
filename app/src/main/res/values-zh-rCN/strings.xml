@@ -31,6 +31,9 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="menuSaveLoadShortcut">S</string>
     <string name="menuSaveLabel">保存棋局</string>
     <string name="menuLoadLabel">载入棋局</string>
+    <string name="saveOverwriteOption">覆盖</string>  <!-- Translation Provided by Claude -->
+    <string name="saveAppendOption">作为新对局追加到文件</string>  <!-- Translation Provided by Claude -->
+    <string name="saveChooseNewLocationOption">选择其他文件</string>  <!-- Translation Provided by Claude -->
     <string name="menuInfoLabel">关于</string>
     <string name="menuInfoShortcut">I</string>
     <string name="menuExitLabel">退出</string>
@@ -55,6 +58,11 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="newGameDialogScoringLabel">计分</string>
     <string name="newGameDialogAIDelayLabel">延迟AI落子（秒）</string> <!-- Translation Provided by ChatGPT -->
     <string name="newGameAllowResignationLabel">允许认输</string>  <!-- Translation Provided by ChatGPT -->
+    <string name="edgeTapPaddingLabel">边缘点击边距</string>  <!-- Translation Provided by Claude -->
+    <string name="edgeTapPaddingOff">关闭</string>  <!-- Translation Provided by Claude -->
+    <string name="edgeTapPaddingOn">开启</string>  <!-- Translation Provided by Claude -->
+    <string name="edgeTapPaddingAuto">自动</string>  <!-- Translation Provided by Claude -->
+    <string name="menuDisplaySettingsLabel">显示设置</string>  <!-- Translation Provided by Claude -->
     <string name="newGameDialogStartButtonText"><b>开始棋局</b></string>
     <string name="newGameDialogApplytButtonText"><b>应用设置</b></string>
     <string name="yourTurnText">该你了</string>

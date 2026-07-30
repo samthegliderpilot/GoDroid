@@ -2,15 +2,18 @@ package com.samthegliderpilot.godroid;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileReader;
-import java.io.FileWriter;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.io.Reader;
+import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.List;
 
 import android.graphics.Point;
+import android.net.Uri;
 import android.text.format.DateFormat;
 import android.util.Log;
 import static com.samthegliderpilot.godroid.MainActivity._LOG_TAG;
@@ -133,7 +136,15 @@ PropertyNode
 	_setupNode,
 	_currentNode;
 
+// Holds a Uri.toString() -- either a content:// Uri from the save/load
+// document picker, or a file:// Uri wrapping an internal path (autosave,
+// or a game shared in via an external .sgf open intent).
 String _sgfFileName;
+
+// Human-readable name for the SGF GameName property -- content:// Uris are
+// often opaque provider paths, so this is tracked separately rather than
+// derived from _sgfFileName.
+String _sgfDisplayName;
 
 boolean _isCollection = false;
 
@@ -172,6 +183,7 @@ GameInfo copyCollection (
 	_collectionNumChars = pGameInfo._collectionNumChars;
 	_collectionNames = pGameInfo._collectionNames;
 	_sgfFileName = pGameInfo._sgfFileName;
+	_sgfDisplayName = pGameInfo._sgfDisplayName;
 	return this;
 }
 
@@ -545,7 +557,7 @@ long[] toLongArray (
 }
 
 PropertyNode getSetupNode (
-	final File pFile,
+	final Uri pUri,
 	final int pCollectionIdx
 	)
 	throws Exception
@@ -558,7 +570,7 @@ PropertyNode getSetupNode (
 		List <String> namesList = Generics.newArrayList (1);
 		boolean isCollection = _isCollection =
 			Node.readCollectionIndices (
-				new BufferedReader (new FileReader (pFile)),
+				new BufferedReader (new InputStreamReader (openInput (pUri))),
 				collectionOffsetsList, collectionNumCharsList, namesList);
 		collectionOffsets = _collectionOffsets =
 			toLongArray (collectionOffsetsList);
@@ -580,7 +592,8 @@ PropertyNode getSetupNode (
 		throw new Exception ("loadGame: collection idx out of bounds");
 	}
 	final Node collection = new Node (
-		new BufferedReader (new FileReader (pFile)), /*_SGF_LOGGER,*/ null,
+		new BufferedReader (new InputStreamReader (openInput (pUri))),
+		/*_SGF_LOGGER,*/ null,
 		collectionOffsets[pCollectionIdx], _collectionNumChars[pCollectionIdx]);
 	final List <Node> games = collection._children;
 	if (games == null || games.size () != 1)
@@ -602,7 +615,7 @@ PropertyNode getSetupNode (
 }
 
 LoadGameStatus loadGame (
-	final File pFile,
+	final Uri pUri,
 	int pCollectionIdx
 	)
 {
@@ -612,7 +625,7 @@ LoadGameStatus loadGame (
 		if (pCollectionIdx == _DEFAULT_GAME_COLLECTION_IDX)
 		{
 			pCollectionIdx = 0;
-			setupNode = getSetupNode (pFile, pCollectionIdx);
+			setupNode = getSetupNode (pUri, pCollectionIdx);
 			if (_isCollection)
 			{
 				return LoadGameStatus.SHOW_COLLECTION_LIST;
@@ -621,7 +634,7 @@ LoadGameStatus loadGame (
 		_collectionIdx = pCollectionIdx;
 		if (setupNode == null)
 		{
-			setupNode = getSetupNode (pFile, pCollectionIdx);
+			setupNode = getSetupNode (pUri, pCollectionIdx);
 		}
 		if (setupNode == null)
 		{
@@ -759,7 +772,8 @@ boolean setupPlayerBlackMoves ()
 }
 
 boolean saveGame (
-	final File pFile
+	final Uri pUri,
+	final String pDisplayName
 	)
 {
 	if (_gameNode == null || _setupNode == null)
@@ -770,12 +784,14 @@ boolean saveGame (
 		addProperty (PropertyName.Date.newProperty (
 			DateFormat.format ("yyyy-MM-dd",
 				new GregorianCalendar ()).toString ())).
-		addProperty (PropertyName.GameName.newProperty (pFile.getName ()));
+		addProperty (PropertyName.GameName.newProperty (pDisplayName));
 	Writer writer = null;
 	try
 	{
+		final OutputStream out =
+			_mainActivity.getContentResolver ().openOutputStream (pUri, "wt");
 		_gameNode.writeNode (
-			writer = new BufferedWriter (new FileWriter (pFile)));
+			writer = new BufferedWriter (new OutputStreamWriter (out)));
 	}
 	catch (final Exception e)
 	{
@@ -797,6 +813,81 @@ boolean saveGame (
 		}
 	}
 	return true;
+}
+
+// Adds this game as an additional (...) tree in an existing SGF file
+// instead of replacing it, turning (or extending) it into a multi-game
+// collection. Reads the existing content and rewrites it in full (rather
+// than relying on SAF "append" open mode) since not every DocumentsProvider
+// is guaranteed to support append semantics.
+boolean appendGame (
+	final Uri pUri,
+	final String pDisplayName
+	)
+{
+	if (_gameNode == null || _setupNode == null)
+	{
+		return false;
+	}
+	_setupNode.
+		addProperty (PropertyName.Date.newProperty (
+			DateFormat.format ("yyyy-MM-dd",
+				new GregorianCalendar ()).toString ())).
+		addProperty (PropertyName.GameName.newProperty (pDisplayName));
+	Writer writer = null;
+	try
+	{
+		final StringBuilder existing = new StringBuilder ();
+		final Reader reader = new InputStreamReader (openInput (pUri));
+		final char[] buffer = new char[4096];
+		int numChars;
+		while ((numChars = reader.read (buffer)) != -1)
+		{
+			existing.append (buffer, 0, numChars);
+		}
+		reader.close ();
+
+		final OutputStream out =
+			_mainActivity.getContentResolver ().openOutputStream (pUri, "wt");
+		writer = new BufferedWriter (new OutputStreamWriter (out));
+		writer.write (existing.toString ());
+		_gameNode.writeNode (writer);
+	}
+	catch (final Exception e)
+	{
+		if (isEnabledFor (_LOG_TAG, Log.ERROR))
+		{
+			log (_LOG_TAG, Log.ERROR, "appending game failed: '" + e + "'");
+		}
+		return false;
+	}
+	finally
+	{
+		if (writer != null)
+		{
+			try
+			{
+				writer.close ();
+			}
+			catch (final Exception ignored) {}
+		}
+	}
+	return true;
+}
+
+private
+InputStream openInput (
+	final Uri pUri
+	)
+	throws Exception
+{
+	final InputStream in =
+		_mainActivity.getContentResolver ().openInputStream (pUri);
+	if (in == null)
+	{
+		throw new Exception ("openInputStream returned null for " + pUri);
+	}
+	return in;
 }
 
 void setupStones (

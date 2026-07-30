@@ -31,6 +31,9 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Salvar Jogo</string>
 	<string name="menuLoadLabel">Carregar Jogo</string>
+	<string name="saveOverwriteOption">Substituir</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Adicionar como novo jogo no arquivo</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Escolher outro arquivo</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Informações</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Sair</string>
@@ -70,6 +73,11 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="newGameDialogScoringLabel">Pontuação</string>
 	<string name="newGameDialogAIDelayLabel">Movimentos lentos da IA (s)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Permitir rendição</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Margem de toque na borda</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Desativado</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Ativado</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Configurações de exibição</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Novo Jogo</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Aplicar Modificações</b></string>
 	<string name="yourTurnText">Sua vez</string>

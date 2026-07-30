@@ -33,6 +33,9 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Spiel speichern</string>
 	<string name="menuLoadLabel">Spiel laden</string>
+	<string name="saveOverwriteOption">Überschreiben</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Als neues Spiel in Datei anhängen</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Andere Datei wählen</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Beenden</string>
@@ -73,6 +76,11 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="newGameDialogScoringLabel">Regeln</string>
 	<string name="newGameDialogAIDelayLabel">Langsame KI-Züge (Sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Aufgabe erlauben</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Randabstand für Tippen</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Aus</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">An</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Anzeigeeinstellungen</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Neues Spiel</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Übernehmen</b></string>
 	<string name="yourTurnText">Dein Zug</string>

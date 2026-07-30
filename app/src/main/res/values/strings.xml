@@ -31,6 +31,9 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Save Game</string>
 	<string name="menuLoadLabel">Load Game</string>
+	<string name="saveOverwriteOption">Overwrite</string>
+	<string name="saveAppendOption">Append as new game in file</string>
+	<string name="saveChooseNewLocationOption">Choose different file</string>
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Exit</string>

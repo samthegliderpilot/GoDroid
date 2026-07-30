@@ -31,6 +31,9 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Salva Partita</string>
 	<string name="menuLoadLabel">Carica Partita</string>
+	<string name="saveOverwriteOption">Sovrascrivi</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Aggiungi come nuova partita nel file</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Scegli un altro file</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Esci</string>
@@ -70,6 +73,11 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="newGameDialogScoringLabel">Regole Punteggio</string>
 	<string name="newGameDialogAIDelayLabel">Mosse lente dell\'IA (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Consenti la resa</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Margine tocco bordo</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Disattivato</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Attivato</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Impostazioni schermo</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nuova Partita</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Applica Cambiamenti</b></string>
 	<string name="yourTurnText">Tuo turno</string>

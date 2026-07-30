@@ -6,6 +6,7 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
 import android.graphics.Point;
+import android.net.Uri;
 
 import androidx.test.core.app.ActivityScenario;
 import androidx.test.ext.junit.runners.AndroidJUnit4;
@@ -107,7 +108,7 @@ public class GameInfoInstrumentedTest
 		gameInfo._playerBlackMoves = !gameInfo._playerBlackMoves;
 
 		final File file = newFile ("saveTest.sgf");
-		assertTrue (gameInfo.saveGame (file));
+		assertTrue (gameInfo.saveGame (Uri.fromFile (file), file.getName ()));
 		assertTrue (file.exists ());
 
 		final String contents = new String (
@@ -132,11 +133,11 @@ public class GameInfoInstrumentedTest
 		original._playerBlackMoves = !original._playerBlackMoves;
 
 		final File file = newFile ("roundTrip.sgf");
-		assertTrue (original.saveGame (file));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals (9, loaded._boardSize);
@@ -173,13 +174,13 @@ public class GameInfoInstrumentedTest
 		original.initSGF ();
 
 		final File file = newFile ("handicap.sgf");
-		assertTrue (original.saveGame (file));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
 		assertEquals (handicap,
 			original._setupNode.getPropertyValues (PropertyName.AddBlack).size ());
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals (boardSize, loaded._boardSize);
@@ -197,7 +198,7 @@ public class GameInfoInstrumentedTest
 
 		final GameInfo gameInfo = new GameInfo ();
 		final LoadGameStatus status =
-			gameInfo.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SHOW_COLLECTION_LIST, status);
 		assertTrue (gameInfo._isCollection);
@@ -216,7 +217,7 @@ public class GameInfoInstrumentedTest
 		assertEquals ("2 Game Two", gameInfo._collectionNames [1]);
 
 		// Loading the second entry explicitly by index should actually load it.
-		final LoadGameStatus secondStatus = gameInfo.loadGame (file, 1);
+		final LoadGameStatus secondStatus = gameInfo.loadGame (Uri.fromFile (file), 1);
 		assertEquals (LoadGameStatus.SUCCESS, secondStatus);
 		assertEquals (13, gameInfo._boardSize);
 	}
@@ -242,7 +243,7 @@ public class GameInfoInstrumentedTest
 
 		final GameInfo gameInfo = new GameInfo ();
 		final LoadGameStatus status =
-			gameInfo.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertFalse (gameInfo._isCollection);
@@ -275,11 +276,11 @@ public class GameInfoInstrumentedTest
 		original.undo ();
 
 		final File file = newFile ("resume.sgf");
-		assertTrue (original.saveGame (file));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		// Only the first 2 moves (before the undo) should be replayed.
@@ -303,7 +304,7 @@ public class GameInfoInstrumentedTest
 		final boolean chineseRulesBeforeLoad = gameInfo._chineseRules;
 
 		final LoadGameStatus status =
-			gameInfo.loadGame (file, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals ("komi is not restored from SGF on load (known gap)",
