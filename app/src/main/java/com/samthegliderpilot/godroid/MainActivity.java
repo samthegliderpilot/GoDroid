@@ -153,7 +153,8 @@ String
 	_preferencesPlayerBlackHumanKey,
 	_preferencesPlayerWhiteHumanKey,
 	_preferencesAiDelayKey,
-	_preferenceAllowResignationKey;
+	_preferenceAllowResignationKey,
+	_preferencesEdgeTapPaddingKey;
 
 private
 Looper _gnuGoLooper;
@@ -262,6 +263,8 @@ void onCreate ( // 0
 	);
 	_preferenceAllowResignationKey = resources.getString (
 			R.string.preferenceAllowResignationKey);
+	_preferencesEdgeTapPaddingKey = resources.getString (
+			R.string.preferencesEdgeTapPaddingKey);
 
 	_undoHintText = resources.getText (R.string.undoHintText);
 	_redoHintText = resources.getText (R.string.redoHintText);
@@ -270,6 +273,7 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
+	_boardView.setEdgeTapPaddingMode (readEdgeTapPaddingMode ());
 	//if (Build.VERSION.SDK_INT >= 34) {
 	//	EdgeToEdge.enable(this);
 	//}
@@ -677,6 +681,9 @@ void enableMenuItem (
 */
 		} else if (id == R.id.menuShareGame) {
 			gtpShareGame();
+			return true;
+		} else if (id == R.id.menuDisplaySettings) {
+			showDisplaySettingsDialog();
 			return true;
 		} else if (id == R.id.menuExit) {
 			//System.runFinalizersOnExit(true);
@@ -2109,6 +2116,71 @@ void showScore (
 	_blackScoreTextView.setText (String.valueOf (_blackCaptures + pBlackTerritory));
 	_whiteScoreTextView.setText (String.valueOf (
 		_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
+}
+
+private
+EdgeTapPaddingMode readEdgeTapPaddingMode ()
+{
+	try
+	{
+		return EdgeTapPaddingMode.valueOf (_sharedPreferences.getString (
+			_preferencesEdgeTapPaddingKey, EdgeTapPaddingMode.AUTO.name ()));
+	}
+	catch (final Exception e)
+	{
+		return EdgeTapPaddingMode.AUTO;
+	}
+}
+
+private
+void showDisplaySettingsDialog ()
+{
+	final View view = getLayoutInflater ().inflate (
+		R.layout.display_settings, null);
+	final Spinner spinner =
+		view.findViewById (R.id.displaySettingsEdgeTapPaddingSpinner);
+	spinner.setSelection (readEdgeTapPaddingMode ().ordinal ());
+	spinner.setOnItemSelectedListener (new AdapterView.OnItemSelectedListener ()
+	{
+		// Spinner fires once for the initial selection when the dialog opens;
+		// only persist/apply on an actual user pick.
+		private boolean _firstCallback = true;
+
+		public
+		void onItemSelected (
+			final AdapterView <?> pAdapterView,
+			final View pView,
+			final int pPosition,
+			final long pRow
+			)
+		{
+			if (_firstCallback)
+			{
+				_firstCallback = false;
+				return;
+			}
+			final EdgeTapPaddingMode mode = EdgeTapPaddingMode.values () [pPosition];
+			_sharedPreferences.edit ().
+				putString (_preferencesEdgeTapPaddingKey, mode.name ()).
+				commit ();
+			_boardView.setEdgeTapPaddingMode (mode);
+			if (_gameInfo != null)
+			{
+				_gtp.drawBoard (_gameInfo, true);
+			}
+		}
+
+		public
+		void onNothingSelected (
+			final AdapterView <?> pAdapterView
+			)
+		{
+		}
+	});
+	new AlertDialog.Builder (this).
+		setTitle (R.string.menuDisplaySettingsLabel).
+		setView (view).
+		show ();
 }
 
 private

@@ -103,7 +103,6 @@
     android:layout_height="wrap_content"
     android:entries="@array/allowResignation"/>
 
-
         </LinearLayout>
     </ScrollView>
 

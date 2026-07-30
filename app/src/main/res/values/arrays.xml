@@ -118,6 +118,11 @@
 		<item>@string/yes</item>
 		<item>@string/no</item>
 	</string-array>
+	<string-array name="edgeTapPaddingOptions">
+		<item>@string/edgeTapPaddingOff</item>
+		<item>@string/edgeTapPaddingOn</item>
+		<item>@string/edgeTapPaddingAuto</item>
+	</string-array>
 	<string-array name="newGameDialogAIDelayItems">
 		<item>@string/number0</item>
 		<item>@string/number1</item>

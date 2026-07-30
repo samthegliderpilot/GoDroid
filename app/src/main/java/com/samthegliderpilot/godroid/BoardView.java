@@ -88,6 +88,8 @@ boolean _isZoom = false;
 
 float _activeCellWidth;
 
+EdgeTapPaddingMode _edgeTapPaddingMode = EdgeTapPaddingMode.AUTO;
+
 private
 float
 	_zoomFactor, // todo preferences
@@ -425,32 +427,41 @@ void surfaceChanged ( // 4
 	)
 {
 	final boolean isLandscape = pWidth > pHeight;
-	final int boardWidth = isLandscape ? pHeight : pWidth;
 
 	final MainActivity mainActivity = _mainActivity;
 	showScoreBackground (true);
 
 	final Bitmap boardBitmap = _boardBitmap;
-	if (boardBitmap != null && _boardWidth == boardWidth)
+	// Compare the raw surface dimensions directly, not a derived square size
+	// (isLandscape ? pHeight : pWidth) -- on a phone where rotation swaps
+	// width/height exactly, that derived value is unchanged across the swap,
+	// which used to skip re-layout entirely and leave the board using the
+	// wrong orientation's offsets after rotating.
+	if (boardBitmap != null && _boardWidth == pWidth && _boardHeight == pHeight)
 	{
 		drawBoard2Surface ();
 		return;
 	}
-	if (boardBitmap == null)
+	// Re-run for ANY real dimension change (rotation, fold/unfold), not just
+	// the very first surface creation, so the board bitmap and centering
+	// offsets -- and, via drawBoard(true) -> INIT_BOARD -> initBoard(), the
+	// Auto edge-tap-padding decision -- reflect the current screen size.
+	final boolean firstCreate = boardBitmap == null;
+	_boardBitmap = Bitmap.createBitmap (pWidth, pHeight, _bitmapConfig);
+	_boardWidth = pWidth;
+	_boardHeight = pHeight;
+	if (isLandscape)
 	{
-		_boardBitmap = Bitmap.createBitmap (pWidth, pHeight, _bitmapConfig);
-		_boardWidth = pWidth;
-		_boardHeight = pHeight;
-		if (isLandscape)
-		{
-			_yBoardOffset = 0;
-			_xBoardOffset = (pWidth - _boardHeight) / 2;
-		}
-		else
-		{
-			_yBoardOffset = (_boardHeight - pWidth) / 2;
-			_xBoardOffset = 0;
-		}
+		_yBoardOffset = 0;
+		_xBoardOffset = (pWidth - _boardHeight) / 2;
+	}
+	else
+	{
+		_yBoardOffset = (_boardHeight - pWidth) / 2;
+		_xBoardOffset = 0;
+	}
+	if (firstCreate)
+	{
 		mainActivity.newGame ();
 	}
 	else
@@ -459,13 +470,43 @@ void surfaceChanged ( // 4
 	}
 }
 
+void setEdgeTapPaddingMode (
+	final EdgeTapPaddingMode pMode
+	)
+{
+	_edgeTapPaddingMode = pMode;
+}
+
 void initBoard (
 	final int pSize
 	)
 {
 	_boardSize = pSize;
 	final int boardW = _boardWidth, boardH = _boardHeight,
-		realBoardWidth = boardW > boardH ? boardH : boardW;
+		fullBoardWidth = boardW > boardH ? boardH : boardW;
+	final boolean isLandscape = boardW > boardH;
+	final float fullCellWidth = (float)fullBoardWidth / pSize;
+	final boolean paddingActive = EdgeTapMath.isPaddingActive (_edgeTapPaddingMode,
+		fullCellWidth, _resources.getDisplayMetrics ().density,
+		EdgeTapMath.AUTO_EDGE_PADDING_THRESHOLD_DP);
+	// Shrink the whole board by one original row-length and add that margin
+	// only on the left/right (the sides that are actually hard to reach on a
+	// thin phone in a case) -- rather than widening touch tolerance, which
+	// was barely noticeable. The vertical offset keeps the original unshrunk
+	// formula, so the freed vertical space just falls wherever it already
+	// was blank instead of pushing the top/bottom edges in too.
+	final int margin = paddingActive ? (int)(fullCellWidth / 2) : 0;
+	final int realBoardWidth = fullBoardWidth - margin * 2;
+	if (isLandscape)
+	{
+		_yBoardOffset = 0;
+		_xBoardOffset = (boardW - boardH) / 2 + margin;
+	}
+	else
+	{
+		_yBoardOffset = (boardH - boardW) / 2;
+		_xBoardOffset = margin;
+	}
 	final float shapeFactor =  _SHAPE_FACTOR,
 		boardWidth = realBoardWidth * shapeFactor,
 		cellWidth = boardWidth / pSize,

@@ -37,6 +37,8 @@
 	-->
 	<item a:id="@+id/menuShareGame"
 		a:title="@string/menuShareGameLabel"/>
+	<item a:id="@+id/menuDisplaySettings"
+		a:title="@string/menuDisplaySettingsLabel"/>
 	<item a:id="@+id/menuInfo"
 		a:title="@string/menuInfoLabel"
 		a:alphabeticShortcut="@string/menuInfoShortcut"
