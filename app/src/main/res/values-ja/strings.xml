@@ -32,6 +32,9 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="menuSaveLoadShortcut">S</string>
     <string name="menuSaveLabel">局を保存</string>
     <string name="menuLoadLabel">局を読み込む</string>
+    <string name="saveOverwriteOption">上書き</string>
+    <string name="saveAppendOption">ファイルに新しい対局として追加</string>
+    <string name="saveChooseNewLocationOption">別のファイルを選択</string>
     <string name="menuInfoLabel">情報</string>
     <string name="menuInfoShortcut">I</string>
     <string name="menuExitLabel">終了</string>
@@ -56,6 +59,11 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="newGameDialogKomiLabel">コミ</string>
     <string name="newGameDialogScoringLabel">ルール</string>
     <string name="newGameAllowResignationLabel">投了を許可</string>
+    <string name="edgeTapPaddingLabel">端タップの余白</string>
+    <string name="edgeTapPaddingOff">オフ</string>
+    <string name="edgeTapPaddingOn">オン</string>
+    <string name="edgeTapPaddingAuto">自動</string>
+    <string name="menuDisplaySettingsLabel">表示設定</string>
     <string name="newGameDialogStartButtonText"><b>新局開始</b></string>
     <string name="newGameDialogApplytButtonText"><b>変更を適用</b></string>
     <string name="yourTurnText">あなたの手番</string>

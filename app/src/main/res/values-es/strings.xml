@@ -31,6 +31,9 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="menuSaveLoadShortcut">G</string>
 	<string name="menuSaveLabel">Guardar Partida</string>
 	<string name="menuLoadLabel">Cargar Partida</string>
+	<string name="saveOverwriteOption">Sobrescribir</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Añadir como nueva partida en el archivo</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Elegir otro archivo</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Salir</string>
@@ -69,6 +72,11 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="newGameDialogScoringLabel">Puntuación</string>
 	<string name="newGameDialogAIDelayLabel">Retrasar movimientos de la IA (s)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Allow Resignation</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Margen de toque en el borde</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Desactivado</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Activado</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Ajustes de pantalla</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nueva Partida</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Guardar cambios</b></string>
 	<string name="yourTurnText">Tu turno</string>

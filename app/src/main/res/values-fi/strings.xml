@@ -30,6 +30,9 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Tallenna peli</string>
 	<string name="menuLoadLabel">Avaa peli</string>
+	<string name="saveOverwriteOption">Korvaa</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Lisää uutena pelinä tiedostoon</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Valitse toinen tiedosto</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Tietoa</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Poistu</string>
@@ -68,6 +71,11 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="newGameDialogScoringLabel">Pisteytys</string>
 	<string name="newGameDialogAIDelayLabel">Hidasta tekoälyn siirtoja (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Salli luovutus</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Reunan kosketustila</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Pois</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Päällä</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Näyttöasetukset</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Uusi peli</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Toteuta muutokset</b></string>
 	<string name="yourTurnText">Sinun vuorosi</string>

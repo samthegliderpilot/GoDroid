@@ -54,6 +54,9 @@ String
 	_autoSaveGamePathFileName,
 	_externalInputPathFileName;
 
+static final
+Object _autoSaveLock = new Object ();
+
 static
 Handler _mainHandler;
 }

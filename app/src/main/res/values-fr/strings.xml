@@ -30,6 +30,9 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Sauvegarder une partie</string>
 	<string name="menuLoadLabel">Charger une partie</string>
+	<string name="saveOverwriteOption">Écraser</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Ajouter comme nouvelle partie dans le fichier</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Choisir un autre fichier</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Quitter</string>
@@ -69,6 +72,11 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="newGameDialogScoringLabel">Règles</string>
 	<string name="newGameDialogAIDelayLabel">Délais pour les coups de l\'IA (s)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Autoriser l\'abandon</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Marge de touche sur les bords</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Désactivé</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Activé</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Paramètres d\'affichage</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nouvelle Partie</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Modifier</b></string>
 	<string name="yourTurnText">A vous</string>

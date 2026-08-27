@@ -13,7 +13,10 @@ import java.util.Set;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
+import android.database.Cursor;
 import android.os.Build;
+import android.provider.DocumentsContract;
+import android.provider.OpenableColumns;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -22,6 +25,9 @@ import android.widget.*;
 //import androidx.activity.EdgeToEdge;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
+import androidx.activity.result.ActivityResult;
+import androidx.activity.result.ActivityResultLauncher;
+import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -153,7 +159,9 @@ String
 	_preferencesPlayerBlackHumanKey,
 	_preferencesPlayerWhiteHumanKey,
 	_preferencesAiDelayKey,
-	_preferenceAllowResignationKey;
+	_preferenceAllowResignationKey,
+	_preferencesEdgeTapPaddingKey,
+	_preferencesLastSaveLoadUriKey;
 
 private
 Looper _gnuGoLooper;
@@ -163,9 +171,6 @@ Thread _gnuGoThread;
 
 private
 GameInfo _gameInfo;
-
-private
-List <File> _goProblems;
 
 private
 AlertDialog  _progressDialog;
@@ -194,6 +199,9 @@ MenuItem
 private
 boolean _undoEnabled = false, _redoEnabled = false;
 
+private
+int _blackCaptures = 0, _whiteCaptures = 0;
+
     private
 Toast _undoRedoHint;
 
@@ -209,8 +217,15 @@ Dialog _changeGameDialog;
 private
 View _changeGameApplyButton;
 
-static
-FileFilter _sgfFileFilter = null;
+private final
+ActivityResultLauncher <Intent> _saveDocumentLauncher =
+	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
+		this::onSaveDocumentResult);
+
+private final
+ActivityResultLauncher <Intent> _openDocumentLauncher =
+	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
+		this::onOpenDocumentResult);
 
 private native static
 void initGTP (float pMemory);
@@ -259,6 +274,10 @@ void onCreate ( // 0
 	);
 	_preferenceAllowResignationKey = resources.getString (
 			R.string.preferenceAllowResignationKey);
+	_preferencesEdgeTapPaddingKey = resources.getString (
+			R.string.preferencesEdgeTapPaddingKey);
+	_preferencesLastSaveLoadUriKey = resources.getString (
+			R.string.preferencesLastSaveLoadUriKey);
 
 	_undoHintText = resources.getText (R.string.undoHintText);
 	_redoHintText = resources.getText (R.string.redoHintText);
@@ -267,6 +286,7 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
+	_boardView.setEdgeTapPaddingMode (readEdgeTapPaddingMode ());
 	//if (Build.VERSION.SDK_INT >= 34) {
 	//	EdgeToEdge.enable(this);
 	//}
@@ -612,7 +632,7 @@ boolean onPrepareOptionsMenu (
 	)
 {
 	super.onPrepareOptionsMenu (pMenu);
-	enableMenuItem (_saveLoadMenuItem, storageCardMounted ());
+	enableMenuItem (_saveLoadMenuItem, true);
 	return true;
 }
 
@@ -656,10 +676,10 @@ void enableMenuItem (
 			redo();
 			return true;
 		} else if (id == R.id.menuSave) {
-			saveGame(null);
+			launchSaveGamePicker();
 			return true;
 		} else if (id == R.id.menuLoad) {
-			loadGame();
+			launchLoadGamePicker();
 			return true;
 		} else if (id == R.id.menuInfo) {
 			showInfo();
@@ -674,6 +694,9 @@ void enableMenuItem (
 */
 		} else if (id == R.id.menuShareGame) {
 			gtpShareGame();
+			return true;
+		} else if (id == R.id.menuDisplaySettings) {
+			showDisplaySettingsDialog();
 			return true;
 		} else if (id == R.id.menuExit) {
 			//System.runFinalizersOnExit(true);
@@ -1123,134 +1146,186 @@ String getDateFileName ()
 }
 
 private
-void saveGame (
-	final String pFilename
-	)
+void launchSaveGamePicker ()
 {
-	final Resources resources = _resources;
-	final EditText input = new EditText (this);
-	input.setLayoutParams (new ViewGroup.LayoutParams (
-		ViewGroup.LayoutParams.MATCH_PARENT,
-		ViewGroup.LayoutParams.MATCH_PARENT));
-	input.setSelectAllOnFocus (true);
-	final View focusView = input.focusSearch (View.FOCUS_LEFT);
-	if (focusView != null)
-	{
-		focusView.requestFocus ();
-	}
-	final String sgfExtension = getSgfFileExtension ();
 	final GameInfo gameInfo = _gameInfo;
-	String fileName = pFilename;
-	if (fileName == null && !gameInfo._isCollection)
+	// A file this game was already saved to or loaded from exists -- offer
+	// overwriting it, appending as an additional game in the same file, or
+	// picking a different location, instead of always re-prompting a fresh
+	// picker. Overwrite is withheld when the source is already a multi-game
+	// collection, so a careless tap can't silently discard the other games.
+	if (gameInfo._sgfFileName != null)
 	{
-		final String sgfFileName = gameInfo._sgfFileName;
-		if (sgfFileName != null)
-		{
-			fileName = sgfFileName.substring (
-				sgfFileName.lastIndexOf (File.separator) +1);
-			fileName = fileName.substring (0, fileName.indexOf (sgfExtension));
-		}
+		showSaveChoiceDialog ();
+		return;
 	}
-	if (fileName == null)
+	launchSaveGamePickerNewLocation ();
+}
+
+private
+void showSaveChoiceDialog ()
+{
+	final GameInfo gameInfo = _gameInfo;
+	final List <CharSequence> options = Generics.newArrayList (3);
+	final List <Runnable> actions = Generics.newArrayList (3);
+	if (!gameInfo._isCollection)
 	{
-		fileName = getDateFileName ();
+		options.add (getString (R.string.saveOverwriteOption));
+		actions.add (this::gtpSaveGame);
 	}
-	input.setText (fileName);
+	options.add (getString (R.string.saveAppendOption));
+	actions.add (this::gtpAppendGame);
+	options.add (getString (R.string.saveChooseNewLocationOption));
+	actions.add (this::launchSaveGamePickerNewLocation);
 	new AlertDialog.Builder (this).
 		setTitle (R.string.menuSaveLabel).
-		setIcon (R.drawable.saveLoadMenuIcon).
-		setView (input).
-		setPositiveButton (R.string.menuSaveLabel,
-			new DialogInterface.OnClickListener ()
-			{
-				public
-				void onClick (
-					final DialogInterface pDialogInterface,
-					final int pWhichButton
-					)
-				{
-					final File saveLoadGamesDir = getSaveLoadGamesDir ();
-					final Editable inputText = input.getText ();
-					String sgfFileName = null;
-					if (saveLoadGamesDir == null
-						|| inputText == null
-						|| ((sgfFileName = inputText.toString ()) == null)
-						|| ((sgfFileName = formatFileName(sgfFileName.trim())).isEmpty()))
-					{
-						final String fileName = sgfFileName;
-						showMessage (resources.getString (
-							R.string.invalidFileNameAlertMessage,
-							(saveLoadGamesDir == null ?
-								"" : saveLoadGamesDir + "/")
-							+ (sgfFileName == null ? "" : sgfFileName))).
-								setOnDismissListener (
-									new DialogInterface.OnDismissListener ()
-									{
-										public
-										void onDismiss (
-											final DialogInterface
-												pDialogInterface)
-										{
-											saveGame (fileName);
-										}
-									}
-								);
-						return;
-					}
-					final File sgfFile = new File (saveLoadGamesDir,
-						sgfFileName + sgfExtension);
-					final String path = sgfFile.getAbsolutePath ();
-					if (sgfFile.exists ())
-					{
-						final String fileName = sgfFileName;
-						final DialogInterface.OnClickListener clickListener =
-							new DialogInterface.OnClickListener ()
-							{
-								public
-								void onClick (
-									final DialogInterface pDialogInterface,
-									final int pWhichButton
-									)
-								{
-									if (pWhichButton ==
-										DialogInterface.BUTTON_POSITIVE)
-									{
-										gtpSaveGame (path);
-									}
-									else
-									{
-										saveGame (fileName);
-									}
-								}
-							};
-						new AlertDialog.Builder (MainActivity.this).
-							setTitle (R.string.menuSaveLabel).
-							setIcon (R.drawable.saveLoadMenuIcon).
-							setMessage (resources.getString (
-								R.string.fileAlreadyExistsMessage, path,
-								resources.getString (
-									R.string.overwriteButtonLabel))).
-							setNegativeButton (android.R.string.cancel,
-								clickListener).
-							setPositiveButton (R.string.overwriteButtonLabel,
-								clickListener).
-							show ();
-						return;
-					}
-					gtpSaveGame (path);
-				}}).
+		setItems (options.toArray (new CharSequence [0]),
+			(pDialog, pWhich) -> actions.get (pWhich).run ()).
 		show ();
 }
 
 private
-void gtpSaveGame (
-	final String pSgfFilePath
+void launchSaveGamePickerNewLocation ()
+{
+	final GameInfo gameInfo = _gameInfo;
+	String suggestedName = gameInfo._sgfDisplayName;
+	if (suggestedName == null)
+	{
+		suggestedName = getDateFileName ();
+	}
+	final Intent intent = new Intent (Intent.ACTION_CREATE_DOCUMENT);
+	intent.addCategory (Intent.CATEGORY_OPENABLE);
+	intent.setType ("application/x-go-sgf");
+	intent.putExtra (Intent.EXTRA_TITLE, suggestedName + getSgfFileExtension ());
+	addInitialUriHint (intent);
+	_saveDocumentLauncher.launch (intent);
+}
+
+private
+void onSaveDocumentResult (
+	final ActivityResult pResult
 	)
+{
+	if (pResult.getResultCode () != RESULT_OK)
+	{
+		return;
+	}
+	final Intent data = pResult.getData ();
+	final Uri uri = data == null ? null : data.getData ();
+	if (uri == null)
+	{
+		return;
+	}
+	takePersistablePermission (uri, true);
+	rememberLastSaveLoadUri (uri);
+	final GameInfo gameInfo = _gameInfo;
+	gameInfo._sgfFileName = uri.toString ();
+	gameInfo._sgfDisplayName = queryDisplayName (uri);
+	gtpSaveGame ();
+}
+
+private
+void gtpSaveGame ()
 {
 	final GameInfo gameInfo = _gameInfo;
 	showWait4Move2FinishMessage (gameInfo);
-	gameInfo._sgfFileName = pSgfFilePath;
 	_gtp.saveGame (gameInfo);
+}
+
+private
+void gtpAppendGame ()
+{
+	final GameInfo gameInfo = _gameInfo;
+	showWait4Move2FinishMessage (gameInfo);
+	_gtp.appendGame (gameInfo);
+}
+
+private
+void takePersistablePermission (
+	final Uri pUri,
+	final boolean pWritable
+	)
+{
+	try
+	{
+		int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
+		if (pWritable)
+		{
+			flags |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
+		}
+		getContentResolver ().takePersistableUriPermission (pUri, flags);
+	}
+	catch (final Exception e)
+	{
+		if (isEnabledFor (_LOG_TAG, Log.INFO))
+		{
+			log (_LOG_TAG, Log.INFO,
+				"failed to persist URI permission for '" + pUri + "': '" + e + "'");
+		}
+	}
+}
+
+private
+void addInitialUriHint (
+	final Intent pIntent
+	)
+{
+	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
+	{
+		return;
+	}
+	final String lastUriString =
+		_sharedPreferences.getString (_preferencesLastSaveLoadUriKey, null);
+	if (lastUriString == null)
+	{
+		return;
+	}
+	try
+	{
+		pIntent.putExtra (DocumentsContract.EXTRA_INITIAL_URI,
+			Uri.parse (lastUriString));
+	}
+	catch (final Exception ignored) {}
+}
+
+private
+void rememberLastSaveLoadUri (
+	final Uri pUri
+	)
+{
+	_sharedPreferences.edit ().
+		putString (_preferencesLastSaveLoadUriKey, pUri.toString ()).
+		commit ();
+}
+
+private
+String queryDisplayName (
+	final Uri pUri
+	)
+{
+	try (Cursor cursor = getContentResolver ().query (
+		pUri, new String [] {OpenableColumns.DISPLAY_NAME}, null, null, null))
+	{
+		if (cursor != null && cursor.moveToFirst ())
+		{
+			final String name = cursor.getString (0);
+			if (name != null)
+			{
+				final String suffix = getSgfFileExtension ();
+				return name.endsWith (suffix) ?
+					name.substring (0, name.length () - suffix.length ()) : name;
+			}
+		}
+	}
+	catch (final Exception e)
+	{
+		if (isEnabledFor (_LOG_TAG, Log.INFO))
+		{
+			log (_LOG_TAG, Log.INFO,
+				"failed to query display name for '" + pUri + "': '" + e + "'");
+		}
+	}
+	return getDateFileName ();
 }
 
 private static
@@ -1267,7 +1342,7 @@ String getSgfFileExtension ()
 }
 
 private
-void loadGame ()
+void launchLoadGamePicker ()
 {
 	final GameInfo gameInfo = _gameInfo;
 	if (gameInfo._isCollection)
@@ -1275,244 +1350,37 @@ void loadGame ()
 		showCollectionList ();
 		return;
 	}
-	final File saveLoadGamesDir = getSaveLoadGamesDir ();
-	if (saveLoadGamesDir == null)
+	final Intent intent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
+	intent.addCategory (Intent.CATEGORY_OPENABLE);
+	intent.setType ("*/*");
+	intent.putExtra (Intent.EXTRA_MIME_TYPES,
+		new String [] {"application/x-go-sgf", "text/plain"});
+	addInitialUriHint (intent);
+	_openDocumentLauncher.launch (intent);
+}
+
+private
+void onOpenDocumentResult (
+	final ActivityResult pResult
+	)
+{
+	if (pResult.getResultCode () != RESULT_OK)
 	{
 		return;
 	}
-	final Resources resources = _resources;
-	if (_goProblems == null)
+	final Intent data = pResult.getData ();
+	final Uri uri = data == null ? null : data.getData ();
+	if (uri == null)
 	{
-		_goProblems = AssetsManager.extractAssetFiles (
-			getAssets (), null, saveLoadGamesDir,
-			resources.getString (R.string.goProblemsAssetFolderName));
-	}
-	final List <File> goProblems = _goProblems;
-
-	final FileFilter sgfFileFilter = _sgfFileFilter;
-	final String sgfSuffix = getSgfFileExtension ();
-	final File [] files =
-		saveLoadGamesDir.listFiles (sgfFileFilter != null ? sgfFileFilter
-		: (_sgfFileFilter = new FileFilter ()
-			{
-				public
-				boolean accept (
-					final File pFile
-					)
-				{
-					return !pFile.isDirectory ()
-						&& pFile.getName ().endsWith (sgfSuffix);
-				}
-			}));
-	if (files.length == 0)
-	{
-		showMessage (resources.getString (R.string.noFiles2load,
-			saveLoadGamesDir.getAbsolutePath ()));
 		return;
 	}
-	Arrays.sort (files,
-		new Comparator <File> ()
-		{
-			public
-			int compare (
-				final File pFile1,
-				final File pFile2
-				)
-			{
-				return pFile1.lastModified () < pFile2.lastModified () ? 1 : -1;
-			}
-		});
-
-	final String filePath = gameInfo._sgfFileName;
-	final File [] checkedFile = new File [1];
-	int selectedPos = -1, fileIdx = 0;
-	for (final File file : files)
-	{
-		if (file.getAbsolutePath ().equals (filePath))
-		{
-			selectedPos = fileIdx;
-			checkedFile [0] = file;
-			break;
-		}
-		fileIdx++;
-	}
-
-	final ViewStub viewStub = new ViewStub (this, R.layout.load_game);
-	final Dialog dialog = new Dialog (this);
-	dialog.getWindow ().requestFeature (Window.FEATURE_NO_TITLE);
-	dialog.setContentView (viewStub);
-	final View view = viewStub.inflate ();
-
-	final Map <View, File> fileNameViewFileMap =
-			Generics.newHashMap (),
-		deleteButtonViewFileMap = Generics.newHashMap ();
-	final Set <View> fileNameViews = Generics.newHashSet ();
-	final View loadButton = view.findViewById (R.id.loadGameDialogButton);
-	loadButton.setOnClickListener (
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				dialog.dismiss ();
-				newGame (restoreGameInfo (new GameInfo ()), null);
-				final GameInfo gameInfo = _gameInfo;
-				gameInfo._sgfFileName = checkedFile [0].getAbsolutePath ();
-				_gtp.loadGame (
-					gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
-			}
-		});
-
-	final View.OnClickListener selectOnClickListener =
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				loadButton.setEnabled (true);
-				for (final View view : fileNameViews)
-				{
-					final boolean checked = view == pView;
-					final CompoundButton fileNameView = view.
-						findViewById (R.id.fileNameTextView);
-					fileNameView.setChecked (checked);
-					if (checked)
-					{
-						checkedFile [0] =
-							fileNameViewFileMap.get (fileNameView);
-					}
-				}
-			}
-		};
-	@SuppressWarnings ("unchecked")
-	final ArrayAdapter <File> [] arrayAdapter = new ArrayAdapter [1];
-	final View.OnClickListener deleteOnClickListener =
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				final File deleteFile = deleteButtonViewFileMap.get (pView);
-				final DialogInterface.OnClickListener clickListener =
-					new DialogInterface.OnClickListener ()
-					{
-						public
-						void onClick (
-							final DialogInterface pDialogInterface,
-							final int pWhichButton
-							)
-						{
-							if (!deleteFile.delete ())
-							{
-								return;
-							}
-							if (saveLoadGamesDir.listFiles (_sgfFileFilter).
-								length == 0)
-							{
-								dialog.dismiss ();
-							}
-							arrayAdapter [0].remove (deleteFile);
-							final View parentView = (View)pView.getParent ();
-							loadButton.setEnabled (loadButton.isEnabled ()
-								&& !((CompoundButton)parentView.
-									findViewById (R.id.fileNameTextView)).
-										isChecked ());
-						}
-					};
-				new AlertDialog.Builder (MainActivity.this).
-					setTitle (R.string.deleteButtonLabel).
-					setIcon (android.R.drawable.ic_dialog_alert).
-					setMessage (resources.getString (
-						R.string.deleteFileMessage,
-						deleteFile.getAbsolutePath ())).
-					setNegativeButton (android.R.string.cancel, null).
-					setPositiveButton (R.string.deleteButtonLabel,
-						clickListener).
-					show ();
-			}
-		};
-	final ListView filesView =
-            view.findViewById (R.id.fileListView);
-	final LayoutInflater layoutInflater = getLayoutInflater ();
-	final CharSequence fileNameInfoTemplate =
-		resources.getText (R.string.fileNameFileInfoTemplate);
-	final String [] fileNameInfoSources = new String []
-		{
-			resources.getString (R.string.fileNameTemplate),
-			resources.getString (R.string.fileInfoTemplate),
-		};
-	final CharSequence [] fileNameInfoDestinations = new CharSequence [2];
-	filesView.setAdapter (
-		arrayAdapter [0] = new ArrayAdapter <File> (this, 0,
-			Generics.newArrayList (Arrays.asList (files)))
-	{
-		public
-		View getView (
-			final int pPosition,
-			View pCachedView,
-			final ViewGroup pParent
-			)
-		{
-			final CompoundButton fileNameView;
-			final View deleteButtonView;
-			if (pCachedView == null)
-			{
-				pCachedView = layoutInflater.
-					inflate (R.layout.load_game_list_entry, null);
-				fileNameViews.add (pCachedView);
-				pCachedView.setOnClickListener (selectOnClickListener);
-				fileNameView = pCachedView.
-					findViewById (R.id.fileNameTextView);
-				fileNameView.setClickable (false);
-				deleteButtonView = pCachedView.
-					findViewById (R.id.fileDeleteButton);
-				deleteButtonView.setOnClickListener (deleteOnClickListener);
-			}
-			else
-			{
-				fileNameView = pCachedView.
-					findViewById (R.id.fileNameTextView);
-				deleteButtonView = pCachedView.
-					findViewById (R.id.fileDeleteButton);
-			}
-			final File file = getItem (pPosition);
-			fileNameView.setChecked (checkedFile [0] == file);
-			fileNameViewFileMap.put (fileNameView, file);
-			final boolean isGoProblem = goProblems.contains (file);
-			deleteButtonView.setVisibility (
-				isGoProblem ? View.GONE : View.VISIBLE);
-			if (isGoProblem)
-			{
-				fileNameInfoDestinations[1] =
-					resources.getString (R.string.goProblemFileInfo);
-			}
-			else
-			{
-				deleteButtonViewFileMap.put (deleteButtonView, file);
-				final Date date = new Date (file.lastModified ());
-				fileNameInfoDestinations[1] =
-					DateFormat.getDateFormat (
-						MainActivity.this).format (date) + " "
-					+ DateFormat.getTimeFormat (
-						MainActivity.this).format (date);
-			}
-			final String name = file.getName ();
-			fileNameInfoDestinations[0] =
-				name.substring (0, name.lastIndexOf (sgfSuffix));
-			fileNameView.setText (TextUtils.replace (fileNameInfoTemplate,
-				fileNameInfoSources, fileNameInfoDestinations));
-			return pCachedView;
-		}
-	});
-	filesView.setSelection (selectedPos);
-	loadButton.setEnabled (selectedPos != -1);
-	dialog.show ();
+	takePersistablePermission (uri, false);
+	rememberLastSaveLoadUri (uri);
+	newGame (restoreGameInfo (new GameInfo ()), null);
+	final GameInfo gameInfo = _gameInfo;
+	gameInfo._sgfFileName = uri.toString ();
+	gameInfo._sgfDisplayName = queryDisplayName (uri);
+	_gtp.loadGame (gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 }
 
 void showCollectionList ()
@@ -1547,7 +1415,7 @@ void showCollectionList ()
 		{
 			dialog.dismiss ();
 			gameInfo._isCollection = false;
-			loadGame ();
+			launchLoadGamePicker ();
 		}
 	});
 	final View view = viewStub.inflate ();
@@ -1637,43 +1505,6 @@ void showCollectionList ()
 	loadButton.setEnabled (
 		selectedPos != GameInfo._DEFAULT_GAME_COLLECTION_IDX);
 	dialog.show ();
-}
-
-static private
-boolean storageCardMounted ()
-{
-	return Environment.MEDIA_MOUNTED.equals (
-		Environment.getExternalStorageState ());
-}
-
-private
-File getSaveLoadGamesDir ()
-{
-	File saveLoadGamesDir = null;
-	try
-	{
-		saveLoadGamesDir = new File(getExternalFilesDir(null), "GoDroid");
-		if (!saveLoadGamesDir.exists()) {
-			saveLoadGamesDir.mkdirs();
-		}
-	}
-	catch (final Exception e)
-	{
-		if (isEnabledFor (_LOG_TAG, Log.INFO))
-		{
-			log (_LOG_TAG, Log.INFO, "failed accessing SD card: '" + e);
-		}
-		final Resources resources = _resources;
-		new AlertDialog.Builder (this).
-			setTitle (R.string.menuSaveLoadLabel).
-			setIcon (android.R.drawable.ic_dialog_alert).
-			setNeutralButton (android.R.string.ok, null).
-			setMessage (resources.getString (R.string.accessFailedAlertMessage,
-				saveLoadGamesDir != null ? saveLoadGamesDir.getAbsolutePath () :
-					resources.getString (R.string.sdCardName))).show ();
-		return null;
-	}
-	return saveLoadGamesDir;
 }
 
 static
@@ -1794,7 +1625,10 @@ showWaitProgress (
 		builder.setView(layout);
 
 		_progressDialog = builder.create();
-		_progressDialog.show();	
+		_progressDialog.show();
+		// Queue dismissal on the GTP thread so it fires after the pending work completes,
+		// not immediately. The GTP thread processes messages in order, so HIDE_WAIT_PROGRESS
+		// will run after whatever command triggered this dialog.
 		_gtp.hideWaitProgress ();
 	}
 }
@@ -1915,12 +1749,6 @@ void showWait4Move2FinishMessage (
 		_gtp.nextMove (_gameInfo);
 	}
 
-	void continueAfterMove()
-	{
-		// Continue game logic that follows the AI move here
-		// For example, update UI, allow user input, etc.
-	}
-
 void drawBoard (
 	final boolean pInit
 	)
@@ -2019,6 +1847,8 @@ void showCaptures (
 	final int pWhite
 	)
 {
+	_blackCaptures = pBlack;
+	_whiteCaptures = pWhite;
 	_blackCapturesTextView.setText (String.valueOf (pBlack));
 	_whiteCapturesTextView.setText (String.valueOf (pWhite));
 }
@@ -2077,7 +1907,7 @@ void showScore (
 	if (pBlackTerritory == _SHOW_MESSAGE)
 	{
 		_scoreTableRow.setVisibility (View.INVISIBLE);
-		_messageTableRow.setVisibility (View.GONE);
+		_messageTableRow.setVisibility (View.VISIBLE);
 		_messageScoreTextView.setText ((String)pStatus);
 		return;
 	}
@@ -2104,12 +1934,74 @@ void showScore (
 	_moveRowTextView.setText (R.string.territoryLabelText);
 	_blackMoveTextView.setText (String.valueOf (pBlackTerritory));
 	_whiteMoveTextView.setText (String.valueOf (pWhiteTerritory));
-	_blackScoreTextView.setText (String.valueOf (
-		Integer.parseInt (_blackCapturesTextView.getText ().toString ()) +
-		pBlackTerritory + 0f));
+	_blackScoreTextView.setText (String.valueOf (_blackCaptures + pBlackTerritory));
 	_whiteScoreTextView.setText (String.valueOf (
-		Integer.parseInt (_whiteCapturesTextView.getText ().toString ()) +
-		pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
+		_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
+}
+
+private
+EdgeTapPaddingMode readEdgeTapPaddingMode ()
+{
+	try
+	{
+		return EdgeTapPaddingMode.valueOf (_sharedPreferences.getString (
+			_preferencesEdgeTapPaddingKey, EdgeTapPaddingMode.AUTO.name ()));
+	}
+	catch (final Exception e)
+	{
+		return EdgeTapPaddingMode.AUTO;
+	}
+}
+
+private
+void showDisplaySettingsDialog ()
+{
+	final View view = getLayoutInflater ().inflate (
+		R.layout.display_settings, null);
+	final Spinner spinner =
+		view.findViewById (R.id.displaySettingsEdgeTapPaddingSpinner);
+	spinner.setSelection (readEdgeTapPaddingMode ().ordinal ());
+	spinner.setOnItemSelectedListener (new AdapterView.OnItemSelectedListener ()
+	{
+		// Spinner fires once for the initial selection when the dialog opens;
+		// only persist/apply on an actual user pick.
+		private boolean _firstCallback = true;
+
+		public
+		void onItemSelected (
+			final AdapterView <?> pAdapterView,
+			final View pView,
+			final int pPosition,
+			final long pRow
+			)
+		{
+			if (_firstCallback)
+			{
+				_firstCallback = false;
+				return;
+			}
+			final EdgeTapPaddingMode mode = EdgeTapPaddingMode.values () [pPosition];
+			_sharedPreferences.edit ().
+				putString (_preferencesEdgeTapPaddingKey, mode.name ()).
+				commit ();
+			_boardView.setEdgeTapPaddingMode (mode);
+			if (_gameInfo != null)
+			{
+				_gtp.drawBoard (_gameInfo, true);
+			}
+		}
+
+		public
+		void onNothingSelected (
+			final AdapterView <?> pAdapterView
+			)
+		{
+		}
+	});
+	new AlertDialog.Builder (this).
+		setTitle (R.string.menuDisplaySettingsLabel).
+		setView (view).
+		show ();
 }
 
 private
@@ -2252,15 +2144,6 @@ Toast makeToast (
 {
 	final Toast toast = Toast.makeText (pContext, pText, Toast.LENGTH_SHORT);
 	toast.setGravity (Gravity.TOP, 0, 0);
-	final View hintView = toast.getView ();
-	if (hintView instanceof LinearLayout)
-	{
-		final View textView = ((LinearLayout)hintView).getChildAt (0);
-		if (textView != null && textView instanceof TextView)
-		{
-			((TextView)textView).setGravity (Gravity.CENTER_HORIZONTAL);
-		}
-	}
 	return toast;
 }
 }

@@ -55,6 +55,7 @@ enum Command
 	UNDO_MOVE,
 	REDO_MOVE,
 	SAVE_GAME,
+	APPEND_GAME,
 	LOAD_GAME,
 	RESTART_GAME,
 	SHOW_TERRITORY,
@@ -237,6 +238,13 @@ void saveGame (
 	executeCommand (Command.SAVE_GAME, pGameInfo);
 }
 
+void appendGame (
+	final GameInfo pGameInfo
+	)
+{
+	executeCommand (Command.APPEND_GAME, pGameInfo);
+}
+
 void loadGame (
 	final GameInfo pGameInfo,
 	final int pCollectionIdx
@@ -361,6 +369,7 @@ void storeMarkers ()
 		{
 		case '+':
 			markers.add (new Point (x, y));
+			// fall through — '+' is also an intersection, so x increments
 		case '.':
 			x += 1;
 			break;
@@ -670,6 +679,20 @@ void handleMessage (
 				: R.string.saveGameFailedAlertMessage),
 			gameInfo._sgfFileName));
 		return;
+	case APPEND_GAME:
+		mainActivity = _mainActivity;
+		final boolean appendSuccess = doAppendGame (gameInfo);
+		if (appendSuccess)
+		{
+			// The file now definitely holds more than one game -- treat it
+			// as a collection so a later plain "Overwrite" isn't offered.
+			gameInfo._isCollection = true;
+		}
+		mainActivity.showMessage (_resources.getString (
+			(appendSuccess ? R.string.gameSavedInFileMessage
+				: R.string.saveGameFailedAlertMessage),
+			gameInfo._sgfFileName));
+		return;
 	case LOAD_GAME:
 		switch (loadSavedGame (gameInfo, false, pMessage.arg1))
 		{
@@ -897,11 +920,10 @@ void removeDeadStones (
 
 void deleteAutoSaveFile ()
 {
-	final String autoSavePathFileName = _autoSaveGamePathFileName;
-	final File autoSaveFile = new File (autoSavePathFileName);
+	final File autoSaveFile = new File (_autoSaveGamePathFileName);
 	if (autoSaveFile.exists ())
 	{
-		synchronized (autoSavePathFileName)
+		synchronized (_autoSaveLock)
 		{
 			autoSaveFile.delete ();
 		}
@@ -920,22 +942,31 @@ GameInfo.LoadGameStatus loadSavedGame (
 		final String externalInputPathFileName = _externalInputPathFileName;
 		_externalInputPathFileName = null;
 		final boolean loadFromExternalInput = externalInputPathFileName != null;
-		final File saveFile = new File (pAutoSave ?
-			(loadFromExternalInput ?
-				externalInputPathFileName : _autoSaveGamePathFileName) :
-			pGameInfo._sgfFileName);
-		if (!saveFile.isFile ())
+		final Uri uri;
+		if (pAutoSave)
 		{
-			return FAIL;
+			final File file = new File (loadFromExternalInput ?
+				externalInputPathFileName : _autoSaveGamePathFileName);
+			if (!file.isFile ())
+			{
+				return FAIL;
+			}
+			uri = Uri.fromFile (file);
+		}
+		else
+		{
+			uri = Uri.parse (pGameInfo._sgfFileName);
 		}
 		GameInfo.LoadGameStatus success =
-			pGameInfo.loadGame (saveFile, pCollectionIdx);
+			pGameInfo.loadGame (uri, pCollectionIdx);
 		switch (success)
 		{
 		case SHOW_COLLECTION_LIST:
 			if (loadFromExternalInput)
 			{
-				pGameInfo._sgfFileName = externalInputPathFileName;
+				pGameInfo._sgfFileName = uri.toString ();
+				pGameInfo._sgfDisplayName =
+					new File (externalInputPathFileName).getName ();
 			}
 			break;
 		case SUCCESS:
@@ -993,18 +1024,47 @@ boolean saveGame (
 {
 	try
 	{
-		final File file = new File (pAutoSave ? _autoSaveGamePathFileName :
-			pGameInfo._sgfFileName);
-		if (file.isFile () && file.exists ())
+		if (pAutoSave)
 		{
-			file.delete ();
+			final File file = new File (_autoSaveGamePathFileName);
+			if (file.isFile ())
+			{
+				file.delete ();
+			}
+			final boolean success;
+			synchronized (pGameInfo)
+			{
+				success = pGameInfo.saveGame (
+					Uri.fromFile (file), file.getName ());
+			}
+			return success;
 		}
+		final Uri uri = Uri.parse (pGameInfo._sgfFileName);
 		final boolean success;
 		synchronized (pGameInfo)
 		{
-			success = pGameInfo.saveGame (file);
+			success = pGameInfo.saveGame (uri, pGameInfo._sgfDisplayName);
 		}
 		return success;
+	}
+	catch (final Exception e)
+	{
+		return false;
+	}
+}
+
+private
+boolean doAppendGame (
+	final GameInfo pGameInfo
+	)
+{
+	try
+	{
+		final Uri uri = Uri.parse (pGameInfo._sgfFileName);
+		synchronized (pGameInfo)
+		{
+			return pGameInfo.appendGame (uri, pGameInfo._sgfDisplayName);
+		}
 	}
 	catch (final Exception e)
 	{
@@ -1028,8 +1088,15 @@ int getCaptures (
 	final boolean pBlack
 	)
 {
-	return Integer.parseInt (
-		gtpCommand (GtpCommand.GET_CAPTURES, pBlack ? _BLACK : _WHITE));
+	try
+	{
+		return Integer.parseInt (
+			gtpCommand (GtpCommand.GET_CAPTURES, pBlack ? _BLACK : _WHITE));
+	}
+	catch (final NumberFormatException e)
+	{
+		return 0;
+	}
 }
 
 private static

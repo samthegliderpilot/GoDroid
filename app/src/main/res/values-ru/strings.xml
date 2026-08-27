@@ -30,6 +30,9 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="menuSaveLoadShortcut">S</string>
 	<string name="menuSaveLabel">Сохр. игру</string>
 	<string name="menuLoadLabel">Загр. игру</string>
+	<string name="saveOverwriteOption">Перезаписать</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Добавить как новую игру в файл</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Выбрать другой файл</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Инфо</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Выйти</string>
@@ -69,6 +72,11 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="newGameDialogScoringLabel">Правила</string>
 	<string name="newGameDialogAIDelayLabel">Задержка ходов ИИ (сек)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Разрешить сдачу</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Отступ у края для касания</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Выкл</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Вкл</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Авто</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Настройки экрана</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText">
 		<b>Новая игра</b>
 	</string>

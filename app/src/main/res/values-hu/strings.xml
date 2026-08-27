@@ -30,6 +30,9 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="menuSaveLoadShortcut">M</string>
 	<string name="menuSaveLabel">Játék mentése</string>
 	<string name="menuLoadLabel">Játék betöltése</string>
+	<string name="saveOverwriteOption">Felülírás</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Hozzáadás új játékként a fájlhoz</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Másik fájl kiválasztása</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Infó</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Kilép</string>
@@ -69,6 +72,11 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="newGameDialogScoringLabel">Szabály</string>
 	<string name="newGameDialogAIDelayLabel">Lassú AI lépések (mp)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Lemondás engedélyezése</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Széli érintési margó</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Ki</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Be</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Megjelenítési beállítások</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Új játék</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Módosítások alkalmazása</b></string>
 	<string name="yourTurnText">Ön lép</string>

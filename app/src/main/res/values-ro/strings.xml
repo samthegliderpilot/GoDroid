@@ -32,6 +32,9 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="menuSaveLabel">Salvează Jocul</string>
     <string name="menuShareGameLabel">Partajează SGF</string>
 	<string name="menuLoadLabel">Încarcă Jocul</string>
+	<string name="saveOverwriteOption">Suprascrie</string>  <!-- Translation Provided by Claude -->
+	<string name="saveAppendOption">Adaugă ca joc nou în fișier</string>  <!-- Translation Provided by Claude -->
+	<string name="saveChooseNewLocationOption">Alege alt fișier</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Informaţii</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Ieşire</string>
@@ -70,6 +73,11 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="newGameDialogScoringLabel">Calcularea scorului</string>
 	<string name="newGameDialogAIDelayLabel">Întârziere mișcări AI (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Permite renunțarea</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="edgeTapPaddingLabel">Margine de atingere la margine</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOff">Dezactivat</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingOn">Activat</string>  <!-- Translation Provided by Claude -->
+	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="menuDisplaySettingsLabel">Setări afișare</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Joc Nou</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Acceptă modificările</b></string>
 	<string name="yourTurnText">Rândul tău</string>
