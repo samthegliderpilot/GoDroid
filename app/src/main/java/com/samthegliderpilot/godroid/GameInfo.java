@@ -146,6 +146,30 @@ String _sgfFileName;
 // derived from _sgfFileName.
 String _sgfDisplayName;
 
+// What to call the file in messages shown to the user. _sgfFileName is a
+// percent-encoded Uri string, so show the decoded path when the provider
+// exposes a readable one (the device's own storage), else the display name,
+// and only then the raw Uri string.
+String getFileNameForMessages ()
+{
+	if (_sgfFileName != null)
+	{
+		final Uri uri = Uri.parse (_sgfFileName);
+		final String path = uri.getPath ();
+		if ("com.android.externalstorage.documents".equals (uri.getAuthority ())
+			&& path != null && path.startsWith ("/document/"))
+		{
+			// Document ids look like "primary:Documents/game.sgf" for the
+			// internal storage, or "1234-ABCD:Documents/game.sgf" for an SD card.
+			final String documentId = path.substring ("/document/".length ());
+			return documentId.startsWith ("primary:")
+				? "/" + documentId.substring ("primary:".length ())
+				: documentId;
+		}
+	}
+	return _sgfDisplayName != null ? _sgfDisplayName : _sgfFileName;
+}
+
 boolean _isCollection = false;
 
 long[]

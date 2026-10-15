@@ -677,7 +677,7 @@ void handleMessage (
 		mainActivity.showMessage (_resources.getString (
 			(saveGame (gameInfo, false) ? R.string.gameSavedInFileMessage
 				: R.string.saveGameFailedAlertMessage),
-			gameInfo._sgfFileName));
+			gameInfo.getFileNameForMessages ()));
 		return;
 	case APPEND_GAME:
 		mainActivity = _mainActivity;
@@ -691,7 +691,7 @@ void handleMessage (
 		mainActivity.showMessage (_resources.getString (
 			(appendSuccess ? R.string.gameSavedInFileMessage
 				: R.string.saveGameFailedAlertMessage),
-			gameInfo._sgfFileName));
+			gameInfo.getFileNameForMessages ()));
 		return;
 	case LOAD_GAME:
 		switch (loadSavedGame (gameInfo, false, pMessage.arg1))
@@ -699,7 +699,8 @@ void handleMessage (
 		case FAIL:
 			mainActivity = _mainActivity;
 			mainActivity.showMessage (_resources.getString (
-				R.string.loadGameFailedAlertMessage, gameInfo._sgfFileName));
+				R.string.loadGameFailedAlertMessage,
+					gameInfo.getFileNameForMessages ()));
 			return;
 		case SHOW_COLLECTION_LIST:
 			showCollectionList ();

@@ -1543,7 +1543,7 @@ void showCollectionList ()
 	if (names == null || names.length == 0)
 	{
 		showMessage (resources.getString (R.string.noFiles2load,
-			gameInfo._sgfFileName));
+			gameInfo.getFileNameForMessages ()));
 		return;
 	}
 	final List <String> namesList = Arrays.asList (names);
