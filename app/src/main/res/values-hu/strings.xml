@@ -33,6 +33,11 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="saveOverwriteOption">Felülírás</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Hozzáadás új játékként a fájlhoz</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Másik fájl kiválasztása</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">%1$d mentett játékot találtunk a GoDroid egy régebbi verziójából egy privát mappában, amelyet más alkalmazások nem láthatnak. Átmásolja őket egy Ön által választott mappába? Az eredetik a helyükön maradnak.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Mappa kiválasztása</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Most nem</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Ne kérdezze többé</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">%1$d/%2$d játék átmásolva.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Infó</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Kilép</string>

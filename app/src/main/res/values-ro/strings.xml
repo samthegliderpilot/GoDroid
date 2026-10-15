@@ -35,6 +35,11 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="saveOverwriteOption">Suprascrie</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Adaugă ca joc nou în fișier</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Alege alt fișier</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Au fost găsite %1$d jocuri salvate de o versiune mai veche a GoDroid într-un dosar privat, pe care alte aplicații nu îl pot vedea. Le copiezi într-un dosar la alegere? Originalele vor rămâne pe loc.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Alege dosarul</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Nu acum</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Nu mai întreba</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Au fost copiate %1$d din %2$d jocuri.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Informaţii</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Ieşire</string>

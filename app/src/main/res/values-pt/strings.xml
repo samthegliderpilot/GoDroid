@@ -34,6 +34,11 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="saveOverwriteOption">Substituir</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Adicionar como novo jogo no arquivo</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Escolher outro arquivo</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Foram encontrados %1$d jogo(s) salvo(s) por uma versão anterior do GoDroid em uma pasta privada que outros aplicativos não conseguem ver. Copiá-los para uma pasta de sua escolha? Os originais serão mantidos.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Escolher pasta</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Agora não</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Não perguntar novamente</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">%1$d de %2$d jogos copiados.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Informações</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Sair</string>

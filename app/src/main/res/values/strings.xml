@@ -34,6 +34,11 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="saveOverwriteOption">Overwrite</string>
 	<string name="saveAppendOption">Append as new game in file</string>
 	<string name="saveChooseNewLocationOption">Choose different file</string>
+	<string name="migrateOldSavesMessage">Found %1$d saved game(s) from an older version of GoDroid in a private folder that other apps cannot see. Copy them to a folder you choose? The originals will be left in place.</string>
+	<string name="migrateOldSavesChooseFolder">Choose folder</string>
+	<string name="migrateOldSavesNotNow">Not now</string>
+	<string name="migrateOldSavesDontAskAgain">Don\'t ask again</string>
+	<string name="migrateOldSavesDone">Copied %1$d of %2$d games.</string>
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Exit</string>

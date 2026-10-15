@@ -34,6 +34,11 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="saveOverwriteOption">Zastąp</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Dodaj jako nową grę w pliku</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Wybierz inny plik</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Znaleziono %1$d zapisanych gier z starszej wersji GoDroid w prywatnym folderze, którego inne aplikacje nie widzą. Skopiować je do wybranego folderu? Oryginały pozostaną na miejscu.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Wybierz folder</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Nie teraz</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Nie pytaj ponownie</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Skopiowano %1$d z %2$d gier.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Wyjście</string>

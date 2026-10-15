@@ -33,6 +33,11 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="saveOverwriteOption">Korvaa</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Lisää uutena pelinä tiedostoon</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Valitse toinen tiedosto</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Löytyi %1$d tallennettua peliä GoDroidin vanhemmasta versiosta yksityisestä kansiosta, jota muut sovellukset eivät näe. Kopioidaanko ne valitsemaasi kansioon? Alkuperäiset jäävät paikoilleen.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Valitse kansio</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Ei nyt</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Älä kysy uudelleen</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Kopioitu %1$d/%2$d peliä.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Tietoa</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Poistu</string>

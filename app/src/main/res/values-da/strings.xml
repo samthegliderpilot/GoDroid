@@ -32,6 +32,11 @@ GNU Go er en AI motor som spiller Go på ca. 8 til 12 kyu styrke.
 	<string name="saveOverwriteOption">Overskriv</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Tilføj som nyt spil i filen</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Vælg en anden fil</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Der blev fundet %1$d gemt(e) spil fra en ældre version af GoDroid i en privat mappe, som andre apps ikke kan se. Vil du kopiere dem til en mappe, du selv vælger? Originalerne bliver liggende.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Vælg mappe</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Ikke nu</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Spørg ikke igen</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Kopierede %1$d af %2$d spil.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Afslut</string>

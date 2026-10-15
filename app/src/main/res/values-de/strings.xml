@@ -36,6 +36,11 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="saveOverwriteOption">Überschreiben</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Als neues Spiel in Datei anhängen</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Andere Datei wählen</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Es wurden %1$d gespeicherte Spiele aus einer älteren GoDroid-Version in einem privaten Ordner gefunden, den andere Apps nicht sehen können. In einen Ordner Ihrer Wahl kopieren? Die Originale bleiben erhalten.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Ordner wählen</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Nicht jetzt</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Nicht mehr fragen</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">%1$d von %2$d Spielen kopiert.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Beenden</string>

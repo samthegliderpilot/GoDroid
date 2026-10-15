@@ -33,6 +33,11 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="saveOverwriteOption">Écraser</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Ajouter comme nouvelle partie dans le fichier</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Choisir un autre fichier</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">%1$d partie(s) enregistrée(s) par une ancienne version de GoDroid ont été trouvées dans un dossier privé que les autres applications ne peuvent pas voir. Les copier dans un dossier de votre choix ? Les originaux seront conservés.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Choisir un dossier</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Pas maintenant</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Ne plus demander</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">%1$d partie(s) copiée(s) sur %2$d.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Quitter</string>

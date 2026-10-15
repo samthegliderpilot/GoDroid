@@ -34,6 +34,11 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="saveOverwriteOption">Sovrascrivi</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Aggiungi come nuova partita nel file</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Scegli un altro file</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">Trovate %1$d partite salvate da una versione precedente di GoDroid in una cartella privata che le altre app non possono vedere. Copiarle in una cartella a tua scelta? Gli originali verranno lasciati dove sono.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Scegli cartella</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Non ora</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Non chiedere più</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Copiate %1$d partite su %2$d.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Info</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Esci</string>

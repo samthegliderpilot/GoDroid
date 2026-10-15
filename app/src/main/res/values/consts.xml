@@ -116,6 +116,7 @@
 	<string name="preferenceAllowResignationKey">allowResignation</string>
 	<string name="preferencesEdgeTapPaddingKey">edgeTapPaddingMode</string>
 	<string name="preferencesLastSaveLoadUriKey">lastSaveLoadUri</string>
+	<string name="preferencesOldSavesMigrationDismissedKey">oldSavesMigrationDismissed</string>
 
 	<drawable name="newGameMenuIcon">@android:drawable/ic_menu_add</drawable>
 	<drawable name="passMenuIcon">

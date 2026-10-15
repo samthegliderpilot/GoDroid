@@ -33,6 +33,11 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="saveOverwriteOption">Перезаписать</string>  <!-- Translation Provided by Claude -->
 	<string name="saveAppendOption">Добавить как новую игру в файл</string>  <!-- Translation Provided by Claude -->
 	<string name="saveChooseNewLocationOption">Выбрать другой файл</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesMessage">В закрытой папке, недоступной другим приложениям, найдено сохранённых партий от старой версии GoDroid: %1$d. Скопировать их в выбранную вами папку? Оригиналы останутся на месте.</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesChooseFolder">Выбрать папку</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesNotNow">Не сейчас</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDontAskAgain">Больше не спрашивать</string>  <!-- Translation Provided by Claude -->
+	<string name="migrateOldSavesDone">Скопировано партий: %1$d из %2$d.</string>  <!-- Translation Provided by Claude -->
 	<string name="menuInfoLabel">Инфо</string>
 	<string name="menuInfoShortcut">I</string>
 	<string name="menuExitLabel">Выйти</string>

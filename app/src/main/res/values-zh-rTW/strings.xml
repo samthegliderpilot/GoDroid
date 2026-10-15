@@ -35,6 +35,11 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="saveOverwriteOption">覆蓋</string>  <!-- Translation Provided by Claude -->
     <string name="saveAppendOption">作為新對局附加到檔案</string>  <!-- Translation Provided by Claude -->
     <string name="saveChooseNewLocationOption">選擇其他檔案</string>  <!-- Translation Provided by Claude -->
+    <string name="migrateOldSavesMessage">在其他應用程式無法存取的私人資料夾中找到 %1$d 個由舊版 GoDroid 儲存的對局。要將它們複製到您選擇的資料夾嗎？原始檔案會保留不動。</string>  <!-- Translation Provided by Claude -->
+    <string name="migrateOldSavesChooseFolder">選擇資料夾</string>  <!-- Translation Provided by Claude -->
+    <string name="migrateOldSavesNotNow">暫不</string>  <!-- Translation Provided by Claude -->
+    <string name="migrateOldSavesDontAskAgain">不再詢問</string>  <!-- Translation Provided by Claude -->
+    <string name="migrateOldSavesDone">已複製 %1$d/%2$d 個對局。</string>  <!-- Translation Provided by Claude -->
     <string name="menuInfoLabel">關于</string>
     <string name="menuInfoShortcut">I</string>
     <string name="menuExitLabel">退出</string>

@@ -35,6 +35,11 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="saveOverwriteOption">上書き</string>
     <string name="saveAppendOption">ファイルに新しい対局として追加</string>
     <string name="saveChooseNewLocationOption">別のファイルを選択</string>
+    <string name="migrateOldSavesMessage">古いバージョンの GoDroid で保存された対局が %1$d 件、他のアプリから見えないプライベートフォルダーに見つかりました。選択したフォルダーにコピーしますか？元のファイルはそのまま残ります。</string>
+    <string name="migrateOldSavesChooseFolder">フォルダーを選択</string>
+    <string name="migrateOldSavesNotNow">今はしない</string>
+    <string name="migrateOldSavesDontAskAgain">今後表示しない</string>
+    <string name="migrateOldSavesDone">%2$d 件中 %1$d 件の対局をコピーしました。</string>
     <string name="menuInfoLabel">情報</string>
     <string name="menuInfoShortcut">I</string>
     <string name="menuExitLabel">終了</string>
