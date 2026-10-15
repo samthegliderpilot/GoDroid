@@ -1,0 +1,15 @@
+A GoDroid segítségével az ősi Go táblajátékot játszhatod Android telefonodon vagy táblagépeden – a GnuGo számítógépes motor ellen vagy a melletted ülő barátod ellen.
+
+Funkciók
+• Játssz a GnuGo vagy egy másik személy ellen ugyanazon az eszközön
+• Japán és kínai szabályok
+• 9×9-es, 13×13-as és 19×19-es táblák
+• Előnykövek, állítható komi és állítható gépi erősség
+• Érintésvezérlés a kövek pontos lerakásához, olyan móddal, amely margót ad a képernyő széleihez
+• Visszalépés, előrelépés és passz
+• Játszmák mentése és betöltése a szabványos SGF formátumban egy tetszőleges mappába; több játszma is hozzáadható egy fájlhoz
+• .sgf fájlok megnyitása más alkalmazásokból és a játszmáid megosztása
+• Választható késleltetés a gép lépései előtt, és lehetőség arra, hogy a gép ne adhassa fel a játszmát
+• Sok nyelvre lefordítva
+
+A GoDroid Andreas Grothe eredeti GOdroid alkalmazásának megújított változata (fork). Nincsenek hirdetések, nincs követés, és nem kér engedélyeket. Szabad szoftver a GPLv3 alatt.

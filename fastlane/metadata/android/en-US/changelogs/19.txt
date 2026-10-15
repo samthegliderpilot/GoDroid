@@ -1,0 +1,6 @@
+First F-Droid release, with everything new in 1.5:
+• Save and load through Android's file picker, in any folder
+• Add games to an existing SGF file
+• Copy games saved by older versions to a folder you choose
+• Side margins option for easier edge taps
+• Larger star points; fixes for rotating and folding

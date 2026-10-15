@@ -1,0 +1,15 @@
+GoDroid pozwala grać w starożytną grę go na telefonie lub tablecie z Androidem – przeciwko silnikowi komputerowemu GnuGo albo przeciwko znajomemu siedzącemu obok.
+
+Funkcje
+• Gra przeciwko GnuGo lub drugiej osobie na tym samym urządzeniu
+• Zasady japońskie i chińskie
+• Plansze 9×9, 13×13 i 19×19
+• Kamienie handicapu, regulowane komi i regulowana siła komputera
+• Sterowanie dotykiem zaprojektowane do dokładnego stawiania kamieni, z trybem dodającym marginesy przy krawędziach ekranu
+• Cofnij, ponów i pas
+• Zapisywanie i wczytywanie partii w standardowym formacie SGF w dowolnym wybranym folderze; dodawanie wielu partii do jednego pliku
+• Otwieranie plików .sgf z innych aplikacji i udostępnianie partii
+• Opcjonalne opóźnienie przed ruchami komputera oraz możliwość zablokowania poddawania się komputera
+• Przetłumaczone na wiele języków
+
+GoDroid to zmodernizowany fork oryginalnego GOdroid autorstwa Andreasa Grothe. Bez reklam, bez śledzenia i bez wymaganych uprawnień. Wolne oprogramowanie na licencji GPLv3.

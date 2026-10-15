@@ -25,21 +25,6 @@ jobs:
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
 
-      - name: Create placeholder keystore.properties
-        # Debug/test tasks never touch the "release" signingConfig, but
-        # app/build.gradle.kts unconditionally loads this file for every
-        # task. This placeholder is not used to sign anything -- it just
-        # lets Gradle's configuration phase succeed. Real release signing
-        # uses real secrets, see release.yml.
-        run: |
-          mkdir -p keystore
-          cat > keystore/keystore.properties <<'EOF'
-          storeFile=placeholder.keystore
-          storePassword=placeholder
-          keyAlias=placeholder
-          keyPassword=placeholder
-          EOF
-
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
 

@@ -1,0 +1,15 @@
+GoDroid îți permite să joci vechiul joc Go pe telefonul sau tableta ta Android – împotriva motorului de calculator GnuGo sau împotriva unui prieten care stă lângă tine.
+
+Funcții
+• Joacă împotriva GnuGo sau a altei persoane pe același dispozitiv
+• Reguli japoneze și chinezești
+• Table de 9×9, 13×13 și 19×19
+• Pietre de handicap, komi reglabil și putere reglabilă a calculatorului
+• Comenzi tactile gândite pentru plasarea precisă a pietrelor, cu un mod care adaugă margini la marginile ecranului
+• Anulare, refacere și pas
+• Salvează și încarcă partide în formatul standard SGF în orice dosar alegi; adaugă mai multe partide în același fișier
+• Deschide fișiere .sgf din alte aplicații și partajează-ți partidele
+• Întârziere opțională înainte de mutările calculatorului și opțiunea de a-l împiedica să renunțe
+• Tradus în multe limbi
+
+GoDroid este o versiune modernizată (fork) a GOdroid-ului original de Andreas Grothe. Fără reclame, fără urmărire și fără permisiuni necesare. Software liber sub GPLv3.

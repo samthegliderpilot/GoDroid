@@ -1,0 +1,15 @@
+Med GoDroid kan du spille det eldgamle brettspillet go på Android-telefonen eller -nettbrettet ditt – mot datamotoren GnuGo eller mot en venn som sitter ved siden av deg.
+
+Funksjoner
+• Spill mot GnuGo eller en annen person på samme enhet
+• Japanske og kinesiske regler
+• Brett på 9×9, 13×13 og 19×19
+• Handicapsteiner, justerbar komi og justerbar datastyrke
+• Berøringsstyring laget for å plassere steiner nøyaktig, med en modus som legger til marger i skjermkantene
+• Angre, gjør om og pass
+• Lagre og last inn spill i standardformatet SGF i en hvilken som helst mappe du velger; legg flere spill i samme fil
+• Åpne .sgf-filer fra andre apper og del spillene dine
+• Valgfri forsinkelse før datamaskinens trekk og mulighet for å hindre at datamaskinen gir opp
+• Oversatt til mange språk
+
+GoDroid er en modernisert fork av den opprinnelige GOdroid av Andreas Grothe. Ingen reklame, ingen sporing og ingen tillatelser kreves. Fri programvare under GPLv3.

@@ -1,0 +1,15 @@
+GoDroid lets you play the ancient game of Go on your Android phone or tablet - against the GnuGo computer engine, or against a friend sitting next to you.
+
+Features
+• Play against GnuGo or another person on the same device
+• Japanese and Chinese rules
+• 9×9, 13×13 and 19×19 boards
+• Handicap stones, adjustable komi and adjustable computer strength
+• Touch controls designed for placing stones accurately, including a mode that adds margins at the screen edges
+• Undo, redo and pass
+• Save and load games in the standard SGF format, in any folder you choose; add several games to one file
+• Open .sgf files from other apps and share your games
+• Optional delay before the computer moves, and an option to stop the computer from resigning
+• Translated into many languages
+
+GoDroid is a modernised fork of the original GOdroid by Andreas Grothe. No ads, no tracking, and it requests no permissions. Free software under the GPLv3.

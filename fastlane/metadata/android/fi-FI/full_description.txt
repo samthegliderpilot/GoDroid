@@ -1,0 +1,15 @@
+GoDroidilla pelaat ikivanhaa Go-lautapeliä Android-puhelimella tai -tabletilla – tietokonemoottori GnuGota vastaan tai vieressäsi istuvaa ystävää vastaan.
+
+Ominaisuudet
+• Pelaa GnuGota tai toista ihmistä vastaan samalla laitteella
+• Japanilaiset ja kiinalaiset säännöt
+• 9×9-, 13×13- ja 19×19-laudat
+• Tasoituskivet, säädettävä komi ja säädettävä tietokoneen taso
+• Kosketusohjaus, joka on suunniteltu kivien tarkkaan asettamiseen, mukaan lukien tila, joka lisää marginaalit näytön reunoille
+• Peru, tee uudestaan ja passaa
+• Tallenna ja avaa pelejä SGF-vakiomuodossa mihin tahansa valitsemaasi kansioon; lisää useita pelejä samaan tiedostoon
+• Avaa .sgf-tiedostoja muista sovelluksista ja jaa pelisi
+• Valinnainen viive ennen tietokoneen siirtoja ja mahdollisuus estää tietokonetta luovuttamasta
+• Käännetty useille kielille
+
+GoDroid on Andreas Grothen alkuperäisen GOdroidin päivitetty haarautuma. Ei mainoksia, ei seurantaa eikä sovellus vaadi käyttöoikeuksia. Vapaa ohjelmisto GPLv3-lisenssillä.
