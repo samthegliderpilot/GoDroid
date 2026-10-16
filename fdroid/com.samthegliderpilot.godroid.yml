@@ -1,5 +1,5 @@
 Categories:
-  - Games
+  - Board Game
 License: GPL-3.0-or-later
 AuthorName: Sam Gilbert
 WebSite: https://github.com/samthegliderpilot/GoDroid
@@ -11,8 +11,8 @@ AutoName: GoDroid
 
 RepoType: git
 Repo: https://github.com/samthegliderpilot/GoDroid.git
-
-Binaries: https://github.com/samthegliderpilot/GoDroid/releases/download/v%v/GoDroid-%v.apk
+Binaries: 
+  https://github.com/samthegliderpilot/GoDroid/releases/download/v%v/GoDroid-%v.apk
 
 Builds:
   - versionName: 1.5.1
@@ -22,6 +22,8 @@ Builds:
     submodules: true
     gradle:
       - yes
+    rm:
+      - third_party/gnugo-3.8/regression
     ndk: r27
 
 AllowedAPKSigningKeys: 012057b98ef9ae86eaf4238793189cefbf436715fe133d9c549e51789544198e
