@@ -1,9 +1,3 @@
-# DRAFT recipe for F-Droid's fdroiddata repository (https://gitlab.com/fdroid/fdroiddata).
-# It lives here only as a reference copy: to submit, fork fdroiddata, copy this file to
-# metadata/com.samthegliderpilot.godroid.yml and open a merge request.
-# Fields marked CHECK should be confirmed against F-Droid's current docs / linter output
-# (run `fdroid lint` and `fdroid build` in the fdroiddata checkout, or read their CI result).
-
 Categories:
   - Games
 License: GPL-3.0-or-later
@@ -18,17 +12,19 @@ AutoName: GoDroid
 RepoType: git
 Repo: https://github.com/samthegliderpilot/GoDroid.git
 
+Binaries: https://github.com/samthegliderpilot/GoDroid/releases/download/v%v/GoDroid-%v.apk
+
 Builds:
   - versionName: 1.5.1
     versionCode: 19
-    commit: v1.5.1
+    commit: REPLACE_WITH_FULL_COMMIT_HASH
     subdir: app
     submodules: true
     gradle:
       - yes
-    # CHECK: the app pins NDK 27.0.12077973, which is NDK r27. Use whatever name
-    # F-Droid's build server accepts for that release.
     ndk: r27
+
+AllowedAPKSigningKeys: 012057b98ef9ae86eaf4238793189cefbf436715fe133d9c549e51789544198e
 
 AutoUpdateMode: Version
 UpdateCheckMode: Tags ^v[0-9.]+$

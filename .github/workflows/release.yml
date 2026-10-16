@@ -77,18 +77,6 @@ jobs:
           generate_release_notes: true
           files: dist/*
 
-      - name: Upload to Google Play (internal testing)
-        # Runs after the GitHub release so a Play-side problem (permissions,
-        # duplicate versionCode) never blocks the GitHub release. Promote to
-        # production by hand in the Play Console after testing the internal build.
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
-          packageName: com.samthegliderpilot.godroid
-          releaseFiles: dist/*.aab
-          track: internal
-          status: completed
-
       - name: Remove decoded keystore
         if: always()
         run: rm -f app/release.keystore

@@ -1,0 +1,58 @@
+name: Upload to Google Play
+
+# Manual only. Play never accepts the same versionCode twice, so uploading is a
+# deliberate step (Actions > Upload to Google Play > Run workflow) and is kept
+# out of the tag-triggered release. It uploads the AAB attached to an existing
+# GitHub release, so what reaches Play is exactly what was released; nothing is
+# rebuilt here.
+
+on:
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: 'Release tag whose AAB to upload (e.g. v1.5.1)'
+        required: true
+        type: string
+      track:
+        description: 'Play track'
+        required: true
+        type: choice
+        options:
+          - internal
+          - alpha
+          - beta
+          - production
+        default: internal
+      status:
+        description: 'Release status (draft = review and roll out by hand in the Play Console)'
+        required: true
+        type: choice
+        options:
+          - completed
+          - draft
+        default: completed
+
+permissions:
+  contents: read
+
+jobs:
+  upload:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download the AAB from the GitHub release
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag }}
+        run: |
+          gh release download "$TAG" --repo "${{ github.repository }}" --pattern '*.aab' --dir dist
+          test "$(ls dist/*.aab | wc -l)" -eq 1
+
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_SERVICE_ACCOUNT_JSON }}
+          packageName: com.samthegliderpilot.godroid
+          releaseFiles: dist/*.aab
+          track: ${{ inputs.track }}
+          status: ${{ inputs.status }}
