@@ -11,6 +11,13 @@ android {
     // Pinned so every builder (CI, F-Droid, local) compiles GnuGo with the same NDK.
     ndkVersion = "27.0.12077973"
 
+    // Do not embed the encrypted "Dependency metadata" block in the APK or AAB. It is
+    // meant for Google and F-Droid rejects upstream APKs that carry it.
+    dependenciesInfo {
+        includeInApk = false
+        includeInBundle = false
+    }
+
     defaultConfig {
         minSdk = 24
         targetSdk = 36
