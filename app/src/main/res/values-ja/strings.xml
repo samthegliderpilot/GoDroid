@@ -148,6 +148,5 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="chooseVariationText">変化図を選択</string>
     <string name="menuToStartLabel">初手へ</string>
     <string name="goProblemFileInfo">問題 (Go)</string>
-    <string name="menuShowTerritoryLabel">@string/territoryLabelText</string>
     <string name="menuShareGameLabel">SGFを共有</string>
 </resources>

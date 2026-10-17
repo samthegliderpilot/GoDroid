@@ -11,7 +11,7 @@ Major features include:
 - Japanese and Chinese rules
 - 9x9, 13x13 and 19x19 boards
 - Great touch controls for playing stones
-- Save and load SFG's
+- Save and load SGF's
 - Localized to many languages (some translations were made with ChatGPT)
 
 Besides updating API calls, recently added features are:

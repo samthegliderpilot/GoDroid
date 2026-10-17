@@ -31,10 +31,6 @@
 	<item a:id="@+id/menuToStart"
 		a:title="@string/menuToStartLabel"
 		a:alphabeticShortcut="@string/menuToStartShortcut"/>
-	<!-- too slow (takes minutes) in most situations
-	<item a:id="@+id/menuShowTerritory"
-		a:title="@string/menuShowTerritoryLabel"/>
-	-->
 	<item a:id="@+id/menuShareGame"
 		a:title="@string/menuShareGameLabel"/>
 	<item a:id="@+id/menuDisplaySettings"
