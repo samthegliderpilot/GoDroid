@@ -703,11 +703,6 @@ void enableMenuItem (
 		} else if (id == R.id.menuToStart) {
 			restartGame();
 			return true;
-/* too slow (takes minutes) in most situations
-} else if (id == R.id.menuShowTerritory) {
-    showTerritory();
-    return true;
-*/
 		} else if (id == R.id.menuShareGame) {
 			gtpShareGame();
 			return true;
@@ -1696,18 +1691,6 @@ boolean onKeyDown (
 	case KeyEvent.KEYCODE_J:
 		diffX = 1;
 		break;
-	/*
-	case KeyEvent.KEYCODE_BACK:
-		if (_undoEnabled)
-		{
-			undo ();
-		}
-		else
-		{
-			showUndoRedoHint (_noUndoHintText);
-		}
-		break;
-	*/
 	default:
 		return super.onKeyDown (pKeyCode, pKeyEvent);
 	}

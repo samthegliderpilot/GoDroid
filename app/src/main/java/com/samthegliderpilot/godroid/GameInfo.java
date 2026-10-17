@@ -94,20 +94,6 @@ enum Rules
 		_sgfPropertyName = pSgfName;
 	}
 }
-/*
-static final
-Map <String, Rules> _rulesMap;
-static
-{
-	final Rules[] rules = Rules.values ();
-	final Map <String, Rules> rulesMap =
-		_rulesMap = Generics.newHashMap (rules.length);
-	for (final Rules rule : rules)
-	{
-		rulesMap.put (rule._sgfPropertyName, rule);
-	}
-}
-*/
 
 enum LoadGameStatus
 {

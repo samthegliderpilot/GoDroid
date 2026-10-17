@@ -91,8 +91,6 @@ enum GtpCommand
 	LIST_LEGAL ("all_legal "),
 	LIST_FINAL_STATUS ("final_status_list "),
 	ESTIMATE_SCORE ("estimate_score"),
-//	SAVE_SGF ("printsgf "),
-//	LOAD_SGF ("loadsgf "),
 	GET_BOARDSIZE ("query_boardsize"),
 	SET_HANDICAP ("fixed_handicap "),
 	UNDO ("gg-undo ");

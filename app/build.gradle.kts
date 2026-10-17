@@ -27,7 +27,9 @@ android {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
 
         ndk {
-            abiFilters += listOf("armeabi-v7a", "arm64-v8a", "x86", "x86_64")
+            // Application.mk only builds armeabi-v7a/arm64-v8a; claiming x86/x86_64 here
+            // without building them would ship an APK missing the native lib on those ABIs.
+            abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
 
         externalNativeBuild {
@@ -42,7 +44,7 @@ android {
     val hasReleaseKeystore = keystorePropertiesFile.exists()
     if (hasReleaseKeystore) {
         val keystoreProperties = Properties().apply {
-            load(FileInputStream(keystorePropertiesFile))
+            FileInputStream(keystorePropertiesFile).use { load(it) }
         }
         signingConfigs {
             create("release") {
@@ -87,9 +89,8 @@ dependencies {
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.core)
+    implementation(libs.activity)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(libs.appcompat)
-    implementation(libs.activity)
 }
