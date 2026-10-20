@@ -14,8 +14,17 @@
 
 # Uncomment this to preserve the line number information for
 # debugging stack traces.
-#-keepattributes SourceFile,LineNumberTable
+-keepattributes SourceFile,LineNumberTable
 
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+
+# MainActivity declares `native` methods (the GnuGo JNI bridge). The native
+# side looks these up by exact name, so R8 must never rename or strip them -
+# the Android default rules already cover this generically, but it's made
+# explicit here since getting it wrong only shows up as a release-build-only
+# crash (debug builds don't run R8 and would never catch the breakage).
+-keepclasseswithmembernames class * {
+    native <methods>;
+}

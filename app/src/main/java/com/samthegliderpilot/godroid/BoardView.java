@@ -26,6 +26,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
+import android.view.ViewConfiguration;
 import android.widget.Toast;
 import static com.samthegliderpilot.godroid.Globals.*;
 
@@ -126,7 +127,11 @@ PathShape _gridShape, _markersShape;
 private
 float [] _textPosUpper, _textPosLower;
 
-final
+// Written on the gnuGo background thread (setLegalMoves), read on the UI
+// thread by gesture callbacks (onScroll etc). volatile + replace-the-whole-set
+// publication (rather than mutating in place) avoids both a stale-visibility
+// read and a torn read of a set being cleared/refilled out from under us.
+volatile
 Set <Point> _legalMoves = Generics.newHashSet ();
 
 private final
@@ -147,6 +152,12 @@ class BoardGestureListener
 
 	float _cellWidthDIV2, _cellWidthDIV3;
 
+	// A floor under the tap-tolerance thresholds below, so a dense board
+	// (19x19) or a high-DPI/high-touch-sampling-rate device can't shrink
+	// them past normal finger jitter. Same constant Android itself uses to
+	// decide "did the finger really move" for scrolling, long-press, etc.
+	final int _touchSlop = ViewConfiguration.get (getContext ()).getScaledTouchSlop ();
+
 	float _lastX, _lastY;
 
 	Point _lastPoint;
@@ -155,14 +166,17 @@ class BoardGestureListener
 
 	boolean _wasTapUp;
 
-	boolean _interactionLocked;
+	// Written from either the UI thread or the gnuGo background thread
+	// (BoardView.lockScreen), read from the UI thread in every gesture
+	// callback below - needs to be visible across threads promptly.
+	volatile boolean _interactionLocked;
 
 	void reset (
 		final float pCellWidth
 		)
 	{
 		_cellWidthDIV2 = pCellWidth / 2;
-		_cellWidthDIV3 = pCellWidth / 3f;
+		_cellWidthDIV3 = Math.max (pCellWidth / 3f, _touchSlop);
 		_lastX = _lastY = -pCellWidth -1;
 		_lastPoint = null;
 		_stonePositionChanged = false;
@@ -204,9 +218,16 @@ class BoardGestureListener
 		final float x = pEvent2.getX () - _activeXBoardOffset,
 			y = pEvent2.getY () - _activeYBoardOffset;
 		final float cellWidth = _activeCellWidth,
-			lastX = _lastX, lastY = _lastY;
-		if (x < lastX || x > lastX + cellWidth
-			|| y < lastY || y > lastY + cellWidth)
+			lastX = _lastX, lastY = _lastY,
+			slop = _touchSlop;
+		// Require the touch to clear the current cell's bounds by a real,
+		// intentional amount (not just a stray pixel of finger jitter) before
+		// treating it as having moved to a different intersection - without
+		// this, a touch landing near a cell boundary could flip back and
+		// forth between neighboring cells on jitter alone, which blocks
+		// onSingleTapUp from ever committing a placement (see below).
+		if (x < lastX - slop || x > lastX + cellWidth + slop
+			|| y < lastY - slop || y > lastY + cellWidth + slop)
 		{
 			final Point newPoint = coord2Point (x, y);
 			if (!_legalMoves.contains (newPoint))
@@ -1139,12 +1160,12 @@ void setLegalMoves (
 	final List <Point> pPoints
 	)
 {
-	final Set <Point> legalMoves = _legalMoves;
-	legalMoves.clear ();
+	final Set <Point> legalMoves = Generics.newHashSet ();
 	if (pPoints != null)
 	{
 		legalMoves.addAll (pPoints);
 	}
+	_legalMoves = legalMoves;
 }
 
 void moveStone (
