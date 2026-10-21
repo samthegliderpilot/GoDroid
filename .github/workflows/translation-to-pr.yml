@@ -1,0 +1,71 @@
+name: Translation Issue to PR
+
+# Runs only when a maintainer adds the "translation-ready" label to an issue -
+# never automatically on issue creation. That keeps a human in the loop
+# before anything from an untrusted submitter touches the repo: the trigger
+# itself is a maintainer decision, and the result is a PR for review, not a
+# direct commit.
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  open-pr:
+    if: github.event.label.name == 'translation-ready'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      pull-requests: write
+      issues: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Apply translations from the issue
+        id: apply
+        env:
+          ISSUE_BODY: ${{ github.event.issue.body }}
+        run: |
+          printf '%s\n' "$ISSUE_BODY" | bash scripts/apply_translation_issue.sh
+
+      - name: Check locale files are still consistent
+        run: bash scripts/check_locale_sync.sh
+
+      - name: Open a pull request
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Translations from #${{ github.event.issue.number }}"
+          branch: translation-issue-${{ github.event.issue.number }}
+          title: "Translations from #${{ github.event.issue.number }}"
+          body: |
+            Generated from #${{ github.event.issue.number }} by the
+            translation-to-pr workflow. Please review the actual translated
+            text before merging - this only checks that the string *keys*
+            are valid, not that the translation itself is correct.
+
+            Closes #${{ github.event.issue.number }}
+          labels: translation
+
+      - name: Comment on success
+        if: success()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "Thanks! I've opened a pull request with these translations for a maintainer to review."
+            });
+
+      - name: Comment on failure
+        if: failure()
+        uses: actions/github-script@v7
+        with:
+          script: |
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: "Something went wrong turning this into a pull request automatically (maybe the language code or the `key = value` lines need a second look). A maintainer will take it from here."
+            });

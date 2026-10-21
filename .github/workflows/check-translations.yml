@@ -1,0 +1,17 @@
+name: Check Translations
+
+on:
+  push:
+    branches: [ "**" ]
+  pull_request:
+    branches: [ "**" ]
+
+jobs:
+  locale-sync:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check locale strings against the default strings.xml
+        run: bash scripts/check_locale_sync.sh

@@ -1,0 +1,57 @@
+name: Translation (add or fix)
+description: Add a new language, or fix/complete an existing translation.
+title: "[Translation] "
+labels: ["translation"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thank you for helping translate GoDroid! You don't need to know Android
+        or touch any code - just fill in the fields below in your language.
+
+        The English text and the internal name ("key") for every string lives in
+        [`app/src/main/res/values/strings.xml`](https://github.com/samthegliderpilot/GoDroid/blob/main/app/src/main/res/values/strings.xml).
+        Open that file to see what each key means before translating it. If you're
+        fixing an existing translation, the current version for your language is in
+        the matching `values-<language>/strings.xml` file in the same folder.
+
+        You only need to include the strings you're adding or changing - not the
+        whole file.
+
+  - type: input
+    id: locale
+    attributes:
+      label: Language
+      description: >
+        The language you're translating, as an Android locale code: a lowercase
+        two-letter code (e.g. `fr`, `de`, `ja`), optionally with a region after a
+        dash (e.g. `zh-rCN` for Simplified Chinese, `pt-rBR` for Brazilian
+        Portuguese). If you're not sure, just write the language name in English
+        and we'll sort out the code.
+      placeholder: "fr"
+    validations:
+      required: true
+
+  - type: textarea
+    id: translations
+    attributes:
+      label: Translations
+      description: >
+        One line per string, in the form `key = translated text`, using the keys
+        from strings.xml (see the link above). Example below - replace with your
+        own language's text.
+      placeholder: |
+        appName = GoDroid
+        menuShareGameLabel = Partager en SGF
+        tapHintText = Touchez pour placer une pierre
+      render: text
+    validations:
+      required: true
+
+  - type: textarea
+    id: context
+    attributes:
+      label: Anything else we should know?
+      description: Optional - context, questions, or strings you weren't sure how to translate.
+    validations:
+      required: false
