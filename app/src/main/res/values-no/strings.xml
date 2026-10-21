@@ -114,6 +114,7 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 http://gobase.org/studying/rules/?id=11&ln=no
 		]]></string>
 	<string name="gnuGoHomepageText">GNU Go Hjemmeside</string>
+	<string name="translateHomepageText">Hjelp til å oversette denne appen</string> <!-- Translation Provided by Claude -->
 	<string name="newGameDialogHumanPlaysBlackListWievItem">
 		<b>Svart</b> (datamaskin hvit)
 	</string>

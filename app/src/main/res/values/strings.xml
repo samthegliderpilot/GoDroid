@@ -111,6 +111,7 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="oldProjectHomepageText">Original Project Homepage</string>
 	<string name="currentProjectHomepageText">Current Project Homepage</string>
 	<string name="gnuGoHomepageText">GNU Go homepage</string>
+	<string name="translateHomepageText">Help translate this app</string>
 
 	<string name="newGameDialogBoardSizeListWievItemSize9">9 × 9</string>
 	<string name="newGameDialogBoardSizeListWievItemSize13">13 × 13</string>

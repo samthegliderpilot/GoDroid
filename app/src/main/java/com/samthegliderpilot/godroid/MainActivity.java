@@ -2164,7 +2164,9 @@ void showInfo ()
 			resources.getString(R.string.godroidProjectUrl), // %s 13
 			resources.getString(R.string.oldProjectHomepageText), // %s 14
 			resources.getString(R.string.gnugoProjectUrl), // %s 15
-			resources.getString(R.string.gnuGoHomepageText) // %s 16
+			resources.getString(R.string.gnuGoHomepageText), // %s 16
+			resources.getString(R.string.translateProjectUrl), // %s 17
+			resources.getString(R.string.translateHomepageText) // %s 18
 			),
 				"text/html", "utf-8", null);
 

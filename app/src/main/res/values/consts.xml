@@ -22,6 +22,9 @@
 	<string name="gnugoProjectUrl">
 		http://www.gnu.org/software/gnugo/
 	</string>
+	<string name="translateProjectUrl">
+		https://github.com/samthegliderpilot/GoDroid/issues/new?template=translation.yml
+	</string>
 	<string name="authorName">Andreas Grothe</string>
 	<string name="authorMailUrl">mailto:a@b.com</string>
 	<string name="refresherName">Sam Gilbert</string>
@@ -48,6 +51,9 @@
 			</p>
 			<p>
 				%s<br/>
+				<a href="%s">%s</a>
+			</p>
+			<p>
 				<a href="%s">%s</a>
 			</p>
 			<p>
