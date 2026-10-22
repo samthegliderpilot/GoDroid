@@ -21,7 +21,7 @@ Besides updating API calls, recently added features are:
 I am not an Android developer, but I was able to fumble through the updates that were needed.  If anyone has requests for new features, I'll do what I can.  Likewise, if anyone wants to fork this library, go right ahead, but I would also be willing to share this repo with you.
 
 ## Contributing
-Speak a language this app doesn't yet, or want to fix a translation? See [CONTRIBUTING.md](CONTRIBUTING.md) - no coding required, just a [translation issue](../../issues/new?template=translation.yml).
+Speak a language this app doesn't yet, or want to fix a translation? Try the [translation page](https://samthegliderpilot.github.io/GoDroid/translate.html) - no coding required. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
 
 
 ## License

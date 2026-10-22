@@ -94,15 +94,23 @@ while IFS= read -r line; do
     fi
 
     escaped_value="$(xml_escape "$value")"
-    new_line="$(printf '\t<string name="%s">%s</string>' "$key" "$escaped_value")"
+    # Submitted values may contain a literal backslash-n (Android's own
+    # newline escape for a plain, non-CDATA string - see translate.html).
+    # Passed as NEW_LINE here and read back via ENVIRON[], not -v: awk's -v
+    # assignment reprocesses backslash escapes in its value (a well-known
+    # awk gotcha), which would silently turn that literal \n into a real
+    # embedded newline - invalid for a plain string tag and liable to be
+    # collapsed by Android's resource compiler.
+    export NEW_LINE="$(printf '\t<string name="%s">%s</string>' "$key" "$escaped_value")"
 
-    awk -v pattern="<string name=\"$key\">" -v newline="$new_line" '
-        BEGIN { done = 0 }
+    awk -v pattern="<string name=\"$key\">" '
+        BEGIN { newline = ENVIRON["NEW_LINE"]; done = 0 }
         index($0, pattern) > 0 { print newline; done = 1; next }
         /<\/resources>/ && !done { print newline; done = 1; print; next }
         { print }
     ' "$strings_file" > "$strings_file.tmp"
     mv "$strings_file.tmp" "$strings_file"
+    unset NEW_LINE
 
     applied+=("$key")
 done <<< "$translations_text"

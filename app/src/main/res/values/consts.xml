@@ -23,7 +23,7 @@
 		http://www.gnu.org/software/gnugo/
 	</string>
 	<string name="translateProjectUrl">
-		https://github.com/samthegliderpilot/GoDroid/issues/new?template=translation.yml
+		https://samthegliderpilot.github.io/GoDroid/translate.html
 	</string>
 	<string name="authorName">Andreas Grothe</string>
 	<string name="authorMailUrl">mailto:a@b.com</string>

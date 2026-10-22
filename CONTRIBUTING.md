@@ -4,19 +4,38 @@
 
 You don't need to know Android, Java, or git to help translate GoDroid.
 
-1. Open a **[Translation issue](../../issues/new?template=translation.yml)**.
-2. Fill in the language and the strings you're adding or fixing, one per
-   line, as `key = translated text`. The English text and the key for every
-   string is in
-   [`app/src/main/res/values/strings.xml`](app/src/main/res/values/strings.xml) -
-   open that file to see what each key means. You only need to include the
-   strings you're adding or changing, not the whole file.
-3. Submit the issue. A maintainer reviews it and turns it into a pull
-   request; you don't need to do anything else.
+1. Open the **[translation page](https://samthegliderpilot.github.io/GoDroid/translate.html)**.
+   Pick your language - if it's already partly translated, every string
+   that's done already shows up pre-filled, so you're only filling in what's
+   missing or fixing what's wrong, not starting from scratch.
+2. Type your translations into the table, right next to the English text
+   they correspond to.
+3. Click "Submit on GitHub" - it opens a pre-filled GitHub issue with just
+   the lines you changed. Submit that issue. A maintainer reviews it and
+   turns it into a pull request; you don't need to do anything else.
+
+If the page isn't working for you, or your language isn't listed yet, you
+can do the same thing by hand: open a
+**[Translation issue](../../issues/new?template=translation.yml)** directly
+and fill in the language and `key = translated text` lines yourself - the
+English text and key for every string is in
+[`app/src/main/res/values/strings.xml`](app/src/main/res/values/strings.xml).
 
 If you're comfortable with git instead, you're welcome to edit the
 `app/src/main/res/values-<locale>/strings.xml` file yourself and open a pull
 request directly - either way works.
+
+### About the translation page
+
+[`docs/translate.html`](docs/translate.html) is a single static page (no
+build step, no backend) hosted on GitHub Pages. It fetches the current
+English strings and your chosen language's existing translations straight
+from `main` at `raw.githubusercontent.com`, so it's always showing the real,
+current state of the app - never stale. It never talks to GitHub on your
+behalf beyond that: submitting still opens an ordinary pre-filled "new
+issue" page for you to review and send yourself, the same mechanism as
+opening the [translation issue](../../issues/new?template=translation.yml)
+template directly.
 
 ### How a translation issue becomes a change
 
