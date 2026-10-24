@@ -111,12 +111,7 @@ String
 
 private static final
 String
-	_GNUGO_SO_LIBRARY_NAME = "gnuGo-3.8",
 	_GNUGO_THREAD_NAME = "gnuGo";
-
-private static final
-int
-	_GNUGO_MEMORY_SIZE = 8;
 
 static final
 int
@@ -240,19 +235,26 @@ ActivityResultLauncher <Intent> _migrationFolderLauncher =
 private
 boolean _oldSavesOffered = false;
 
-private native static
-void initGTP (float pMemory);
-
-native static
-String playGTP (String pInput);
-
-native static
-void setRules (int chineseRules);
+private static
+GnuGoEngine _gnuGoEngine;
 
 static
+String playGTP (String pInput)
 {
-	System.loadLibrary (MainActivity._GNUGO_SO_LIBRARY_NAME);
-	initGTP (_GNUGO_MEMORY_SIZE);
+	return _gnuGoEngine.sendCommand (pInput);
+}
+
+private
+void startGnuGoEngine ()
+{
+	try
+	{
+		_gnuGoEngine = GnuGoEngine.start (getApplicationInfo ().nativeLibraryDir);
+	}
+	catch (java.io.IOException e)
+	{
+		throw new RuntimeException ("Could not start the GnuGo engine", e);
+	}
 }
 
 public
@@ -262,6 +264,7 @@ void onCreate ( // 0
 {
 	super.onCreate (pSavedInstanceState);
 	_mainActivity = this;
+	startGnuGoEngine ();
 	_appInfo = new AppInfo ();
 	final Resources resources = _resources = getResources ();
 

@@ -3,8 +3,10 @@ import java.io.FileInputStream
 
 plugins {
     alias(libs.plugins.android.application)
+    alias(libs.plugins.kotlin.android)
 }
 apply(from = "$rootDir/app/prepareGnugo.gradle.kts")
+apply(from = "$rootDir/app/buildGnugoExecutable.gradle.kts")
 android {
     namespace = "com.samthegliderpilot.godroid"
     compileSdk = 36
@@ -31,10 +33,14 @@ android {
             // without building them would ship an APK missing the native lib on those ABIs.
             abiFilters += listOf("armeabi-v7a", "arm64-v8a")
         }
+    }
 
-        externalNativeBuild {
-            ndkBuild {
-            }
+    // libgnugo.so is a real executable run via ProcessBuilder, not dlopen'd, so it
+    // must exist as an actual file on disk - the default (API 23+) of mapping native
+    // libraries directly out of the compressed APK, with no on-disk copy, won't do.
+    packaging {
+        jniLibs {
+            useLegacyPackaging = true
         }
     }
     // Release signing is optional. The release workflow writes keystore.properties,
@@ -68,16 +74,13 @@ android {
         }
     }
 
-    // using original ndk build, I tried cmake and almost got it working...
-    externalNativeBuild {
-        ndkBuild {
-            path = file("src/main/cpp/Android.mk")
-        }
-    }
-
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_11
         targetCompatibility = JavaVersion.VERSION_11
+    }
+
+    kotlinOptions {
+        jvmTarget = "11"
     }
 
     buildFeatures {
@@ -90,6 +93,7 @@ dependencies {
     implementation(libs.material)
     implementation(libs.core)
     implementation(libs.activity)
+    implementation(libs.kotlinx.coroutines.android)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

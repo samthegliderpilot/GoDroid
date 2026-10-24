@@ -158,6 +158,7 @@ DECLARE(gtp_same_dragon);
 DECLARE(gtp_set_boardsize);
 DECLARE(gtp_set_free_handicap);
 DECLARE(gtp_set_resign_option);
+DECLARE(gtp_set_rules);
 DECLARE(gtp_set_komi);
 DECLARE(gtp_set_level);
 DECLARE(gtp_set_orientation);
@@ -301,6 +302,7 @@ static struct gtp_command commands[] = {
   {"restricted_genmove",      gtp_restricted_genmove},
   {"same_dragon",    	      gtp_same_dragon},
   {"set_resign_option",        gtp_set_resign_option },
+  {"set_rules",                gtp_set_rules },
   {"set_free_handicap",       gtp_set_free_handicap},
   {"set_random_seed",  	      gtp_set_random_seed},
   {"set_search_diamond",      gtp_set_search_diamond},
@@ -328,44 +330,21 @@ static struct gtp_command commands[] = {
   {NULL,                      NULL}
 };
 
-// AGR
-void
-play_gtp()
-{
-  gtp_main_loop(commands, NULL, NULL, NULL);
-}
-
-// AGR
-void
-set_rules (int chineseRules)
-{
-	chinese_rules = chineseRules;
-	capture_all_dead = chineseRules;
-	play_out_aftermath = chineseRules;
-}
-
-
 /* Start playing using the Go Text Protocol. */
 void
-/* AGR
 play_gtp(FILE *gtp_input, FILE *gtp_output, FILE *gtp_dump_commands,
 	 int gtp_initial_orientation)
-*/
-init_gtp(float memory)
 {
   /* Make sure `gtp_output' is unbuffered. (Line buffering is also
    * okay but not necessary. Block buffering breaks GTP mode.)
    *
    * FIXME: Maybe should go to `gtp.c'?
    */
-// AGR  setbuf(gtp_output, NULL);
-
-//  init_gnugo(memory, seed);
-  init_gnugo(memory, time(0)); // AGR
+  setbuf(gtp_output, NULL);
 
   /* Inform the GTP utility functions about the board size. */
   gtp_internal_set_boardsize(board_size);
-  gtp_orientation = 0; // AGRgtp_initial_orientation;
+  gtp_orientation = gtp_initial_orientation;
   gtp_set_vertex_transform_hooks(rotate_on_input, rotate_on_output);
 
   /* Initialize time handling. */
@@ -374,11 +353,9 @@ init_gtp(float memory)
   /* Prepare pattern matcher and reading code. */
   reset_engine();
   clearstats();
-  /* AGR
   gtp_main_loop(commands, gtp_input, gtp_output, gtp_dump_commands);
   if (showstatistics)
     showstats();
-  */
 }
 
 
@@ -608,6 +585,32 @@ gtp_set_resign_option(char *s)
 {
   if (sscanf(s, "%d", &resign_allowed) < 1)
     return gtp_failure("resign allowed not an int");
+
+  return gtp_success("");
+}
+
+/***************************
+ * Setting scoring rules   *
+ ***************************/
+
+/* Function:  Switch between Chinese and Japanese scoring rules.
+ * Arguments: int (nonzero for Chinese rules)
+ * Fails:     incorrect argument
+ * Returns:   nothing
+ *
+ * Status:    Custom GTP command.
+ */
+static int
+gtp_set_rules(char *s)
+{
+  int chinese_rules_requested;
+
+  if (sscanf(s, "%d", &chinese_rules_requested) < 1)
+    return gtp_failure("chinese rules not an int");
+
+  chinese_rules = chinese_rules_requested;
+  capture_all_dead = chinese_rules_requested;
+  play_out_aftermath = chinese_rules_requested;
 
   return gtp_success("");
 }

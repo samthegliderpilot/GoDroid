@@ -18,6 +18,14 @@ include $(CLEAR_VARS)
 
 LOCAL_MODULE    := gnuGo-3.8
 
+# Package the executable through the same mechanism Android uses for native
+# libraries: name it like a .so so the installer extracts it into the app's
+# native-library directory with execute permission (exempt from the API 29+
+# W^X restriction on exec() against the writable app data directory). It is
+# still a real ELF executable, not a shared object - only the filename and
+# packaging path matter to the installer, not what's inside.
+LOCAL_MODULE_FILENAME := libgnugo
+
 LOCAL_CFLAGS := -DHAVE_CONFIG_H \
 -I$(LOCAL_PATH) \
 -I$(LOCAL_PATH)/engine \
@@ -69,7 +77,7 @@ engine/worm.c \
 \
 interface/gtp.c \
 interface/play_gtp.c \
-interface/java_bridge.c \
+interface/gtp_stdio_main.c \
 \
 patterns/aa_attackpat.c \
 patterns/apatterns.c \
@@ -106,4 +114,4 @@ utils/winsocket.c
 
 LOCAL_LDFLAGS += -Wl,-z,max-page-size=16384
 
-include $(BUILD_SHARED_LIBRARY)
+include $(BUILD_EXECUTABLE)

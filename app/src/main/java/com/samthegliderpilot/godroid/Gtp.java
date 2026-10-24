@@ -83,6 +83,7 @@ enum GtpCommand
 	SET_LEVEL ("level "),
 	SET_KOMI ("komi "),
 	SET_RESIGN("set_resign_option "),
+	SET_RULES ("set_rules "),
 	SHOWBOARD ("showboard"),
 	PLAY_MOVE ("play "),
 	GEN_MOVE ("genmove "),
@@ -794,12 +795,7 @@ void reStartGame (
 	gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi);
 	gtpCommand (GtpCommand.SET_RESIGN, pGameInfo._allowResignation ? "1" : "0");
 
-	final int chineseRules = pGameInfo._chineseRules ? 1 : 0;
-	MainActivity.setRules (chineseRules);
-	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
-	{
-		log (_LOG_TAG, Log.DEBUG, "command: 'chineseRules': " + chineseRules);
-	}
+	gtpCommand (GtpCommand.SET_RULES, pGameInfo._chineseRules ? "1" : "0");
 	drawBoard (pGameInfo, pInit);
 	_boardView.lockScreen (false);
 	if (playerIsMachine (pGameInfo))
