@@ -9,7 +9,7 @@ APP_OPTIM := release
 # pattern constants converted to the 32-bit Hashvalue). They flood build logs, and
 # F-Droid's CI cuts a log off at 4 MB, hiding the real result. We do not edit
 # GnuGo, so the warnings are not actionable here.
-APP_CFLAGS += -w
+# APP_CFLAGS += -w  # temporarily disabled to inspect warnings
 
 # Make the compiled output independent of where the project is checked out.
 # GnuGo embeds __FILE__ (an absolute path) in assertion messages, so a build in

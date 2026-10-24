@@ -37,6 +37,11 @@ local.properties
 # NDK
 obj/
 
+# Scratch output dirs from direct ndk-build invocations (NDK_OUT/NDK_LIBS_OUT),
+# e.g. when investigating warnings outside the normal Gradle build path.
+app/src/main/cpp/obj_warncheck/
+app/src/main/cpp/libs_warncheck/
+
 # Mac junk
 .DS_Store
 
