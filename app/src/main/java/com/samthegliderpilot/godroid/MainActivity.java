@@ -38,6 +38,7 @@ import androidx.core.view.ViewCompat;
 import androidx.core.view.WindowCompat;
 import androidx.core.view.WindowInsetsCompat;
 import androidx.core.view.WindowInsetsControllerCompat;
+import androidx.lifecycle.ViewModelProvider;
 
 import android.app.AlertDialog;
 import android.app.Dialog;
@@ -236,25 +237,12 @@ private
 boolean _oldSavesOffered = false;
 
 private static
-GnuGoEngine _gnuGoEngine;
+GoEngineViewModel _goEngineViewModel;
 
 static
 String playGTP (String pInput)
 {
-	return _gnuGoEngine.sendCommand (pInput);
-}
-
-private
-void startGnuGoEngine ()
-{
-	try
-	{
-		_gnuGoEngine = GnuGoEngine.start (getApplicationInfo ().nativeLibraryDir);
-	}
-	catch (java.io.IOException e)
-	{
-		throw new RuntimeException ("Could not start the GnuGo engine", e);
-	}
+	return _goEngineViewModel.playGTP (pInput);
 }
 
 public
@@ -264,7 +252,7 @@ void onCreate ( // 0
 {
 	super.onCreate (pSavedInstanceState);
 	_mainActivity = this;
-	startGnuGoEngine ();
+	_goEngineViewModel = new ViewModelProvider (this).get (GoEngineViewModel.class);
 	_appInfo = new AppInfo ();
 	final Resources resources = _resources = getResources ();
 

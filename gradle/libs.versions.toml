@@ -9,6 +9,7 @@ material = "1.13.0"
 activity = "1.11.0"
 kotlin = "2.0.21"
 coroutinesAndroid = "1.9.0"
+lifecycleViewmodel = "2.11.0"
 
 [libraries]
 core = { module = "androidx.core:core", version.ref = "core" }
@@ -19,6 +20,7 @@ appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "a
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
 kotlinx-coroutines-android = { module = "org.jetbrains.kotlinx:kotlinx-coroutines-android", version.ref = "coroutinesAndroid" }
+lifecycle-viewmodel-ktx = { module = "androidx.lifecycle:lifecycle-viewmodel-ktx", version.ref = "lifecycleViewmodel" }
 
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }

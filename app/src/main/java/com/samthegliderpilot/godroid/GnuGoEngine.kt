@@ -16,20 +16,15 @@ import java.io.OutputStreamWriter
  * Callers are expected to already be off the main thread - this class does
  * its own blocking I/O synchronously, same as the JNI calls it replaces.
  */
-class GnuGoEngine private constructor(private val process: Process) {
+class GnuGoEngine private constructor(private val process: Process) : GoEngine {
 
     private val writer: BufferedWriter =
         BufferedWriter(OutputStreamWriter(process.outputStream))
     private val reader: BufferedReader =
         BufferedReader(InputStreamReader(process.inputStream))
 
-    /**
-     * Sends one GTP command and returns its response, including the leading
-     * "= "/"? " status marker, up to (not including) the blank line that
-     * terminates every GTP response.
-     */
     @Synchronized
-    fun sendCommand(command: String): String {
+    override fun sendCommand(command: String): String {
         writer.write(command)
         writer.write("\n")
         writer.flush()
@@ -44,9 +39,9 @@ class GnuGoEngine private constructor(private val process: Process) {
         return response.toString()
     }
 
-    fun isAlive(): Boolean = process.isAlive
+    override fun isAlive(): Boolean = process.isAlive
 
-    fun shutdown() {
+    override fun shutdown() {
         try {
             sendCommand("quit")
         } catch (ignored: Exception) {

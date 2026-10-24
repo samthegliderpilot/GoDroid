@@ -94,6 +94,7 @@ dependencies {
     implementation(libs.core)
     implementation(libs.activity)
     implementation(libs.kotlinx.coroutines.android)
+    implementation(libs.lifecycle.viewmodel.ktx)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
