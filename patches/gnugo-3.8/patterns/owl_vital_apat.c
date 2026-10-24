@@ -612,7 +612,7 @@ autohelperowl_vital_apat32(int trans, int move, int color, int action)
   a = AFFINE_TRANSFORM(687, trans, move);
   b = AFFINE_TRANSFORM(685, trans, move);
 
-  return countlib(a)>1 || !play_attack_defend_n(color, 1, 3, move, NO_MOVE, b, move)==WIN;
+  return countlib(a)>1 || !(play_attack_defend_n(color, 1, 3, move, NO_MOVE, b, move)==WIN);
 }
 
 static int

@@ -56,10 +56,11 @@
  * GoDroid deviation: the above assumes `unsigned long` is always the
  * platform's native word width, which doesn't hold across Android's own
  * ABIs - it's 32 bits on armeabi-v7a but 64 on arm64-v8a. The vendored
- * pattern databases (patterns/*.c) were generated as genuine 64-bit
- * Zobrist hashes; on a 32-bit `unsigned long` those pre-computed constants
- * were silently truncated to their low 32 bits at compile time instead of
- * being split across two array slots the way MIN_HASHBITS=64 intends,
+ * pattern databases (the generated sources under patterns/) were built
+ * as genuine 64-bit Zobrist hashes; on a 32-bit `unsigned long` those
+ * pre-computed constants were silently truncated to their low 32 bits
+ * at compile time instead of being split across two array slots the
+ * way MIN_HASHBITS=64 intends,
  * quietly halving pattern-matching's collision resistance on that ABI
  * alone (and this same type also backs the live search/reading position
  * hash, where a collision can hit the gg_assert() below, not just
