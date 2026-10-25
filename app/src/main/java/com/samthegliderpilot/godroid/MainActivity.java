@@ -82,14 +82,12 @@ import android.view.ViewGroup;
 import android.view.ViewStub;
 import android.view.Window;
 import android.webkit.WebView;
-import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.CompoundButton;
 import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -151,16 +149,6 @@ SharedPreferences _sharedPreferences;
 
 private
 String
-	_preferencesBoardSizeKey,
-	_preferencesHandicapKey,
-	_preferencesKomiKey,
-	_preferencesChineseRulesKey,
-	_preferencesLevelKey,
-	_preferencesPlayerBlackHumanKey,
-	_preferencesPlayerWhiteHumanKey,
-	_preferencesAiDelayKey,
-	_preferenceAllowResignationKey,
-	_preferencesEdgeTapPaddingKey,
 	_preferencesLastSaveLoadUriKey,
 	_preferencesOldSavesMigrationDismissedKey;
 
@@ -212,12 +200,6 @@ CharSequence
 	_noUndoHintText, _noRedoHintText,
 	_yourTurnText;
 
-private
-Dialog _changeGameDialog;
-
-private
-View _changeGameApplyButton;
-
 private final
 ActivityResultLauncher <Intent> _saveDocumentLauncher =
 	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
@@ -239,6 +221,9 @@ boolean _oldSavesOffered = false;
 private static
 GoEngineViewModel _goEngineViewModel;
 
+private
+SettingsDataStore _settingsDataStore;
+
 static
 String playGTP (String pInput)
 {
@@ -253,6 +238,7 @@ void onCreate ( // 0
 	super.onCreate (pSavedInstanceState);
 	_mainActivity = this;
 	_goEngineViewModel = new ViewModelProvider (this).get (GoEngineViewModel.class);
+	_settingsDataStore = new SettingsDataStore (this);
 	_appInfo = new AppInfo ();
 	final Resources resources = _resources = getResources ();
 
@@ -261,25 +247,6 @@ void onCreate ( // 0
 		getFileStreamPath (resources.getString (R.string.autoSaveFileName)).
 			toString ();
 	_sharedPreferences =  getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
-	_preferencesBoardSizeKey = resources.getString (
-		R.string.preferencesBoardSizeKey);
-	_preferencesHandicapKey = resources.getString (
-		R.string.preferencesHandicapKey);
-	_preferencesKomiKey = resources.getString (R.string.preferencesKomiKey);
-	_preferencesChineseRulesKey =
-		resources.getString (R.string.preferencesChineseRulesKey);
-	_preferencesLevelKey = resources.getString (R.string.preferencesLevelKey);
-	_preferencesPlayerBlackHumanKey = resources.getString (
-		R.string.preferencesPlayerBlackHunanKey);
-	_preferencesPlayerWhiteHumanKey = resources.getString (
-		R.string.preferencesPlayerWhiteHunanKey);
-	_preferencesAiDelayKey = resources.getString(
-			R.string.preferencesAiDelayKey
-	);
-	_preferenceAllowResignationKey = resources.getString (
-			R.string.preferenceAllowResignationKey);
-	_preferencesEdgeTapPaddingKey = resources.getString (
-			R.string.preferencesEdgeTapPaddingKey);
 	_preferencesLastSaveLoadUriKey = resources.getString (
 			R.string.preferencesLastSaveLoadUriKey);
 	_preferencesOldSavesMigrationDismissedKey = resources.getString (
@@ -292,7 +259,7 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
-	_boardView.setEdgeTapPaddingMode (readEdgeTapPaddingMode ());
+	_boardView.setEdgeTapPaddingMode (_settingsDataStore.getEdgeTapPaddingModeBlocking ());
 	//if (Build.VERSION.SDK_INT >= 34) {
 	//	EdgeToEdge.enable(this);
 	//}
@@ -665,10 +632,7 @@ void enableMenuItem (
 		int id = pItem.getItemId();
 
 		if (id == R.id.menuNewGame) {
-			if (_changeGameDialog == null) {
-				initChangeGameDialog();
-			}
-			showChangedGameDialog();
+			showNewGame();
 			return true;
 		} else if (id == R.id.menuPass) {
 			showMove(_gameInfo._playerBlackMoves, getPassedText(false));
@@ -709,376 +673,31 @@ void enableMenuItem (
 		return false;
 	}
 
-	private
-	enum SpinnerEnum
-	{
-		BoardSize (R.id.newGameDialogBoardSizeSpinner, R.array.boardSizes),
-		Handicap (R.id.newGameDialogHandicapSpinner, R.array.handicaps),
-		PlayerBlackWhite (R.id.newGameDialogHumanPlaysSpinner,
-				R.array.playerBlackWhiteValues, true),
-		Strength (R.id.newGameDialogStrengthSpinner, R.array.strengths, true),
-		Komi (R.id.newGameDialogKomiSpinner, R.array.komis, true),
-		Scoring (R.id.newGameDialogScoringSpinner, R.array.scorings),
-		AIDelay (R.id.newGameDialogAIDelaySpinner, R.array.newGameDialogAIDelayItems, true),
-		AllowResignation(R.id.newGameDialogAllowResignSpinner, R.array.allowResignation, true);
-
-		final
-		int _spinnerResId;
-
-		private final
-		int _valuesResId;
-
-		final
-		boolean _mustChange;
-
-		// Removed this field to fix memory leak
-		// private Spinner _spinner;
-
-		private
-		TypedArray
-				_values,
-				_playerBlackHumanValues,
-				_playerWhiteHumanValues;
-		private
-		String[]
-				_stringValuesForAiDelay,
-				_stringValuesForAllowResignation;
-
-		private
-		Map <Object, Integer> _spinnerEntriesMap;
-
-		boolean _changed;
-
-		SpinnerEnum (
-				final int pSpinnerResId,
-				final int pResId
-		)
-		{
-			this (pSpinnerResId, pResId, false);
-		}
-
-		SpinnerEnum (
-				final int pSpinnerResId,
-				final int pResId,
-				final boolean pMustChange
-		)
-		{
-			_spinnerResId = pSpinnerResId;
-			_valuesResId = pResId;
-			_mustChange = pMustChange;
-		}
-
-		void init (
-				final Resources pResources,
-				final Spinner pSpinner
-		)
-		{
-			// replaced usage of _spinner field by passed-in pSpinner where needed
-			final TypedArray values = _values =
-					pResources.obtainTypedArray (_valuesResId);
-			int numEntries = values.length ();
-			if (_spinnerEntriesMap == null)
-			{
-				_spinnerEntriesMap = Generics.newHashMap (numEntries);
-			}
-			if (this == AIDelay) {
-				_stringValuesForAiDelay = pResources.getStringArray(_valuesResId);
-				int numEntries2 = _stringValuesForAiDelay.length;
-				_spinnerEntriesMap = Generics.newHashMap(numEntries);
-				for (int idx = 0; idx < numEntries2; idx++) {
-					Integer value2 = Integer.valueOf(_stringValuesForAiDelay[idx]);
-					_spinnerEntriesMap.put(value2, idx);
-				}
-				return;
-			}
-			if (this == AllowResignation) {
-				_stringValuesForAllowResignation = pResources.getStringArray(_valuesResId);
-				int numEntries2 = _stringValuesForAllowResignation.length;
-				_spinnerEntriesMap = Generics.newHashMap(numEntries2);
-				for (int idx = 0; idx < numEntries2; idx++) {
-					String value = _stringValuesForAllowResignation[idx];
-					_spinnerEntriesMap.put(value, idx);
-				}
-				return;
-			}
-			_spinnerEntriesMap = Generics.newHashMap(numEntries);
-			for (int idx = 0; idx < numEntries; idx++) {
-				Object value = "";
-				switch (values.peekValue(idx).type) {
-					case TypedValue.TYPE_STRING:
-						value = values.getString(idx);
-						break;
-					case TypedValue.TYPE_FLOAT:
-						value = values.getFloat(idx, 0);
-						break;
-					case TypedValue.TYPE_INT_DEC:
-					case TypedValue.TYPE_INT_HEX:
-						value = values.getInt(idx, 0);
-						break;
-					case TypedValue.TYPE_INT_BOOLEAN:
-						value = values.getBoolean(idx, false);
-						break;
-				}
-				_spinnerEntriesMap.put(value, idx);
-			}
-
-			if (this == PlayerBlackWhite) {
-				_playerBlackHumanValues = pResources.obtainTypedArray(
-						R.array.playerBlackHumanValues);
-				_playerWhiteHumanValues = pResources.obtainTypedArray(
-						R.array.playerWhiteHumanValues);
-			}
-		}
-
-		void setSpinnerSelection (
-				final GameInfo pGameInfo,
-				final Spinner pSpinner,
-				final Resources resources
-		)
-		{
-			Object val = 0;
-			switch (this)
-			{
-				case BoardSize:
-					val = pGameInfo._boardSize;
-					break;
-				case Handicap:
-					val = pGameInfo._handicap;
-					break;
-				case PlayerBlackWhite:
-					pSpinner.setSelection (_values.getInteger (
-							(pGameInfo._playerBlackHuman ? 2 : 0)
-									+ (pGameInfo._playerWhiteHuman ? 1 : 0), 0));
-					return;
-				case Strength:
-					val = pGameInfo._level;
-					break;
-				case Komi:
-					val = pGameInfo._komi;
-					break;
-				case Scoring:
-					val = pGameInfo._chineseRules;
-					break;
-				case AIDelay:
-					val = pGameInfo._aiDelaySeconds;
-					break;
-				case AllowResignation:
-					String yesString = resources.getString (R.string.yes);
-					String noString = resources.getString (R.string.no);
-					val = pGameInfo._allowResignation ? yesString : noString;
-					break;
-			}
-			pSpinner.setSelection (_spinnerEntriesMap.get (val));
-		}
-
-		void setHideStatus (
-				final GameInfo pGameInfo,
-				int pRow,
-				final Resources resources
-		)
-		{
-			Object value = 0;
-			switch (this)
-			{
-				case BoardSize:
-					value = pGameInfo._boardSize;
-					break;
-				case Handicap:
-					value = pGameInfo._handicap;
-					break;
-				case PlayerBlackWhite:
-					value = pRow;
-					pRow = (pGameInfo._playerBlackHuman ? 2 : 0)
-							+ (pGameInfo._playerWhiteHuman ? 1 : 0);
-					break;
-				case Strength:
-					value = pGameInfo._level;
-					break;
-				case Komi:
-					value = pGameInfo._komi;
-					break;
-				case Scoring:
-					value = pGameInfo._chineseRules;
-					break;
-				case AIDelay:
-					value = pGameInfo._aiDelaySeconds;
-					break;
-				case AllowResignation:
-					String yesString = resources.getString (R.string.yes);
-					String noString = resources.getString (R.string.no);
-					value = pGameInfo._allowResignation ? yesString : noString;
-					break;
-			}
-			_changed = pRow != _spinnerEntriesMap.get (value);
-		}
-
-		void setGameInfoValue (
-				final GameInfo pGameInfo,
-				final Spinner pSpinner,
-				final Resources resources
-		)
-		{
-			final int pos = pSpinner.getSelectedItemPosition ();
-			switch (this)
-			{
-				case BoardSize:
-					pGameInfo._boardSize = _values.getInteger (pos, 0);
-					break;
-				case Handicap:
-					pGameInfo._handicap = _values.getInteger (pos, 0);
-					break;
-				case PlayerBlackWhite:
-					pGameInfo._playerBlackHuman =
-							_playerBlackHumanValues.getBoolean (pos, true);
-					pGameInfo._playerWhiteHuman =
-							_playerWhiteHumanValues.getBoolean (pos, true);
-					break;
-				case Strength:
-					pGameInfo._level = _values.getInteger (pos, 0);
-					break;
-				case Komi:
-					pGameInfo._komi = _values.getString (pos);
-					break;
-				case Scoring:
-					pGameInfo._chineseRules = _values.getBoolean (pos, false);
-					break;
-				case AIDelay:
-					if (_stringValuesForAiDelay != null) {
-						String selectedValue = _stringValuesForAiDelay[pos];
-						pGameInfo._aiDelaySeconds = Integer.parseInt(selectedValue);
-					}
-					break;
-				case AllowResignation:
-					if(_stringValuesForAllowResignation !=null) {
-						String selectedValue = _stringValuesForAllowResignation[pos];
-						pGameInfo._allowResignation = selectedValue.equals(
-								resources.getString (R.string.yes)
-						);
-					}
-					break;
-			}
-		}
-	}
-
-
 private
-void initChangeGameDialog ()
+void showNewGame ()
 {
-	final ViewStub viewStub = new ViewStub (this, R.layout.new_game);
-	final Dialog dialog = _changeGameDialog = new Dialog (this);
-	dialog.getWindow ().requestFeature (Window.FEATURE_NO_TITLE);
-	dialog.setContentView (viewStub);
-	final View view = viewStub.inflate ();
-
-	final Resources resources = _resources;
-	final SpinnerEnum [] spinnerEnums = SpinnerEnum.values ();
-	final Map <Spinner, SpinnerEnum> spinnerSpinnerEnumMap =
-		Generics.newHashMap (spinnerEnums.length);
-	for (final SpinnerEnum spinnerEnum : spinnerEnums)
-	{
-		final Spinner spinner = view.findViewById (
-			spinnerEnum._spinnerResId);
-		spinnerEnum.init (resources, spinner);
-		spinnerSpinnerEnumMap.put (spinner, spinnerEnum);
-	}
-	final View applyButton = _changeGameApplyButton =
-		view.findViewById (R.id.newGameDialogApplyButton);
-
-	final AdapterView.OnItemSelectedListener hideChangeSettingsListener =
-		new AdapterView.OnItemSelectedListener ()
+	final GameInfo currentGameInfo = _gameInfo;
+	final NewGameSettings original = new NewGameSettings (
+		currentGameInfo._boardSize, currentGameInfo._handicap,
+		currentGameInfo._playerBlackHuman, currentGameInfo._playerWhiteHuman,
+		currentGameInfo._level, currentGameInfo._komi,
+		currentGameInfo._chineseRules, currentGameInfo._aiDelaySeconds,
+		currentGameInfo._allowResignation);
+	NewGameScreenKt.showNewGameDialog (this, original,
+		(settings, startFresh) ->
 		{
-			public
-			void onItemSelected (
-				final AdapterView <?> pAdapterView,
-				final View pView,
-				final int pPosition,
-				long pRow
-				)
-			{
-				final GameInfo gameInfo = _gameInfo;
-				if (gameInfo._invalid)
-				{
-					return;
-				}
-				//noinspection SuspiciousMethodCalls
-				spinnerSpinnerEnumMap.get (pAdapterView).setHideStatus (
-					gameInfo, (int)pRow, _resources);
-				boolean showApplyButton = false;
-				for (final SpinnerEnum item : spinnerEnums)
-				{
-					final boolean changed = item._changed;
-					if (item._mustChange)
-					{
-						if (changed)
-						{
-							showApplyButton = true;
-						}
-					}
-					else if (changed)
-					{
-						showApplyButton = false;
-						break;
-					}
-				}
-				applyButton.setEnabled (showApplyButton);
-			}
-
-			public
-			void onNothingSelected (
-				final AdapterView <?> pAdapterView
-				)
-			{
-			}
-		};
-	for (final Spinner spinner : spinnerSpinnerEnumMap.keySet ())
-	{
-		spinner.setOnItemSelectedListener (hideChangeSettingsListener);
-	}
-
-	final View.OnClickListener onClickListener =
-		new View.OnClickListener ()
-		{
-			public
-			void onClick (
-				final View pView
-				)
-			{
-				final GameInfo gameInfo = new GameInfo ();
-				for (final SpinnerEnum spinnerEnum : spinnerEnums)
-				{
-					final Spinner spinner = _changeGameDialog.findViewById(spinnerEnum._spinnerResId);
-					spinnerEnum.setGameInfoValue (gameInfo, spinner, _resources);
-				}
-				newGame (storeGameInfo (gameInfo), pView != applyButton);
-				dialog.dismiss ();
-			}
-		};
-	applyButton.setOnClickListener (onClickListener);
-	view.findViewById (R.id.newGameDialogStartButton).
-		setOnClickListener (onClickListener);
-}
-
-static private
-void clearChangedGameDialogSpinnerChangedStatus ()
-{
-	for (final SpinnerEnum item : SpinnerEnum.values ())
-	{
-		item._changed = false;
-	}
-}
-
-private
-void showChangedGameDialog ()
-{
-	_changeGameApplyButton.setEnabled (false);
-	clearChangedGameDialogSpinnerChangedStatus ();
-	final GameInfo gameInfo = _gameInfo;
-	for (final SpinnerEnum item : SpinnerEnum.values ())
-	{
-		final Spinner spinner = _changeGameDialog.findViewById(item._spinnerResId);
-		item.setSpinnerSelection (gameInfo, spinner, _resources);
-	}
-	_changeGameDialog.show ();
+			final GameInfo gameInfo = new GameInfo ();
+			gameInfo._boardSize = settings.getBoardSize ();
+			gameInfo._handicap = settings.getHandicap ();
+			gameInfo._playerBlackHuman = settings.getPlayerBlackHuman ();
+			gameInfo._playerWhiteHuman = settings.getPlayerWhiteHuman ();
+			gameInfo._level = settings.getLevel ();
+			gameInfo._komi = settings.getKomi ();
+			gameInfo._chineseRules = settings.getChineseRules ();
+			gameInfo._aiDelaySeconds = settings.getAiDelaySeconds ();
+			gameInfo._allowResignation = settings.getAllowResignation ();
+			newGame (storeGameInfo (gameInfo), startFresh);
+		});
 }
 
 private
@@ -1773,22 +1392,12 @@ GameInfo storeGameInfo (
 	final GameInfo pGameInfo
 	)
 {
-	final SharedPreferences.Editor editor = _sharedPreferences.edit ();
-	editor.putInt (_preferencesBoardSizeKey, pGameInfo._boardSize);
-	editor.putInt (_preferencesHandicapKey, pGameInfo._handicap);
-	editor.putString (_preferencesKomiKey, pGameInfo._komi);
-	editor.putBoolean (_preferencesChineseRulesKey, pGameInfo._chineseRules);
-	editor.putInt (_preferencesLevelKey, pGameInfo._level);
-	editor.putBoolean (
-		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
-	editor.putBoolean (
-		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
-	editor.putInt(
-			_preferencesAiDelayKey, pGameInfo._aiDelaySeconds
-	);
-	editor.putBoolean(
-			_preferenceAllowResignationKey, pGameInfo._allowResignation);
-	editor.commit ();
+	_settingsDataStore.saveNewGameSettingsBlocking (new NewGameSettings (
+		pGameInfo._boardSize, pGameInfo._handicap,
+		pGameInfo._playerBlackHuman, pGameInfo._playerWhiteHuman,
+		pGameInfo._level, pGameInfo._komi,
+		pGameInfo._chineseRules, pGameInfo._aiDelaySeconds,
+		pGameInfo._allowResignation));
 	return pGameInfo;
 }
 
@@ -1797,28 +1406,17 @@ GameInfo restoreGameInfo (
 	final GameInfo pGameInfo
 	)
 {
-	final SharedPreferences preferences = _sharedPreferences;
-	pGameInfo._boardSize = preferences.getInt (_preferencesBoardSizeKey,
-		pGameInfo._boardSize);
-	pGameInfo._handicap = preferences.getInt (_preferencesHandicapKey,
-		pGameInfo._handicap);
-	try
-	{
-		pGameInfo._komi = preferences.getString (_preferencesKomiKey,
-			pGameInfo._komi);
-		pGameInfo._chineseRules = preferences.getBoolean (
-			_preferencesChineseRulesKey, pGameInfo._chineseRules);
-	}
-	catch (final Exception e) {}
-	pGameInfo._level = preferences.getInt (_preferencesLevelKey,
-		pGameInfo._level);
-	pGameInfo._playerBlackHuman = preferences.getBoolean (
-		_preferencesPlayerBlackHumanKey, pGameInfo._playerBlackHuman);
-	pGameInfo._playerWhiteHuman = preferences.getBoolean (
-		_preferencesPlayerWhiteHumanKey, pGameInfo._playerWhiteHuman);
-	pGameInfo._aiDelaySeconds = preferences.getInt(_preferencesAiDelayKey, pGameInfo._aiDelaySeconds);
-	pGameInfo._allowResignation = preferences.getBoolean (
-			_preferenceAllowResignationKey, pGameInfo._allowResignation);
+	final NewGameSettings settings =
+		_settingsDataStore.loadNewGameSettingsBlocking ();
+	pGameInfo._boardSize = settings.getBoardSize ();
+	pGameInfo._handicap = settings.getHandicap ();
+	pGameInfo._komi = settings.getKomi ();
+	pGameInfo._chineseRules = settings.getChineseRules ();
+	pGameInfo._level = settings.getLevel ();
+	pGameInfo._playerBlackHuman = settings.getPlayerBlackHuman ();
+	pGameInfo._playerWhiteHuman = settings.getPlayerWhiteHuman ();
+	pGameInfo._aiDelaySeconds = settings.getAiDelaySeconds ();
+	pGameInfo._allowResignation = settings.getAllowResignation ();
 	return pGameInfo;
 }
 
@@ -2066,68 +1664,23 @@ void showScore (
 }
 
 private
-EdgeTapPaddingMode readEdgeTapPaddingMode ()
-{
-	try
-	{
-		return EdgeTapPaddingMode.valueOf (_sharedPreferences.getString (
-			_preferencesEdgeTapPaddingKey, EdgeTapPaddingMode.AUTO.name ()));
-	}
-	catch (final Exception e)
-	{
-		return EdgeTapPaddingMode.AUTO;
-	}
-}
-
-private
 void showDisplaySettingsDialog ()
 {
-	final View view = getLayoutInflater ().inflate (
-		R.layout.display_settings, null);
-	final Spinner spinner =
-		view.findViewById (R.id.displaySettingsEdgeTapPaddingSpinner);
-	spinner.setSelection (readEdgeTapPaddingMode ().ordinal ());
-	spinner.setOnItemSelectedListener (new AdapterView.OnItemSelectedListener ()
-	{
-		// Spinner fires once for the initial selection when the dialog opens;
-		// only persist/apply on an actual user pick.
-		private boolean _firstCallback = true;
-
-		public
-		void onItemSelected (
-			final AdapterView <?> pAdapterView,
-			final View pView,
-			final int pPosition,
-			final long pRow
-			)
+	AppPreferencesScreenKt.showAppPreferencesDialog (this, _settingsDataStore,
+		new EdgeTapPaddingModeListener ()
 		{
-			if (_firstCallback)
+			public
+			void onEdgeTapPaddingModeChanged (
+				final EdgeTapPaddingMode pMode
+				)
 			{
-				_firstCallback = false;
-				return;
+				_boardView.setEdgeTapPaddingMode (pMode);
+				if (_gameInfo != null)
+				{
+					_gtp.drawBoard (_gameInfo, true);
+				}
 			}
-			final EdgeTapPaddingMode mode = EdgeTapPaddingMode.values () [pPosition];
-			_sharedPreferences.edit ().
-				putString (_preferencesEdgeTapPaddingKey, mode.name ()).
-				commit ();
-			_boardView.setEdgeTapPaddingMode (mode);
-			if (_gameInfo != null)
-			{
-				_gtp.drawBoard (_gameInfo, true);
-			}
-		}
-
-		public
-		void onNothingSelected (
-			final AdapterView <?> pAdapterView
-			)
-		{
-		}
-	});
-	new AlertDialog.Builder (this).
-		setTitle (R.string.menuDisplaySettingsLabel).
-		setView (view).
-		show ();
+		});
 }
 
 private

@@ -1,40 +1,50 @@
 <?xml version="1.0" encoding="utf-8"?>
 <menu xmlns:a="http://schemas.android.com/apk/res/android">
-	<item a:id="@+id/menuNewGame"
-		a:title="@string/menuNewEditGameLabel"
-		a:alphabeticShortcut="@string/menuNewGameShortcut"
-		a:icon="@drawable/newGameMenuIcon"/>
-	<item a:id="@+id/menuUndo"
-		a:title="@string/menuUndoLabel"
-		a:alphabeticShortcut="@string/menuUndoShortcut"
-		a:icon="@drawable/undoMenuIcon"/>
-	<item a:id="@+id/menuRedo"
-		a:title="@string/menuRedoLabel"
-		a:alphabeticShortcut="@string/menuRedoShortcut"/>
-	<item a:id="@+id/menuPass"
-		a:title="@string/menuPassLabel"
-		a:alphabeticShortcut="@string/menuPassShortcut"
-		a:icon="@drawable/passMenuIcon"/>
-	<item a:id="@+id/menuSaveLoad"
-		a:title="@string/menuSaveLoadLabel"
-		a:alphabeticShortcut="@string/menuSaveLoadShortcut"
-		a:icon="@drawable/saveLoadMenuIcon">
-		<menu>
-			<item a:id="@+id/menuSave"
-				a:title="@string/menuSaveLabel"/>
-			<item a:id="@+id/menuLoad"
-				a:title="@string/menuLoadLabel"/>
-		</menu>
-	</item>
+	<!-- Game setup: starting/editing a game's own settings -->
+	<group a:id="@+id/menuGroupGameSetup">
+		<item a:id="@+id/menuNewGame"
+			a:title="@string/menuNewEditGameLabel"
+			a:alphabeticShortcut="@string/menuNewGameShortcut"
+			a:icon="@drawable/newGameMenuIcon"/>
+	</group>
 
-	<!-- extended menu -->
-	<item a:id="@+id/menuToStart"
-		a:title="@string/menuToStartLabel"
-		a:alphabeticShortcut="@string/menuToStartShortcut"/>
-	<item a:id="@+id/menuShareGame"
-		a:title="@string/menuShareGameLabel"/>
-	<item a:id="@+id/menuDisplaySettings"
-		a:title="@string/menuDisplaySettingsLabel"/>
+	<!-- In-game actions: things you do mid-game -->
+	<group a:id="@+id/menuGroupInGameActions">
+		<item a:id="@+id/menuUndo"
+			a:title="@string/menuUndoLabel"
+			a:alphabeticShortcut="@string/menuUndoShortcut"
+			a:icon="@drawable/undoMenuIcon"/>
+		<item a:id="@+id/menuRedo"
+			a:title="@string/menuRedoLabel"
+			a:alphabeticShortcut="@string/menuRedoShortcut"/>
+		<item a:id="@+id/menuPass"
+			a:title="@string/menuPassLabel"
+			a:alphabeticShortcut="@string/menuPassShortcut"
+			a:icon="@drawable/passMenuIcon"/>
+		<item a:id="@+id/menuSaveLoad"
+			a:title="@string/menuSaveLoadLabel"
+			a:alphabeticShortcut="@string/menuSaveLoadShortcut"
+			a:icon="@drawable/saveLoadMenuIcon">
+			<menu>
+				<item a:id="@+id/menuSave"
+					a:title="@string/menuSaveLabel"/>
+				<item a:id="@+id/menuLoad"
+					a:title="@string/menuLoadLabel"/>
+			</menu>
+		</item>
+		<item a:id="@+id/menuToStart"
+			a:title="@string/menuToStartLabel"
+			a:alphabeticShortcut="@string/menuToStartShortcut"/>
+		<item a:id="@+id/menuShareGame"
+			a:title="@string/menuShareGameLabel"/>
+	</group>
+
+	<!-- App preferences: things you set once -->
+	<group a:id="@+id/menuGroupAppPreferences">
+		<item a:id="@+id/menuDisplaySettings"
+			a:title="@string/menuDisplaySettingsLabel"/>
+	</group>
+
 	<item a:id="@+id/menuInfo"
 		a:title="@string/menuInfoLabel"
 		a:alphabeticShortcut="@string/menuInfoShortcut"
