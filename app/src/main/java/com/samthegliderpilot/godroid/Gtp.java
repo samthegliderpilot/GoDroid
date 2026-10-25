@@ -392,7 +392,15 @@ String gtpCommand (
 
 	if (reply != null)
 	{
-		reply = reply.replaceFirst ("= ", "").replace ("\n\n", "");
+		// GnuGoEngine appends exactly one '\n' after every line it reads,
+		// including the last - trim that one trailing separator, not every
+		// newline (multi-line replies like showboard need their internal
+		// line breaks kept intact).
+		reply = reply.replaceFirst ("= ", "");
+		if (reply.endsWith ("\n"))
+		{
+			reply = reply.substring (0, reply.length () - 1);
+		}
 	}
 	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
 	{
