@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import java.io.IOException
 import kotlinx.coroutines.Deferred
 import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.async
 import kotlinx.coroutines.runBlocking
 
@@ -34,6 +35,7 @@ class GoEngineViewModel(application: Application) : AndroidViewModel(application
         engineDeferred.await().sendCommand(input)
     }
 
+    @OptIn(ExperimentalCoroutinesApi::class)
     override fun onCleared() {
         runBlocking {
             if (engineDeferred.isCompleted && engineDeferred.getCompletionExceptionOrNull() == null) {
