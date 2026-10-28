@@ -2,9 +2,6 @@ package com.samthegliderpilot.godroid;
 
 import java.io.File;
 import java.io.FileFilter;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
@@ -15,8 +12,6 @@ import java.util.Set;
 import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
-import android.content.ContentResolver;
-import android.provider.DocumentsContract;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -25,9 +20,6 @@ import android.widget.*;
 //import androidx.activity.EdgeToEdge;
 import androidx.activity.EdgeToEdge;
 import androidx.activity.OnBackPressedCallback;
-import androidx.activity.result.ActivityResult;
-import androidx.activity.result.ActivityResultLauncher;
-import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.graphics.Insets;
 import androidx.core.view.ViewCompat;
@@ -217,13 +209,7 @@ CharSequence
 
 SaveLoadController _saveLoadController;
 
-private final
-ActivityResultLauncher <Intent> _migrationFolderLauncher =
-	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
-		this::onMigrationFolderResult);
-
-private
-boolean _oldSavesOffered = false;
+OldSavesMigrationController _oldSavesMigrationController;
 
 private static
 GoEngineViewModel _goEngineViewModel;
@@ -406,6 +392,10 @@ void onCreate ( // 0
 		() -> newGame (restoreGameInfo (new GameInfo ()), null),
 		this::showCollectionList);
 
+	_oldSavesMigrationController = new OldSavesMigrationController (
+		this, _sharedPreferences, _preferencesOldSavesMigrationDismissedKey,
+		_saveLoadController.getSgfFileExtension ());
+
 	getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
 		@Override
 		public void handleOnBackPressed() {
@@ -455,7 +445,7 @@ void onStart ()
 	{
 		onNewIntent (getIntent ());
 	}
-	getWindow ().getDecorView ().post (this::offerOldSavesMigration);
+	getWindow ().getDecorView ().post (_oldSavesMigrationController::offerMigration);
 }
 
 @Override
@@ -754,142 +744,6 @@ private
 void restartGame ()
 {
 	_gtp.restartGame (_gameInfo);
-}
-
-// Versions before 1.5.0 saved games to this app-private folder, which file
-// managers and other apps cannot see. Newer versions use the system document
-// picker instead, so offer to copy any games left there to a folder the user
-// picks. The originals are never touched.
-private
-File [] findOldSaves ()
-{
-	final File baseDir = getExternalFilesDir (null);
-	if (baseDir == null)
-	{
-		return new File [0];
-	}
-	final String suffix = _saveLoadController.getSgfFileExtension ();
-	final File [] files = new File (baseDir, "GoDroid").listFiles (
-		(pDir, pName) -> pName.endsWith (suffix));
-	return files == null ? new File [0] : files;
-}
-
-private
-void offerOldSavesMigration ()
-{
-	if (_oldSavesOffered || _sharedPreferences.getBoolean (
-		_preferencesOldSavesMigrationDismissedKey, false))
-	{
-		return;
-	}
-	_oldSavesOffered = true;
-	final File [] oldSaves = findOldSaves ();
-	if (oldSaves.length == 0)
-	{
-		return;
-	}
-	new AlertDialog.Builder (this).
-		setMessage (getString (R.string.migrateOldSavesMessage, oldSaves.length)).
-		setPositiveButton (R.string.migrateOldSavesChooseFolder,
-			(pDialog, pWhich) -> launchMigrationFolderPicker ()).
-		setNegativeButton (R.string.migrateOldSavesNotNow, null).
-		setNeutralButton (R.string.migrateOldSavesDontAskAgain,
-			(pDialog, pWhich) -> markOldSavesMigrationDismissed ()).
-		show ();
-}
-
-private
-void markOldSavesMigrationDismissed ()
-{
-	_sharedPreferences.edit ().
-		putBoolean (_preferencesOldSavesMigrationDismissedKey, true).
-		commit ();
-}
-
-private
-void launchMigrationFolderPicker ()
-{
-	final Intent intent = new Intent (Intent.ACTION_OPEN_DOCUMENT_TREE);
-	intent.addFlags (Intent.FLAG_GRANT_READ_URI_PERMISSION
-		| Intent.FLAG_GRANT_WRITE_URI_PERMISSION);
-	_migrationFolderLauncher.launch (intent);
-}
-
-private
-void onMigrationFolderResult (
-	final ActivityResult pResult
-	)
-{
-	if (pResult.getResultCode () != RESULT_OK)
-	{
-		return;
-	}
-	final Intent data = pResult.getData ();
-	final Uri treeUri = data == null ? null : data.getData ();
-	if (treeUri == null)
-	{
-		return;
-	}
-	final File [] oldSaves = findOldSaves ();
-	new Thread (() ->
-	{
-		final int copied = copyOldSaves (oldSaves, treeUri);
-		runOnUiThread (() ->
-		{
-			// Only stop asking once everything made it across, so a partial
-			// failure is offered again on the next launch.
-			if (copied == oldSaves.length)
-			{
-				markOldSavesMigrationDismissed ();
-			}
-			showMessage (getString (R.string.migrateOldSavesDone,
-				copied, oldSaves.length));
-		});
-	}).start ();
-}
-
-private
-int copyOldSaves (
-	final File [] pFiles,
-	final Uri pTreeUri
-	)
-{
-	final ContentResolver resolver = getContentResolver ();
-	final Uri parentUri = DocumentsContract.buildDocumentUriUsingTree (
-		pTreeUri, DocumentsContract.getTreeDocumentId (pTreeUri));
-	final byte [] buffer = new byte [8192];
-	int copied = 0;
-	for (final File file : pFiles)
-	{
-		try
-		{
-			final Uri targetUri = DocumentsContract.createDocument (
-				resolver, parentUri, "application/x-go-sgf", file.getName ());
-			if (targetUri == null)
-			{
-				throw new Exception ("provider refused to create the file");
-			}
-			try (InputStream in = new FileInputStream (file);
-				OutputStream out = resolver.openOutputStream (targetUri, "wt"))
-			{
-				int numBytes;
-				while ((numBytes = in.read (buffer)) != -1)
-				{
-					out.write (buffer, 0, numBytes);
-				}
-			}
-			copied++;
-		}
-		catch (final Exception e)
-		{
-			if (isEnabledFor (_LOG_TAG, Log.INFO))
-			{
-				log (_LOG_TAG, Log.INFO,
-					"failed to copy old save '" + file + "': '" + e + "'");
-			}
-		}
-	}
-	return copied;
 }
 
 void showCollectionList ()
