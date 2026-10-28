@@ -9,6 +9,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SegmentedButton
 import androidx.compose.material3.SegmentedButtonDefaults
 import androidx.compose.material3.SingleChoiceSegmentedButtonRow
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -74,17 +75,19 @@ fun showAppPreferencesDialog(
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
         setContent {
             GoDroidTheme {
-                val scope = rememberCoroutineScope()
-                val currentMode by settingsDataStore.edgeTapPaddingMode.collectAsState(
-                    initial = EdgeTapPaddingMode.AUTO
-                )
-                AppPreferencesScreen(
-                    currentMode = currentMode,
-                    onModeSelected = { mode ->
-                        scope.launch { settingsDataStore.setEdgeTapPaddingMode(mode) }
-                        listener.onEdgeTapPaddingModeChanged(mode)
-                    }
-                )
+                Surface(color = MaterialTheme.colorScheme.surface) {
+                    val scope = rememberCoroutineScope()
+                    val currentMode by settingsDataStore.edgeTapPaddingMode.collectAsState(
+                        initial = EdgeTapPaddingMode.AUTO
+                    )
+                    AppPreferencesScreen(
+                        currentMode = currentMode,
+                        onModeSelected = { mode ->
+                            scope.launch { settingsDataStore.setEdgeTapPaddingMode(mode) }
+                            listener.onEdgeTapPaddingModeChanged(mode)
+                        }
+                    )
+                }
             }
         }
     }

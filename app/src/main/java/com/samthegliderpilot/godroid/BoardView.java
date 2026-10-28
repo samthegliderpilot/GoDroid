@@ -1,7 +1,6 @@
 package com.samthegliderpilot.godroid;
 
 import java.util.List;
-import java.util.Set;
 
 import android.content.Context;
 import android.content.res.Resources;
@@ -26,9 +25,7 @@ import android.view.MotionEvent;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
 import android.view.View;
-import android.view.ViewConfiguration;
 import android.widget.Toast;
-import static com.samthegliderpilot.godroid.Globals.*;
 
 import androidx.annotation.NonNull;
 
@@ -70,6 +67,8 @@ static
 private static final
 Bitmap.Config _bitmapConfig = Bitmap.Config.ARGB_8888;
 
+MainActivity _mainActivity;
+
 private final
 int _blackStoneColor, _whiteStoneColor;
 
@@ -108,6 +107,7 @@ int
 	_activeIntCellWidth, _activeIntCellWidthDIV2,
 	_intZoomCellWidth, _intZoomCellWidthDIV2,
 	_yBoardOffset, _xBoardOffset,
+	_drawnBoardWidth,
 	_maxZoomBoardSizeOffset,
 	_zoomRangeLow, _zoomRangeHigh,
 	_crossCursorStrokeWidth;
@@ -127,269 +127,13 @@ PathShape _gridShape, _markersShape;
 private
 float [] _textPosUpper, _textPosLower;
 
-// Written on the gnuGo background thread (setLegalMoves), read on the UI
-// thread by gesture callbacks (onScroll etc). volatile + replace-the-whole-set
-// publication (rather than mutating in place) avoids both a stale-visibility
-// read and a torn read of a set being cleared/refilled out from under us.
-volatile
-Set <Point> _legalMoves = Generics.newHashSet ();
+final
+LegalMoves _legalMoves = new LegalMoves ();
 
 private final
 List <Point> _markers = Generics.newArrayList ();
 
 Point _zoomViewPoint;
-
-private final
-class BoardGestureListener
-	extends GestureDetector.SimpleOnGestureListener
-{
-	static final
-	int _HINT_DISPLAY_TIME_MILLIS = 2*60*1000;
-
-	long _lastHintDisplayTime;
-
-	boolean _showHint = true;
-
-	float _cellWidthDIV2, _cellWidthDIV3;
-
-	// A floor under the tap-tolerance thresholds below, so a dense board
-	// (19x19) or a high-DPI/high-touch-sampling-rate device can't shrink
-	// them past normal finger jitter. Same constant Android itself uses to
-	// decide "did the finger really move" for scrolling, long-press, etc.
-	final int _touchSlop = ViewConfiguration.get (getContext ()).getScaledTouchSlop ();
-
-	float _lastX, _lastY;
-
-	Point _lastPoint;
-
-	boolean _stonePositionChanged;
-
-	boolean _wasTapUp;
-
-	// Written from either the UI thread or the gnuGo background thread
-	// (BoardView.lockScreen), read from the UI thread in every gesture
-	// callback below - needs to be visible across threads promptly.
-	volatile boolean _interactionLocked;
-
-	void reset (
-		final float pCellWidth
-		)
-	{
-		_cellWidthDIV2 = pCellWidth / 2;
-		_cellWidthDIV3 = Math.max (pCellWidth / 3f, _touchSlop);
-		_lastX = _lastY = -pCellWidth -1;
-		_lastPoint = null;
-		_stonePositionChanged = false;
-	}
-
-	void showHint ()
-	{
-		final long currentTime = System.currentTimeMillis ();
-		if (currentTime - _HINT_DISPLAY_TIME_MILLIS < _lastHintDisplayTime)
-		{
-			return;
-		}
-		_tapHint.show ();
-		_lastHintDisplayTime = currentTime;
-	}
-
-	Point coord2Point (
-		final float x,
-		final float y
-		)
-	{
-		final float activeCellWidth = _activeCellWidth;
-		return new Point ((int)(x / activeCellWidth),
-			(int)(y / activeCellWidth));
-	}
-
-	public
-	boolean onScroll (
-			final MotionEvent pEvent1,
-			@NonNull final MotionEvent pEvent2,
-			final float pDistanceX,
-			final float pDistanceY
-		)
-	{
-		if (_interactionLocked)
-		{
-			return true;
-		}
-		final float x = pEvent2.getX () - _activeXBoardOffset,
-			y = pEvent2.getY () - _activeYBoardOffset;
-		final float cellWidth = _activeCellWidth,
-			lastX = _lastX, lastY = _lastY,
-			slop = _touchSlop;
-		// Require the touch to clear the current cell's bounds by a real,
-		// intentional amount (not just a stray pixel of finger jitter) before
-		// treating it as having moved to a different intersection - without
-		// this, a touch landing near a cell boundary could flip back and
-		// forth between neighboring cells on jitter alone, which blocks
-		// onSingleTapUp from ever committing a placement (see below).
-		if (x < lastX - slop || x > lastX + cellWidth + slop
-			|| y < lastY - slop || y > lastY + cellWidth + slop)
-		{
-			final Point newPoint = coord2Point (x, y);
-			if (!_legalMoves.contains (newPoint))
-			{
-				return true;
-			}
-			moveStone (newPoint);
-		}
-		return true;
-	}
-
-	void moveStone (
-		final Point pNewPoint
-		)
-	{
-		final float cellWidth = _activeCellWidth;
-		_lastX = pNewPoint.x * cellWidth;
-		_lastY = pNewPoint.y * cellWidth;
-		final Point lastPoint = new Point (pNewPoint);
-		final String vertex = Gtp.point2Vertex (pNewPoint, _boardSize);
-		_mainActivity.showMove (drawMovingStone (pNewPoint, _lastPoint),
-			vertex);
-		_lastPoint = lastPoint;
-		_stonePositionChanged = true;
-	}
-
-	public
-	boolean onSingleTapUp (
-			@NonNull final MotionEvent pEvent
-		)
-	{
-		if (_interactionLocked)
-		{
-			return true;
-		}
-		_wasTapUp = true;
-		if (_stonePositionChanged)
-		{
-			showHint ();
-			return true;
-		}
-		final float x = pEvent.getX () - _activeXBoardOffset,
-			y = pEvent.getY () - _activeYBoardOffset,
-			cellWidthDVI2 = _cellWidthDIV2, hitRange = _cellWidthDIV3,
-			lastX = _lastX + cellWidthDVI2, lastY = _lastY + cellWidthDVI2;
-		if (Math.abs (lastX - x) < hitRange && Math.abs (lastY - y) < hitRange)
-		{
-			setStone ();
-		}
-		return true;
-	}
-
-	void setStone ()
-	{
-		_showHint = false;
-		final Point lastPoint = _lastPoint;
-		_lastPoint = null;
-		if (lastPoint == null)
-		{
-			return;
-		}
-		drawMovingStone (new Point (lastPoint), false);
-		_mainActivity.nextMove (lastPoint);
-	}
-
-	void moveStoneIncrementally (
-		int pDiffX,
-		int pDiffY
-		)
-	{
-		if (_interactionLocked)
-		{
-			return;
-		}
-		Point lastPoint = _lastPoint;
-		if (pDiffX == 0 && pDiffY == 0)
-		{
-			if (lastPoint != null)
-			{
-				setStone ();
-			}
-			return;
-		}
-
-		final Set <Point> legalMoves = _legalMoves;
-		if (lastPoint == null)
-		{
-			if (legalMoves.isEmpty())
-			{
-				_stonePositionChanged = false;
-				return;
-			}
-			lastPoint = legalMoves.iterator ().next ();
-			pDiffX = pDiffY = 0;
-		}
-		int newX = lastPoint.x, newY = lastPoint.y;
-		final int boardSize = _boardSize;
-		final Point newPoint = new Point ();
-		do
-		{
-			newX += pDiffX; newY += pDiffY;
-			if (newX < 0 || newX == boardSize
-				|| newY < 0 || newY == boardSize)
-			{
-				return;
-			}
-			newPoint.set (newX, newY);
-		}
-		while (!legalMoves.contains (newPoint));
-		moveStone (newPoint);
-	}
-
-	void onUp ()
-	{
-		if (_interactionLocked)
-		{
-			return;
-		}
-		if (!_wasTapUp)
-		{
-			showHint ();
-		}
-		_wasTapUp = false;
-	}
-
-	public
-	boolean onDown (
-			@NonNull final MotionEvent pMotionEvent
-		)
-	{
-		if (_interactionLocked)
-		{
-			return true;
-		}
-		_stonePositionChanged = false;
-		return onScroll (null, pMotionEvent, 0, 0);
-	}
-
-	public
-	void onLongPress (
-			@NonNull final MotionEvent pEvent
-		)
-	{
-		if (_interactionLocked)
-		{
-			return;
-		}
-		if (_isZoom)
-		{
-			_isZoom = false;
-		}
-		else
-		{
-			_isZoom = true;
-			final Point lastPoint = _lastPoint;
-			_zoomViewPoint = _legalMoves.contains (lastPoint) ? lastPoint
-				: coord2Point (pEvent.getX (), pEvent.getY ());
-		}
-		_mainActivity.drawBoard (false);
-		_wasTapUp = true;
-	}
-}
 
 public
 BoardView ( // 1
@@ -398,9 +142,8 @@ BoardView ( // 1
 	)
 {
 	super (pContext, pAttrs);
-	final MainActivity mainActivity = ((MainActivity)pContext);
-	_boardView = this;
-	final Resources resources = _resources;
+	final MainActivity mainActivity = _mainActivity = ((MainActivity)pContext);
+	final Resources resources = getResources ();
 	_xferModePaintAtopAlpha.setAlpha (resources.getInteger (
 		R.integer.movingStoneAlphaTransperency));
 	_crossCursporPaint.setStrokeWidth (
@@ -421,7 +164,7 @@ BoardView ( // 1
 	holder.addCallback (this);
 
 	final BoardGestureListener gestureListener = _gestureListener =
-		new BoardGestureListener ();
+		new BoardGestureListener (this);
 	_gestureDetector = new GestureDetector (pContext, gestureListener);
 }
 
@@ -508,7 +251,7 @@ void initBoard (
 	final boolean isLandscape = boardW > boardH;
 	final float fullCellWidth = (float)fullBoardWidth / pSize;
 	final boolean paddingActive = EdgeTapMath.isPaddingActive (_edgeTapPaddingMode,
-		fullCellWidth, _resources.getDisplayMetrics ().density,
+		fullCellWidth, getResources ().getDisplayMetrics ().density,
 		EdgeTapMath.AUTO_EDGE_PADDING_THRESHOLD_DP);
 	// Shrink the whole board by one original row-length and add that margin
 	// only on the left/right (the sides that are actually hard to reach on a
@@ -517,7 +260,7 @@ void initBoard (
 	// formula, so the freed vertical space just falls wherever it already
 	// was blank instead of pushing the top/bottom edges in too.
 	final int margin = paddingActive ? (int)(fullCellWidth / 2) : 0;
-	final int realBoardWidth = fullBoardWidth - margin * 2;
+	final int realBoardWidth = _drawnBoardWidth = fullBoardWidth - margin * 2;
 	if (isLandscape)
 	{
 		_yBoardOffset = 0;
@@ -547,7 +290,7 @@ void initBoard (
 	_activeCellWidth = realCellWidth;
 	_activeXBoardOffset = _xBoardOffset; _activeYBoardOffset = _yBoardOffset;
 
-	final Resources resources = _resources;
+	final Resources resources = getResources ();
 	Path path = new Path ();
 
 	final float lineEnd = boardWidth - cellWidthDIV2;
@@ -709,7 +452,7 @@ void drawBoard (
 		realCellWidthDIV2 = _realCellWidthDIV2,
 		activeCellWidthDIV2;
 
-	final Resources resources = _resources;
+	final Resources resources = getResources ();
 	final Paint paint = new Paint (_xferModePaintSrc);
 	paint.setColor (resources.getColor (R.color.boardColor));
 	final Canvas canvas = new Canvas (boardBitmap);
@@ -771,8 +514,12 @@ void drawBoard (
 	final int sizeMin1 = size -1;
 	final float realCellWidhtDIV4 = realCellWidthDIV2 / 2,
 		textYOffset = realCellWidthDIV2 + realCellWidhtDIV4,
-		textXPos = (boardWidth > boardHeight ? boardHeight : boardWidth)
-			- realCellWidhtDIV4;
+		// _drawnBoardWidth is the grid's actual on-screen size, which shrinks when
+		// edge tap padding is active - unlike boardWidth/boardHeight here, which are
+		// this View's fixed full pixel dimensions and don't track that margin, so
+		// using them left the right-edge coordinate numbers behind where the grid
+		// actually ends.
+		textXPos = _drawnBoardWidth - realCellWidhtDIV4;
 	for (int idx=0; idx < size; idx++)
 	{
 		final float pos = textYOffset + idx * realCellWidth;
@@ -932,7 +679,6 @@ void drawBoard2Surface ()
 	}
 }
 
-private
 boolean drawMovingStone (
 	final Point pMovingStone,
 	final Point pLastStone
@@ -1134,14 +880,12 @@ void point2Coord (
 	final Point pPoint
 	)
 {
-	if (pPoint instanceof GameInfo.Passed)
+	final Point newCoord = BoardGeometry.point2Coord (
+		pPoint, _activeCellWidth, _activeXBoardOffset, _activeYBoardOffset);
+	if (newCoord != null)
 	{
-		return;
+		pPoint.set (newCoord.x, newCoord.y);
 	}
-	final float cellWidth = _activeCellWidth;
-	pPoint.set (
-		(int)(pPoint.x * cellWidth + _activeXBoardOffset),
-		(int)(pPoint.y * cellWidth + _activeYBoardOffset));
 }
 
 private
@@ -1160,12 +904,7 @@ void setLegalMoves (
 	final List <Point> pPoints
 	)
 {
-	final Set <Point> legalMoves = Generics.newHashSet ();
-	if (pPoints != null)
-	{
-		legalMoves.addAll (pPoints);
-	}
-	_legalMoves = legalMoves;
+	_legalMoves.replaceWith (pPoints);
 }
 
 void moveStone (

@@ -5,6 +5,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
+import android.content.ContentResolver;
 import android.graphics.Point;
 import android.net.Uri;
 
@@ -27,9 +28,9 @@ import java.io.Writer;
 
 /**
  * Characterization tests for GameInfo.saveGame/loadGame/getSetupNode, run on-device
- * because GameInfo's static init (Globals._appInfo, MainActivity._LOG_TAG) requires
- * the real app bootstrap, and loadGame drives the native GnuGo engine synchronously
- * via Gtp.gtpCommand/Gtp.playMove.
+ * because GameInfo's static init (MainActivity._LOG_TAG) requires the real app
+ * bootstrap, and loadGame drives the native GnuGo engine synchronously via
+ * Gtp.gtpCommand/Gtp.playMove.
  *
  * These call GameInfo's package-private save/load methods directly, bypassing the
  * async Gtp.handleMessage UI-orchestration layer (which needs a live BoardView / UI
@@ -45,6 +46,8 @@ public class GameInfoInstrumentedTest
 
 	private File _testDir;
 
+	private ContentResolver _contentResolver;
+
 	@Before
 	public void launchAppAndPrepareScratchDir () throws Exception
 	{
@@ -55,9 +58,11 @@ public class GameInfoInstrumentedTest
 		// the same single native engine instance, to avoid interleaving.
 		Thread.sleep (2000);
 
-		_testDir = new File (InstrumentationRegistry.getInstrumentation ()
-			.getTargetContext ().getCacheDir (), "gameInfoTest");
+		final android.content.Context targetContext = InstrumentationRegistry
+			.getInstrumentation ().getTargetContext ();
+		_testDir = new File (targetContext.getCacheDir (), "gameInfoTest");
 		_testDir.mkdirs ();
+		_contentResolver = targetContext.getContentResolver ();
 	}
 
 	@After
@@ -98,7 +103,7 @@ public class GameInfoInstrumentedTest
 	{
 		final GameInfo gameInfo = new GameInfo ();
 		gameInfo._boardSize = 9;
-		gameInfo.initSGF ();
+		gameInfo.initSGF ("GoDroidTest", "test");
 		// addMove records the move under the CURRENT _playerBlackMoves color and
 		// does not toggle it -- the caller is responsible for alternating turns,
 		// same as Gtp.handleMessage's PLAY_MOVE case does around addMove().
@@ -108,7 +113,7 @@ public class GameInfoInstrumentedTest
 		gameInfo._playerBlackMoves = !gameInfo._playerBlackMoves;
 
 		final File file = newFile ("saveTest.sgf");
-		assertTrue (gameInfo.saveGame (Uri.fromFile (file), file.getName ()));
+		assertTrue (gameInfo.saveGame (Uri.fromFile (file), file.getName (), _contentResolver));
 		assertTrue (file.exists ());
 
 		final String contents = new String (
@@ -124,7 +129,7 @@ public class GameInfoInstrumentedTest
 	{
 		final GameInfo original = new GameInfo ();
 		original._boardSize = 9;
-		original.initSGF ();
+		original.initSGF ("GoDroidTest", "test");
 		original.addMove (new Point (2, 2));
 		original._playerBlackMoves = !original._playerBlackMoves;
 		original.addMove (new Point (6, 6));
@@ -133,11 +138,11 @@ public class GameInfoInstrumentedTest
 		original._playerBlackMoves = !original._playerBlackMoves;
 
 		final File file = newFile ("roundTrip.sgf");
-		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName (), _contentResolver));
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals (9, loaded._boardSize);
@@ -171,16 +176,16 @@ public class GameInfoInstrumentedTest
 		original._boardSize = boardSize;
 		original._handicap = handicap;
 		original._playerBlackMoves = false;
-		original.initSGF ();
+		original.initSGF ("GoDroidTest", "test");
 
 		final File file = newFile ("handicap.sgf");
-		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName (), _contentResolver));
 		assertEquals (handicap,
 			original._setupNode.getPropertyValues (PropertyName.AddBlack).size ());
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals (boardSize, loaded._boardSize);
@@ -198,7 +203,7 @@ public class GameInfoInstrumentedTest
 
 		final GameInfo gameInfo = new GameInfo ();
 		final LoadGameStatus status =
-			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SHOW_COLLECTION_LIST, status);
 		assertTrue (gameInfo._isCollection);
@@ -217,7 +222,8 @@ public class GameInfoInstrumentedTest
 		assertEquals ("2 Game Two", gameInfo._collectionNames [1]);
 
 		// Loading the second entry explicitly by index should actually load it.
-		final LoadGameStatus secondStatus = gameInfo.loadGame (Uri.fromFile (file), 1);
+		final LoadGameStatus secondStatus =
+			gameInfo.loadGame (Uri.fromFile (file), 1, _contentResolver);
 		assertEquals (LoadGameStatus.SUCCESS, secondStatus);
 		assertEquals (13, gameInfo._boardSize);
 	}
@@ -243,7 +249,7 @@ public class GameInfoInstrumentedTest
 
 		final GameInfo gameInfo = new GameInfo ();
 		final LoadGameStatus status =
-			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertFalse (gameInfo._isCollection);
@@ -264,7 +270,7 @@ public class GameInfoInstrumentedTest
 		// looking for that marker to know where a resumed game left off.
 		final GameInfo original = new GameInfo ();
 		original._boardSize = 9;
-		original.initSGF ();
+		original.initSGF ("GoDroidTest", "test");
 		original.addMove (new Point (2, 2));
 		original._playerBlackMoves = !original._playerBlackMoves;
 		original.addMove (new Point (6, 6));
@@ -276,11 +282,11 @@ public class GameInfoInstrumentedTest
 		original.undo ();
 
 		final File file = newFile ("resume.sgf");
-		assertTrue (original.saveGame (Uri.fromFile (file), file.getName ()));
+		assertTrue (original.saveGame (Uri.fromFile (file), file.getName (), _contentResolver));
 
 		final GameInfo loaded = new GameInfo ();
 		final LoadGameStatus status =
-			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			loaded.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		// Only the first 2 moves (before the undo) should be replayed.
@@ -304,7 +310,7 @@ public class GameInfoInstrumentedTest
 		final boolean chineseRulesBeforeLoad = gameInfo._chineseRules;
 
 		final LoadGameStatus status =
-			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX);
+			gameInfo.loadGame (Uri.fromFile (file), GameInfo._DEFAULT_GAME_COLLECTION_IDX, _contentResolver);
 
 		assertEquals (LoadGameStatus.SUCCESS, status);
 		assertEquals ("komi is not restored from SGF on load (known gap)",

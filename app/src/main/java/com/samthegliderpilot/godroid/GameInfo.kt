@@ -1,5 +1,6 @@
 package com.samthegliderpilot.godroid
 
+import android.content.ContentResolver
 import android.graphics.Point
 import android.net.Uri
 import android.text.format.DateFormat
@@ -129,13 +130,12 @@ class GameInfo {
         return this
     }
 
-    fun initSGF() {
-        val appInfo = Globals._appInfo
+    fun initSGF(appName: String, appVersion: String) {
         val gameNode = Node(null)
         _gameNode = gameNode
         val node = PropertyNode(
             gameNode,
-            PropertyName.Application.newProperty("${appInfo._appName}:${appInfo._appVersion}")
+            PropertyName.Application.newProperty("$appName:$appVersion")
         )
             .addProperty(PropertyName.FileFormat.newProperty(PropertyName._SGF_FILE_FORMAT4))
             .addProperty(PropertyName.GameType.newProperty(PropertyName._GO_GAME_NUMBER))
@@ -235,13 +235,10 @@ class GameInfo {
         return moves
     }
 
-    fun getRedoPoints(): MutableList<Point>? {
-        val redoPoints = _redoPoints ?: return null
-        val newRedoPoints = Generics.newArrayList<Point>(redoPoints.size)
-        for (redoPoint in redoPoints) {
-            newRedoPoints.add(if (redoPoint is Passed) redoPoint else Point(redoPoint))
+    fun getRedoPoints(): MutableList<Point>? = _redoPoints?.let { redoPoints ->
+        redoPoints.mapTo(Generics.newArrayList(redoPoints.size)) { point ->
+            if (point is Passed) point else Point(point)
         }
-        return newRedoPoints
     }
 
     fun undo(): MutableList<Point>? {
@@ -370,14 +367,14 @@ class GameInfo {
         return redoPoints
     }
 
-    fun getSetupNode(pUri: Uri, pCollectionIdx: Int): PropertyNode {
+    fun getSetupNode(pUri: Uri, pCollectionIdx: Int, pContentResolver: ContentResolver): PropertyNode {
         var collectionOffsets = _collectionOffsets
         if (collectionOffsets == null) {
             val collectionOffsetsList = Generics.newArrayList<Long>(1)
             val collectionNumCharsList = Generics.newArrayList<Long>(1)
             val namesList = Generics.newArrayList<String>(1)
             val isCollection = Node.readCollectionIndices(
-                BufferedReader(InputStreamReader(openInput(pUri))),
+                BufferedReader(InputStreamReader(openInput(pUri, pContentResolver))),
                 collectionOffsetsList, collectionNumCharsList, namesList
             )
             _isCollection = isCollection
@@ -392,7 +389,7 @@ class GameInfo {
             throw Exception("loadGame: collection idx out of bounds")
         }
         val collection = Node(
-            BufferedReader(InputStreamReader(openInput(pUri))),
+            BufferedReader(InputStreamReader(openInput(pUri, pContentResolver))),
             null,
             collectionOffsets[pCollectionIdx], _collectionNumChars!![pCollectionIdx]
         )
@@ -407,20 +404,20 @@ class GameInfo {
         return setupNodesList[0]
     }
 
-    fun loadGame(pUri: Uri, pCollectionIdxArg: Int): LoadGameStatus {
+    fun loadGame(pUri: Uri, pCollectionIdxArg: Int, pContentResolver: ContentResolver): LoadGameStatus {
         var pCollectionIdx = pCollectionIdxArg
         try {
             var setupNode: PropertyNode? = null
             if (pCollectionIdx == _DEFAULT_GAME_COLLECTION_IDX) {
                 pCollectionIdx = 0
-                setupNode = getSetupNode(pUri, pCollectionIdx)
+                setupNode = getSetupNode(pUri, pCollectionIdx, pContentResolver)
                 if (_isCollection) {
                     return LoadGameStatus.SHOW_COLLECTION_LIST
                 }
             }
             _collectionIdx = pCollectionIdx
             if (setupNode == null) {
-                setupNode = getSetupNode(pUri, pCollectionIdx)
+                setupNode = getSetupNode(pUri, pCollectionIdx, pContentResolver)
             }
             val nonNullSetupNode = setupNode ?: return LoadGameStatus.FAIL
             val gameNode = Node(null)
@@ -534,7 +531,7 @@ class GameInfo {
         return _playerBlackMoves
     }
 
-    fun saveGame(pUri: Uri, pDisplayName: String): Boolean {
+    fun saveGame(pUri: Uri, pDisplayName: String, pContentResolver: ContentResolver): Boolean {
         val gameNode = _gameNode
         val setupNode = _setupNode
         if (gameNode == null || setupNode == null) {
@@ -549,7 +546,7 @@ class GameInfo {
             .addProperty(PropertyName.GameName.newProperty(pDisplayName))
         var writer: Writer? = null
         try {
-            val out = Globals._mainActivity.contentResolver.openOutputStream(pUri, "wt")
+            val out = pContentResolver.openOutputStream(pUri, "wt")
             writer = BufferedWriter(OutputStreamWriter(out))
             gameNode.writeNode(writer)
         } catch (e: Exception) {
@@ -573,7 +570,7 @@ class GameInfo {
     // collection. Reads the existing content and rewrites it in full (rather
     // than relying on SAF "append" open mode) since not every DocumentsProvider
     // is guaranteed to support append semantics.
-    fun appendGame(pUri: Uri, pDisplayName: String): Boolean {
+    fun appendGame(pUri: Uri, pDisplayName: String, pContentResolver: ContentResolver): Boolean {
         val gameNode = _gameNode
         val setupNode = _setupNode
         if (gameNode == null || setupNode == null) {
@@ -589,7 +586,7 @@ class GameInfo {
         var writer: Writer? = null
         try {
             val existing = StringBuilder()
-            val reader: Reader = InputStreamReader(openInput(pUri))
+            val reader: Reader = InputStreamReader(openInput(pUri, pContentResolver))
             val buffer = CharArray(4096)
             var numChars: Int
             while (reader.read(buffer).also { numChars = it } != -1) {
@@ -597,7 +594,7 @@ class GameInfo {
             }
             reader.close()
 
-            val out = Globals._mainActivity.contentResolver.openOutputStream(pUri, "wt")
+            val out = pContentResolver.openOutputStream(pUri, "wt")
             writer = BufferedWriter(OutputStreamWriter(out))
             writer.write(existing.toString())
             gameNode.writeNode(writer)
@@ -617,8 +614,8 @@ class GameInfo {
         return true
     }
 
-    private fun openInput(pUri: Uri): InputStream {
-        return Globals._mainActivity.contentResolver.openInputStream(pUri)
+    private fun openInput(pUri: Uri, pContentResolver: ContentResolver): InputStream {
+        return pContentResolver.openInputStream(pUri)
             ?: throw Exception("openInputStream returned null for $pUri")
     }
 
@@ -753,7 +750,17 @@ class GameInfo {
 
     companion object {
         const val _CURRENT_NODE_NAME = "-RECENT_MOVE"
-        val _RECENT_MOVE_NAME: String = Globals._appInfo._appName + _CURRENT_NODE_NAME
+
+        // An internal SGF marker (never shown to the user, never compared
+        // against anything outside this app's own save files) - "GoDroid" is
+        // a fixed literal, not a read of the app's live display name, so
+        // this stays a compile-time constant and every version keeps writing
+        // and recognizing the exact same marker value. (Matches
+        // MainActivity.AppInfo's _appName, which has always resolved to the
+        // same "GoDroid" app_name string resource - see AndroidManifest's
+        // android:label - so this preserves compatibility with saves from
+        // every prior version too.)
+        const val _RECENT_MOVE_NAME = "GoDroid" + _CURRENT_NODE_NAME
         const val _CHINESE_RULES_PROPERTY_VALUE = "Chinese"
         const val _DEFAULT_KOMI = "5.5"
 

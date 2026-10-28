@@ -29,77 +29,12 @@ android:id="@+id/root_layout"
             android:layout_alignParentTop="true"
             android:layout_alignParentEnd="true" />
 
-        <!-- Score table -->
-        <TableLayout
-            style="@style/WrapContent"
-            android:layout_centerInParent="true"
-            android:padding="@dimen/scoreViewTextPadding"
-            android:stretchColumns="1,2"
-            android:shrinkColumns="0">
-
-            <TableRow>
-                <TextView
-                    android:id="@+id/blackColorTextView"
-                    android:text="@string/blackColorText"
-                    android:layout_column="1"
-                    style="@style/TableLayoutTextCentered"/>
-                <TextView
-                    android:id="@+id/whiteColorTextView"
-                    android:text="@string/whiteColorText"
-                    style="@style/TableLayoutTextCentered"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView
-                    android:id="@+id/capturesRowTextView"
-                    android:text="@string/capturesLabelText"
-                    style="@style/TableLayoutText"/>
-                <TextView
-                    android:id="@+id/blackCapturesTextView"
-                    style="@style/TableLayoutTextCentered"/>
-                <TextView
-                    android:id="@+id/whiteCapturesTextView"
-                    style="@style/TableLayoutTextCentered"/>
-            </TableRow>
-
-            <TableRow>
-                <TextView
-                    android:id="@+id/moveRowTextView"
-                    android:text="@string/moveLabelText"
-                    style="@style/TableLayoutText"/>
-                <include
-                    layout="@layout/move_cell"
-                    android:id="@+id/blackMoveCell"/>
-                <include
-                    layout="@layout/move_cell"
-                    android:id="@+id/whiteMoveCell"/>
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/scoreTableRow">
-                <TextView
-                    android:id="@+id/scoreRowTextView"
-                    android:text="@string/scoreLabelText"
-                    style="@style/TableLayoutText"/>
-                <TextView
-                    android:id="@+id/blackScoreTextView"
-                    style="@style/TableLayoutTextCentered"/>
-                <TextView
-                    android:id="@+id/whiteScoreTextView"
-                    style="@style/TableLayoutTextCentered"/>
-            </TableRow>
-
-            <TableRow
-                android:id="@+id/messageTableRow"
-                android:visibility="gone">
-                <TextView
-                    android:id="@+id/messageScoreTextView"
-                    android:layout_span="3"
-                    style="@style/TableLayoutTextCentered"/>
-            </TableRow>
-
-
-        </TableLayout>
+        <!-- Score display -->
+        <androidx.compose.ui.platform.ComposeView
+            android:id="@+id/scoreComposeView"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true" />
     </com.samthegliderpilot.godroid.ScoreView>
 
     <!-- Go board fills the rest of the screen -->

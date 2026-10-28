@@ -18,6 +18,7 @@ import androidx.compose.material3.ExposedDropdownMenuDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -291,17 +292,19 @@ fun showNewGameDialog(
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
         setContent {
             GoDroidTheme {
-                NewGameScreen(
-                    original = original,
-                    onApply = { settings ->
-                        listener.onConfirm(settings, false)
-                        dialog.dismiss()
-                    },
-                    onStart = { settings ->
-                        listener.onConfirm(settings, true)
-                        dialog.dismiss()
-                    }
-                )
+                Surface(color = MaterialTheme.colorScheme.surface) {
+                    NewGameScreen(
+                        original = original,
+                        onApply = { settings ->
+                            listener.onConfirm(settings, false)
+                            dialog.dismiss()
+                        },
+                        onStart = { settings ->
+                            listener.onConfirm(settings, true)
+                            dialog.dismiss()
+                        }
+                    )
+                }
             }
         }
     }

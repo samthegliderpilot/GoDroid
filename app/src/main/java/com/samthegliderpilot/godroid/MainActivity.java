@@ -8,7 +8,6 @@ import java.io.OutputStream;
 import java.net.URL;
 import java.util.Arrays;
 import java.util.Comparator;
-import java.util.Date;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -17,10 +16,7 @@ import android.animation.AnimatorSet;
 import android.animation.ObjectAnimator;
 import android.animation.ValueAnimator;
 import android.content.ContentResolver;
-import android.database.Cursor;
-import android.os.Build;
 import android.provider.DocumentsContract;
-import android.provider.OpenableColumns;
 import android.view.View;
 import android.view.WindowManager;
 import android.view.animation.AccelerateDecelerateInterpolator;
@@ -46,13 +42,13 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.content.res.Resources;
-import android.content.res.TypedArray;
 import android.graphics.Bitmap;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Matrix;
-import android.graphics.Paint;
 import android.graphics.Point;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
@@ -64,13 +60,8 @@ import android.os.HandlerThread;
 import android.os.Looper;
 import android.os.Message;
 import android.text.Editable;
-import android.text.Layout;
-import android.text.StaticLayout;
-import android.text.TextPaint;
 import android.text.TextUtils;
-import android.text.format.DateFormat;
 import android.util.Log;
-import android.util.TypedValue;
 import android.view.GestureDetector;
 import android.view.Gravity;
 import android.view.KeyEvent;
@@ -88,13 +79,11 @@ import android.widget.EditText;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
-import android.widget.TableRow;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.samthegliderpilot.util.AssetsManager;
 import com.samthegliderpilot.util.Generics;
 
-import static com.samthegliderpilot.godroid.Globals.*;
 import static com.samthegliderpilot.util.Logging.buidLogTag;
 import static com.samthegliderpilot.util.Logging.isEnabledFor;
 import static com.samthegliderpilot.util.Logging.log;
@@ -144,6 +133,37 @@ static
 	}
 }
 
+static final
+class AppInfo
+{
+	final String _appName, _appVersion;
+
+	AppInfo (
+		final Context pContext
+		)
+	{
+		String appName, appVersion;
+		try
+		{
+			final PackageManager packageManager = pContext.getPackageManager ();
+			final PackageInfo packageInfo =
+				packageManager.getPackageInfo (_PACKAGE_NAME, 0);
+			appName = packageInfo.applicationInfo.loadLabel (packageManager).
+				toString ();
+			appVersion = packageInfo.versionName;
+		}
+		catch (final Exception e)
+		{
+			appName = "GoDroid";
+			appVersion = "unknown";
+		}
+		_appName = appName;
+		_appVersion = appVersion;
+	}
+}
+
+AppInfo _appInfo;
+
 private
 SharedPreferences _sharedPreferences;
 
@@ -162,21 +182,16 @@ private
 GameInfo _gameInfo;
 
 private
+BoardView _boardView;
+
+private
+Gtp _gtp;
+
+private
 AlertDialog  _progressDialog;
 
 private
-TextView
-	_capturesRowTextView,
-	_blackCapturesTextView, _whiteCapturesTextView,
-	_blackMoveTextView, _whiteMoveTextView,
-	_blackScoreTextView, _whiteScoreTextView,
-	_moveRowTextView, _messageScoreTextView;
-
-private
-TableRow _scoreTableRow, _messageTableRow;
-
-private
-ProgressBar _blackMoveProgressBar, _whiteMoveProgressBar;
+androidx.compose.runtime.MutableState <ScoreViewState> _scoreViewState;
 
 private
 MenuItem
@@ -200,15 +215,7 @@ CharSequence
 	_noUndoHintText, _noRedoHintText,
 	_yourTurnText;
 
-private final
-ActivityResultLauncher <Intent> _saveDocumentLauncher =
-	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
-		this::onSaveDocumentResult);
-
-private final
-ActivityResultLauncher <Intent> _openDocumentLauncher =
-	registerForActivityResult (new ActivityResultContracts.StartActivityForResult (),
-		this::onOpenDocumentResult);
+SaveLoadController _saveLoadController;
 
 private final
 ActivityResultLauncher <Intent> _migrationFolderLauncher =
@@ -236,14 +243,13 @@ void onCreate ( // 0
 	)
 {
 	super.onCreate (pSavedInstanceState);
-	_mainActivity = this;
 	_goEngineViewModel = new ViewModelProvider (this).get (GoEngineViewModel.class);
 	_settingsDataStore = new SettingsDataStore (this);
-	_appInfo = new AppInfo ();
-	final Resources resources = _resources = getResources ();
+	_appInfo = new AppInfo (this);
+	final Resources resources = getResources ();
 
 	//_saveLoadGamesDirName = resources.getString (R.string.app_name);
-	_autoSaveGamePathFileName =
+	final String autoSaveGamePathFileName =
 		getFileStreamPath (resources.getString (R.string.autoSaveFileName)).
 			toString ();
 	_sharedPreferences =  getSharedPreferences("app_prefs", Context.MODE_PRIVATE);
@@ -259,32 +265,16 @@ void onCreate ( // 0
 	_yourTurnText = resources.getText (R.string.yourTurnText);
 
 	setContentView (R.layout.main);
+	_boardView = findViewById (R.id.boardView);
 	_boardView.setEdgeTapPaddingMode (_settingsDataStore.getEdgeTapPaddingModeBlocking ());
 	//if (Build.VERSION.SDK_INT >= 34) {
 	//	EdgeToEdge.enable(this);
 	//}
 
-	final String textViewTag = resources.getString (R.string.moveTextViewTag),
-		progressBarViewTag = resources.getString (R.string.moveProgressBarTag);
-	View moveView = findViewById (R.id.blackMoveCell);
-	_blackMoveTextView = moveView.findViewWithTag (textViewTag);
-	_blackMoveProgressBar = moveView.
-		findViewWithTag (progressBarViewTag);
-	moveView = findViewById (R.id.whiteMoveCell);
-	_whiteMoveTextView = moveView.findViewWithTag (textViewTag);
-	_whiteMoveProgressBar = moveView.
-		findViewWithTag (progressBarViewTag);
-	_capturesRowTextView = findViewById (R.id.capturesRowTextView);
-	_blackCapturesTextView =
-            findViewById (R.id.blackCapturesTextView);
-	_whiteCapturesTextView =
-            findViewById (R.id.whiteCapturesTextView);
-	_scoreTableRow = findViewById (R.id.scoreTableRow);
-	_messageTableRow = findViewById (R.id.messageTableRow);
-	_blackScoreTextView = findViewById (R.id.blackScoreTextView);
-	_whiteScoreTextView = findViewById (R.id.whiteScoreTextView);
-	_moveRowTextView = findViewById (R.id.moveRowTextView);
-	_messageScoreTextView = findViewById (R.id.messageScoreTextView);
+	_scoreViewState = ScoreScreenKt.createScoreViewState ();
+	ScoreScreenKt.setUpScoreComposeView (
+		(androidx.compose.ui.platform.ComposeView)findViewById (R.id.scoreComposeView),
+		_scoreViewState);
  	_undoRedoHint = makeToast (this, "");
 
 	View menuButton = findViewById(R.id.MenuButton);
@@ -346,7 +336,7 @@ void onCreate ( // 0
 		}
 	});
 
-	_mainHandler = new Handler (getMainLooper())
+	final Handler mainHandler = new Handler (getMainLooper())
 	{
 		public
 		void handleMessage (
@@ -407,7 +397,14 @@ void onCreate ( // 0
 			{
 				_gtp.handleMessage (pMessage);
 			}
-		});
+		},
+		mainHandler, autoSaveGamePathFileName, this, _boardView);
+
+	_saveLoadController = new SaveLoadController (
+		this, _sharedPreferences, _preferencesLastSaveLoadUriKey, _gtp,
+		() -> _gameInfo, this::showWait4Move2FinishMessage,
+		() -> newGame (restoreGameInfo (new GameInfo ()), null),
+		this::showCollectionList);
 
 	getOnBackPressedDispatcher().addCallback(this, new OnBackPressedCallback(true) {
 		@Override
@@ -508,7 +505,7 @@ void onNewIntent (
 		if (inputFile != null)
 		{
 			inputFile.deleteOnExit ();
-			_externalInputPathFileName = inputFile.getAbsolutePath ();
+			_gtp.setExternalInputPath (inputFile.getAbsolutePath ());
 			if (_gameInfo != null)
 			{
 				newGame ();
@@ -585,7 +582,7 @@ boolean onCreateOptionsMenu (
 	matrix.preScale (-1, 1);
 	try
 	{
-		_redoMenuItem.setIcon (new BitmapDrawable (_resources,
+		_redoMenuItem.setIcon (new BitmapDrawable (getResources (),
 			Bitmap.createBitmap (redoBitmap, 0, 0,
 				width, height, matrix, false)));
 	}
@@ -647,10 +644,10 @@ void enableMenuItem (
 			redo();
 			return true;
 		} else if (id == R.id.menuSave) {
-			launchSaveGamePicker();
+			_saveLoadController.launchSaveGamePicker();
 			return true;
 		} else if (id == R.id.menuLoad) {
-			launchLoadGamePicker();
+			_saveLoadController.launchLoadGamePicker();
 			return true;
 		} else if (id == R.id.menuInfo) {
 			showInfo();
@@ -759,196 +756,6 @@ void restartGame ()
 	_gtp.restartGame (_gameInfo);
 }
 
-String getDateFileName ()
-{
-	final Date now = new Date ();
-	return formatFileName (DateFormat.getDateFormat (this).format (now)
-		+ " " + DateFormat.getTimeFormat (this).format (now));
-}
-
-private
-void launchSaveGamePicker ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	// A file this game was already saved to or loaded from exists -- offer
-	// overwriting it, appending as an additional game in the same file, or
-	// picking a different location, instead of always re-prompting a fresh
-	// picker. Overwrite is withheld when the source is already a multi-game
-	// collection, so a careless tap can't silently discard the other games.
-	if (gameInfo._sgfFileName != null)
-	{
-		showSaveChoiceDialog ();
-		return;
-	}
-	launchSaveGamePickerNewLocation ();
-}
-
-private
-void showSaveChoiceDialog ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	final List <CharSequence> options = Generics.newArrayList (3);
-	final List <Runnable> actions = Generics.newArrayList (3);
-	if (!gameInfo._isCollection)
-	{
-		options.add (getString (R.string.saveOverwriteOption));
-		actions.add (this::gtpSaveGame);
-	}
-	options.add (getString (R.string.saveAppendOption));
-	actions.add (this::gtpAppendGame);
-	options.add (getString (R.string.saveChooseNewLocationOption));
-	actions.add (this::launchSaveGamePickerNewLocation);
-	new AlertDialog.Builder (this).
-		setTitle (R.string.menuSaveLabel).
-		setItems (options.toArray (new CharSequence [0]),
-			(pDialog, pWhich) -> actions.get (pWhich).run ()).
-		show ();
-}
-
-private
-void launchSaveGamePickerNewLocation ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	String suggestedName = gameInfo._sgfDisplayName;
-	if (suggestedName == null)
-	{
-		suggestedName = getDateFileName ();
-	}
-	final Intent intent = new Intent (Intent.ACTION_CREATE_DOCUMENT);
-	intent.addCategory (Intent.CATEGORY_OPENABLE);
-	intent.setType ("application/x-go-sgf");
-	intent.putExtra (Intent.EXTRA_TITLE, suggestedName + getSgfFileExtension ());
-	addInitialUriHint (intent);
-	_saveDocumentLauncher.launch (intent);
-}
-
-private
-void onSaveDocumentResult (
-	final ActivityResult pResult
-	)
-{
-	if (pResult.getResultCode () != RESULT_OK)
-	{
-		return;
-	}
-	final Intent data = pResult.getData ();
-	final Uri uri = data == null ? null : data.getData ();
-	if (uri == null)
-	{
-		return;
-	}
-	takePersistablePermission (uri, true);
-	rememberLastSaveLoadUri (uri);
-	final GameInfo gameInfo = _gameInfo;
-	gameInfo._sgfFileName = uri.toString ();
-	gameInfo._sgfDisplayName = queryDisplayName (uri);
-	gtpSaveGame ();
-}
-
-private
-void gtpSaveGame ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	showWait4Move2FinishMessage (gameInfo);
-	_gtp.saveGame (gameInfo);
-}
-
-private
-void gtpAppendGame ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	showWait4Move2FinishMessage (gameInfo);
-	_gtp.appendGame (gameInfo);
-}
-
-private
-void takePersistablePermission (
-	final Uri pUri,
-	final boolean pWritable
-	)
-{
-	try
-	{
-		int flags = Intent.FLAG_GRANT_READ_URI_PERMISSION;
-		if (pWritable)
-		{
-			flags |= Intent.FLAG_GRANT_WRITE_URI_PERMISSION;
-		}
-		getContentResolver ().takePersistableUriPermission (pUri, flags);
-	}
-	catch (final Exception e)
-	{
-		if (isEnabledFor (_LOG_TAG, Log.INFO))
-		{
-			log (_LOG_TAG, Log.INFO,
-				"failed to persist URI permission for '" + pUri + "': '" + e + "'");
-		}
-	}
-}
-
-private
-void addInitialUriHint (
-	final Intent pIntent
-	)
-{
-	if (Build.VERSION.SDK_INT < Build.VERSION_CODES.O)
-	{
-		return;
-	}
-	final String lastUriString =
-		_sharedPreferences.getString (_preferencesLastSaveLoadUriKey, null);
-	if (lastUriString == null)
-	{
-		return;
-	}
-	try
-	{
-		pIntent.putExtra (DocumentsContract.EXTRA_INITIAL_URI,
-			Uri.parse (lastUriString));
-	}
-	catch (final Exception ignored) {}
-}
-
-private
-void rememberLastSaveLoadUri (
-	final Uri pUri
-	)
-{
-	_sharedPreferences.edit ().
-		putString (_preferencesLastSaveLoadUriKey, pUri.toString ()).
-		commit ();
-}
-
-private
-String queryDisplayName (
-	final Uri pUri
-	)
-{
-	try (Cursor cursor = getContentResolver ().query (
-		pUri, new String [] {OpenableColumns.DISPLAY_NAME}, null, null, null))
-	{
-		if (cursor != null && cursor.moveToFirst ())
-		{
-			final String name = cursor.getString (0);
-			if (name != null)
-			{
-				final String suffix = getSgfFileExtension ();
-				return name.endsWith (suffix) ?
-					name.substring (0, name.length () - suffix.length ()) : name;
-			}
-		}
-	}
-	catch (final Exception e)
-	{
-		if (isEnabledFor (_LOG_TAG, Log.INFO))
-		{
-			log (_LOG_TAG, Log.INFO,
-				"failed to query display name for '" + pUri + "': '" + e + "'");
-		}
-	}
-	return getDateFileName ();
-}
-
 // Versions before 1.5.0 saved games to this app-private folder, which file
 // managers and other apps cannot see. Newer versions use the system document
 // picker instead, so offer to copy any games left there to a folder the user
@@ -961,7 +768,7 @@ File [] findOldSaves ()
 	{
 		return new File [0];
 	}
-	final String suffix = getSgfFileExtension ();
+	final String suffix = _saveLoadController.getSgfFileExtension ();
 	final File [] files = new File (baseDir, "GoDroid").listFiles (
 		(pDir, pName) -> pName.endsWith (suffix));
 	return files == null ? new File [0] : files;
@@ -1085,64 +892,9 @@ int copyOldSaves (
 	return copied;
 }
 
-private static
-String formatFileName (
-	final String pFileName
-	)
-{
-	return pFileName.replaceAll ("[ /:*?\"<>|\\\\]", "_");
-}
-
-String getSgfFileExtension ()
-{
-	return _resources.getString (R.string.sgfFileExtension);
-}
-
-private
-void launchLoadGamePicker ()
-{
-	final GameInfo gameInfo = _gameInfo;
-	if (gameInfo._isCollection)
-	{
-		showCollectionList ();
-		return;
-	}
-	final Intent intent = new Intent (Intent.ACTION_OPEN_DOCUMENT);
-	intent.addCategory (Intent.CATEGORY_OPENABLE);
-	intent.setType ("*/*");
-	intent.putExtra (Intent.EXTRA_MIME_TYPES,
-		new String [] {"application/x-go-sgf", "text/plain"});
-	addInitialUriHint (intent);
-	_openDocumentLauncher.launch (intent);
-}
-
-private
-void onOpenDocumentResult (
-	final ActivityResult pResult
-	)
-{
-	if (pResult.getResultCode () != RESULT_OK)
-	{
-		return;
-	}
-	final Intent data = pResult.getData ();
-	final Uri uri = data == null ? null : data.getData ();
-	if (uri == null)
-	{
-		return;
-	}
-	takePersistablePermission (uri, false);
-	rememberLastSaveLoadUri (uri);
-	newGame (restoreGameInfo (new GameInfo ()), null);
-	final GameInfo gameInfo = _gameInfo;
-	gameInfo._sgfFileName = uri.toString ();
-	gameInfo._sgfDisplayName = queryDisplayName (uri);
-	_gtp.loadGame (gameInfo, GameInfo._DEFAULT_GAME_COLLECTION_IDX);
-}
-
 void showCollectionList ()
 {
-	final Resources resources = _resources;
+	final Resources resources = getResources ();
 	final GameInfo gameInfo = _gameInfo;
 	final String[] names = gameInfo._collectionNames;
 	if (names == null || names.length == 0)
@@ -1172,7 +924,7 @@ void showCollectionList ()
 		{
 			dialog.dismiss ();
 			gameInfo._isCollection = false;
-			launchLoadGamePicker ();
+			_saveLoadController.launchLoadGamePicker ();
 		}
 	});
 	final View view = viewStub.inflate ();
@@ -1461,7 +1213,7 @@ void showWait4Move2FinishMessage (
 {
 	if (Gtp.playerIsMachine (pGameInfo))
 	{
-		showWaitProgress (_resources.getString (
+		showWaitProgress (getResources ().getString (
 			R.string.waitProgressLastMoveMessage));
 	}
 }
@@ -1499,7 +1251,7 @@ AlertDialog showMessage (
 			final boolean pColorBlack,
 			final boolean pResigned
 	) {
-		final Resources resources = _resources;
+		final Resources resources = getResources ();
 
 		String message = resources.getString(
 				R.string.passedDialogMessageText,
@@ -1536,7 +1288,7 @@ String getPassedText (
 	final boolean pResigned
 	)
 {
-	return _resources.getString (pResigned ? R.string.resignedText
+	return getResources ().getString (pResigned ? R.string.resignedText
 		: R.string.passedText);
 }
 
@@ -1546,23 +1298,18 @@ void showMove (
 	)
 {
 	final boolean showProgressBar = pMoveText == null;
-	(pBlack ? _blackMoveProgressBar : _whiteMoveProgressBar).
-		setVisibility (showProgressBar ? View.VISIBLE : View.GONE);
-	final TextView textView = pBlack ? _blackMoveTextView : _whiteMoveTextView;
-	textView.setVisibility (showProgressBar ? View.INVISIBLE : View.VISIBLE);
 	final GameInfo gameInfo = _gameInfo;
 	_boardView.showScoreBackground (!showProgressBar
 		&& !(Gtp.otherPlayerIsMachine (gameInfo)
 			&& Gtp.playerIsMachine (gameInfo)));
-	if (!showProgressBar)
-	{
-		textView.setText (pMoveText.length () == 0
-			&& ((pBlack && gameInfo._playerBlackHuman
-					&& gameInfo._playerBlackMoves)
-				|| (!pBlack && gameInfo._playerWhiteHuman
-					&& !gameInfo._playerBlackMoves)) ?
-						_yourTurnText : pMoveText);
-	}
+	final String text = showProgressBar ? "" : (pMoveText.length () == 0
+		&& ((pBlack && gameInfo._playerBlackHuman
+				&& gameInfo._playerBlackMoves)
+			|| (!pBlack && gameInfo._playerWhiteHuman
+				&& !gameInfo._playerBlackMoves)) ?
+					_yourTurnText.toString () : pMoveText);
+	_scoreViewState.setValue (ScoreScreenKt.withMove (
+		_scoreViewState.getValue (), pBlack, showProgressBar, text));
 }
 
 private
@@ -1573,8 +1320,8 @@ void showCaptures (
 {
 	_blackCaptures = pBlack;
 	_whiteCaptures = pWhite;
-	_blackCapturesTextView.setText (String.valueOf (pBlack));
-	_whiteCapturesTextView.setText (String.valueOf (pWhite));
+	_scoreViewState.setValue (ScoreScreenKt.withCaptures (
+		_scoreViewState.getValue (), pBlack, pWhite));
 }
 
 private
@@ -1620,47 +1367,30 @@ void showScore (
 	_boardView.showScoreBackground (true);
 	if (pStatus == null)
 	{
-		_capturesRowTextView.setText (R.string.capturesLabelText);
-		_moveRowTextView.setText (R.string.moveLabelText);
-		_scoreTableRow.setVisibility (View.INVISIBLE);
-		_messageTableRow.setVisibility (View.GONE);
-		_blackScoreTextView.setText (null);
-		_whiteScoreTextView.setText (null);
+		_scoreViewState.setValue (ScoreScreenKt.withNormalScore (_scoreViewState.getValue ()));
 		return;
 	}
 	if (pBlackTerritory == _SHOW_MESSAGE)
 	{
-		_scoreTableRow.setVisibility (View.INVISIBLE);
-		_messageTableRow.setVisibility (View.VISIBLE);
-		_messageScoreTextView.setText ((String)pStatus);
+		_scoreViewState.setValue (ScoreScreenKt.withMessageScore (
+			_scoreViewState.getValue (), (String)pStatus));
 		return;
 	}
-	_scoreTableRow.setVisibility (View.VISIBLE);
-	_messageTableRow.setVisibility (View.GONE);
 	if (pBlackTerritory == _SHOW_ESTIMATED_SCORE
 		|| pWhiteTerritory == _SHOW_ESTIMATED_SCORE)
 	{
-		if (pBlackTerritory == _SHOW_ESTIMATED_SCORE)
-		{
-			_blackScoreTextView.setText ((String)pStatus);
-		}
-		else
-		{
-			_whiteScoreTextView.setText ((String)pStatus);
-		}
+		_scoreViewState.setValue (ScoreScreenKt.withEstimatedScore (
+			_scoreViewState.getValue (),
+			pBlackTerritory == _SHOW_ESTIMATED_SCORE, (String)pStatus));
 		return;
 	}
 	final GameInfo gameInfo = (GameInfo)pStatus;
-	if (gameInfo._chineseRules)
-	{
-		_capturesRowTextView.setText (R.string.stonesLabelText);
-	}
-	_moveRowTextView.setText (R.string.territoryLabelText);
-	_blackMoveTextView.setText (String.valueOf (pBlackTerritory));
-	_whiteMoveTextView.setText (String.valueOf (pWhiteTerritory));
-	_blackScoreTextView.setText (String.valueOf (_blackCaptures + pBlackTerritory));
-	_whiteScoreTextView.setText (String.valueOf (
-		_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi)));
+	final String blackScore = String.valueOf (_blackCaptures + pBlackTerritory),
+		whiteScore = String.valueOf (
+			_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi));
+	_scoreViewState.setValue (ScoreScreenKt.withFinalScore (
+		_scoreViewState.getValue (), gameInfo._chineseRules,
+		pBlackTerritory, pWhiteTerritory, blackScore, whiteScore));
 }
 
 private
@@ -1689,7 +1419,7 @@ void showInfo ()
 	try
 	{
 		final AppInfo appInfo = _appInfo;
-		final Resources resources = _resources;
+		final Resources resources = getResources ();
 		final WebView webView = new WebView (this);
 		webView.loadDataWithBaseURL (null,
 			resources.getString (R.string.infoDialogText,
@@ -1723,98 +1453,6 @@ void showInfo ()
 			show ();
 	}
 	catch (final Exception e) {}
-}
-
-static
-String getLongestString (
-	final int pColumn0StringsId,
-	final int pColumnsRefsId,
-	final Resources pResources,
-	final Paint pPaint
-	)
-{
-	final String COLUMN_SEPARATOR = "  ";
-	String longestString = "";
-	float maxWidth = 0;
-	final String[] column0Strings =
-		pResources.getStringArray (pColumn0StringsId);
-	final TypedArray columnsRefs = pResources.obtainTypedArray (pColumnsRefsId);
-	final int numCols0 = columnsRefs.length ();
-	for (int col0Idx = 0; col0Idx < numCols0; col0Idx++)
-	{
-		final String column0String = column0Strings[col0Idx];
-		final String[] columns =
-			pResources.getStringArray (columnsRefs.getResourceId (col0Idx, 0));
-		final int numCols = columns.length;
-		for (int colIdx = 0; colIdx < numCols; colIdx += 2)
-		{
-			final String column1 = columns[colIdx];
-			final boolean emptyCol = column1.isEmpty();
-			final String measureString =
-				column0String + (emptyCol ? ""
-					: (COLUMN_SEPARATOR + column1 + COLUMN_SEPARATOR))
-					+ columns[colIdx+1];
-			final float width = pPaint.measureText (measureString);
-			if (isEnabledFor (_LOG_TAG, Log.DEBUG))
-			{
-				log (_LOG_TAG, Log.DEBUG, "measure string: "
-					+ width + " '" + measureString + "'");
-			}
-			if (width > maxWidth)
-			{
-				maxWidth = width;
-				longestString = measureString;
-			}
-		}
-	}
-	columnsRefs.recycle ();
-	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
-	{
-		log (_LOG_TAG, Log.DEBUG, "longest string: " + maxWidth
-			+ " '" + longestString + "'");
-	}
-	return longestString;
-}
-
-static
-float calcTextSize (
-	final TextView pMeasureView,
-	float pTextSize,
-	final String pMeasureString,
-	final float pNumLines,
-	final float pPadding,
-	final float pMaxWidth,
-	final float pMaxHeight
-	)
-{
-	final float originalTextSize = pMeasureView.getTextSize();
-	final float numLinesMinus1 = pNumLines -1f;
-	while (true)
-	{
-		pMeasureView.setTextSize (TypedValue.COMPLEX_UNIT_PX, pTextSize);
-		final TextPaint paint = pMeasureView.getPaint ();
-		final Paint.FontMetrics metrics = paint.getFontMetrics ();
-		final float width = paint.measureText (pMeasureString) + pPadding,
-			height = (float)(new StaticLayout (pMeasureString, paint,
-				(int)width, Layout.Alignment.ALIGN_NORMAL, 1.0f, 0.0f, true).
-					getHeight ()) * pNumLines
-				+ metrics.leading * numLinesMinus1 + pPadding;
-		if (isEnabledFor (_LOG_TAG, Log.DEBUG))
-		{
-			log (_LOG_TAG, Log.DEBUG, "scale down: w " + width
-				+ " max w " + pMaxWidth
-				+ " | h " + height + " max h " + pMaxHeight
-				+ "\ns " + pTextSize);
-		}
-		if (width < pMaxWidth && height < pMaxHeight)
-		{
-			break;
-		}
-		pTextSize -= width - pMaxWidth > 100 || height - pMaxHeight > 100 ?
-			4f : 2f;
-	}
-	pMeasureView.setTextSize(TypedValue.COMPLEX_UNIT_PX, originalTextSize);
-	return pTextSize;
 }
 
 static

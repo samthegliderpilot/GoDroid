@@ -1,16 +1,13 @@
 package com.samthegliderpilot.godroid;
 
 import java.io.File;
-import java.io.FileInputStream;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import android.content.res.Resources;
-import android.content.Context;
 import android.graphics.Point;
 import android.os.Handler;
 import android.os.Looper;
@@ -22,13 +19,9 @@ import static com.samthegliderpilot.godroid.GameInfo.Passed;
 import static com.samthegliderpilot.godroid.MainActivity.MainCommand;
 import static com.samthegliderpilot.godroid.MainActivity._LOG_TAG;
 import static com.samthegliderpilot.godroid.MainActivity.playGTP;
-import static com.samthegliderpilot.godroid.Globals.*;
 import com.samthegliderpilot.util.Generics;
-import com.samthegliderpilot.util.AssetsManager;
 import static com.samthegliderpilot.util.Logging.isEnabledFor;
 import static com.samthegliderpilot.util.Logging.log;
-
-import androidx.core.content.FileProvider;
 
 public
 class Gtp
@@ -92,7 +85,6 @@ enum GtpCommand
 	LIST_LEGAL ("all_legal "),
 	LIST_FINAL_STATUS ("final_status_list "),
 	ESTIMATE_SCORE ("estimate_score"),
-	GET_BOARDSIZE ("query_boardsize"),
 	SET_HANDICAP ("fixed_handicap "),
 	UNDO ("gg-undo ");
 
@@ -125,13 +117,47 @@ private static final
 List <Point> _markers = Generics.newArrayList ();
 
 private final
-Handler _myHandler;
+Handler _myHandler, _mainHandler;
+
+private final
+String _autoSaveGamePathFileName;
+
+private final
+Object _autoSaveLock = new Object ();
+
+private
+String _externalInputPathFileName;
+
+private final
+MainActivity _mainActivity;
+
+private final
+BoardView _boardView;
+
+private final
+GameSharer _gameSharer;
 
 Gtp (
-	final Handler pHandler
+	final Handler pHandler,
+	final Handler pMainHandler,
+	final String pAutoSaveGamePathFileName,
+	final MainActivity pMainActivity,
+	final BoardView pBoardView
 	)
 {
 	_myHandler = pHandler;
+	_mainHandler = pMainHandler;
+	_autoSaveGamePathFileName = pAutoSaveGamePathFileName;
+	_mainActivity = pMainActivity;
+	_gameSharer = new GameSharer (pMainActivity);
+	_boardView = pBoardView;
+}
+
+void setExternalInputPath (
+	final String pPath
+	)
+{
+	_externalInputPathFileName = pPath;
 }
 
 private
@@ -388,28 +414,12 @@ String gtpCommand (
 	final String cmd = pCommand._gtpCommand,
 		command = pArgument == null ? cmd : cmd + pArgument;
 
-	String reply = playGTP (command);
+	final String reply = GtpProtocol.cleanReply (playGTP (command));
 
-	if (reply != null)
-	{
-		// GnuGoEngine appends exactly one '\n' after every line it reads,
-		// including the last - trim that one trailing separator, not every
-		// newline (multi-line replies like showboard need their internal
-		// line breaks kept intact).
-		reply = reply.replaceFirst ("= ", "");
-		if (reply.endsWith ("\n"))
-		{
-			reply = reply.substring (0, reply.length () - 1);
-		}
-	}
 	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
 	{
 		log (_LOG_TAG, Log.DEBUG, "command: '"
 			+ command + "' reply: '" + reply + "'");
-	}
-	if (reply == null || reply.length () == 0 || reply.charAt (0) == '?')
-	{
-		return "";
 	}
 	return reply;
 }
@@ -515,7 +525,7 @@ void handleMessage (
 			else
 			{
 				showScore (MainActivity._SHOW_MESSAGE, 0,
-					_resources.getString (R.string.chooseVariationText));
+					_mainActivity.getResources ().getString (R.string.chooseVariationText));
 			}
 			showMove (playerBlackMoves, "");
 			drawBoard (gameInfo);
@@ -536,7 +546,8 @@ void handleMessage (
 					String.valueOf (gameInfo._handicap));
 				gameInfo._playerBlackMoves = false;
 			}
-			gameInfo.initSGF ();
+			gameInfo.initSGF (
+				_mainActivity._appInfo._appName, _mainActivity._appInfo._appVersion);
 			break;
 		case SHOW_COLLECTION_LIST:
 			showCollectionList ();
@@ -681,7 +692,7 @@ void handleMessage (
 		return;
 	case SAVE_GAME:
 		MainActivity mainActivity = _mainActivity;
-		mainActivity.showMessage (_resources.getString (
+		mainActivity.showMessage (mainActivity.getResources ().getString (
 			(saveGame (gameInfo, false) ? R.string.gameSavedInFileMessage
 				: R.string.saveGameFailedAlertMessage),
 			gameInfo.getFileNameForMessages ()));
@@ -695,7 +706,7 @@ void handleMessage (
 			// as a collection so a later plain "Overwrite" isn't offered.
 			gameInfo._isCollection = true;
 		}
-		mainActivity.showMessage (_resources.getString (
+		mainActivity.showMessage (mainActivity.getResources ().getString (
 			(appendSuccess ? R.string.gameSavedInFileMessage
 				: R.string.saveGameFailedAlertMessage),
 			gameInfo.getFileNameForMessages ()));
@@ -705,7 +716,7 @@ void handleMessage (
 		{
 		case FAIL:
 			mainActivity = _mainActivity;
-			mainActivity.showMessage (_resources.getString (
+			mainActivity.showMessage (mainActivity.getResources ().getString (
 				R.string.loadGameFailedAlertMessage,
 					gameInfo.getFileNameForMessages ()));
 			return;
@@ -735,28 +746,8 @@ void handleMessage (
 		saveGame (gameInfo , true);
 		try
 		{
-			mainActivity = _mainActivity;
-			String fileName = gameInfo._sgfFileName;
-			fileName = fileName == null ?
-				mainActivity.getDateFileName ()
-					+ mainActivity.getSgfFileExtension () :
-				new File (fileName).getName ();
-			AssetsManager.copyFile (
-				new FileInputStream (_autoSaveGamePathFileName),
-				mainActivity.openFileOutput (
-					fileName, Context.MODE_PRIVATE));
-			final File copiedFile = mainActivity.getFileStreamPath (fileName);
-			if (copiedFile != null)
-			{
-				copiedFile.deleteOnExit ();
-			}
-			File file = mainActivity.getFileStreamPath(fileName);
-			Uri contentUri = FileProvider.getUriForFile(
-					mainActivity,
-					"com.samthegliderpilot.godroid.fileprovider", // must match manifest `authorities`
-					file
-			);
-			shareGameMain (	contentUri);
+			shareGameMain (_gameSharer.prepareShareUri (
+				gameInfo, _autoSaveGamePathFileName));
 		}
 		catch (final Exception ignored) {}
 		hideWaitProgress ();
@@ -848,7 +839,7 @@ void score (
 		enablePassMenu (false);
 		_boardView.lockScreen (true);
 	}
-	final Resources resources = _resources;
+	final Resources resources = _mainActivity.getResources ();
 	if (pFinalScore
 		&& pGameInfo._playerBlackHuman && pGameInfo._playerWhiteHuman)
 	{
@@ -961,7 +952,7 @@ GameInfo.LoadGameStatus loadSavedGame (
 			uri = Uri.parse (pGameInfo._sgfFileName);
 		}
 		GameInfo.LoadGameStatus success =
-			pGameInfo.loadGame (uri, pCollectionIdx);
+			pGameInfo.loadGame (uri, pCollectionIdx, _mainActivity.getContentResolver ());
 		switch (success)
 		{
 		case SHOW_COLLECTION_LIST:
@@ -1038,7 +1029,7 @@ boolean saveGame (
 			synchronized (pGameInfo)
 			{
 				success = pGameInfo.saveGame (
-					Uri.fromFile (file), file.getName ());
+					Uri.fromFile (file), file.getName (), _mainActivity.getContentResolver ());
 			}
 			return success;
 		}
@@ -1046,7 +1037,8 @@ boolean saveGame (
 		final boolean success;
 		synchronized (pGameInfo)
 		{
-			success = pGameInfo.saveGame (uri, pGameInfo._sgfDisplayName);
+			success = pGameInfo.saveGame (
+				uri, pGameInfo._sgfDisplayName, _mainActivity.getContentResolver ());
 		}
 		return success;
 	}
@@ -1066,7 +1058,8 @@ boolean doAppendGame (
 		final Uri uri = Uri.parse (pGameInfo._sgfFileName);
 		synchronized (pGameInfo)
 		{
-			return pGameInfo.appendGame (uri, pGameInfo._sgfDisplayName);
+			return pGameInfo.appendGame (
+				uri, pGameInfo._sgfDisplayName, _mainActivity.getContentResolver ());
 		}
 	}
 	catch (final Exception e)
@@ -1108,13 +1101,7 @@ Point vertex2Point (
 	final GameInfo pGameInfo
 	)
 {
-	if (pVertex == null)
-	{
-		return null;
-	}
-	return new Point (
-		_POSITION_LETTERS_STR.indexOf (pVertex.charAt (0)),
-		pGameInfo._boardSize - Integer.parseInt (pVertex.substring (1)));
+	return GtpProtocol.vertex2Point (pVertex, pGameInfo._boardSize);
 }
 
 private static
@@ -1123,18 +1110,7 @@ List <Point> verteces2Points (
 	final GameInfo pGameInfo
 	)
 {
-	final List <Point> points = Generics.newArrayList ();
-	if (pVerteces == null)
-	{
-		return points;
-	}
-	final StringTokenizer tokenizer = new StringTokenizer (pVerteces, " \n");
-	while (tokenizer.hasMoreTokens ())
-	{
-		points.add (new Point (
-			vertex2Point (tokenizer.nextToken (), pGameInfo)));
-	}
-	return points;
+	return GtpProtocol.verteces2Points (pVerteces, pGameInfo._boardSize);
 }
 
 static
@@ -1143,12 +1119,7 @@ String point2Vertex (
 	final int pBoardSize
 	)
 {
-	if (pPoint == null || pPoint instanceof Passed)
-	{
-		return null;
-	}
-	return _POSITION_LETTERS_CHARS [pPoint.x]
-		+ String.valueOf (pBoardSize - pPoint.y);
+	return GtpProtocol.point2Vertex (pPoint, pBoardSize);
 }
 
 static
