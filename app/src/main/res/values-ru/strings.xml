@@ -14,8 +14,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="capturesLabelText">Захвачено</string>
 	<string name="stonesLabelText">Камни</string>
 	<string name="moveLabelText">Ход</string>
-	<string name="territoryLabelText">Территория</string>
-	<string name="scoreLabelText">Очки</string>
+	<string name="territoryAndScoreLabelText">Территория и очки</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Коснитесь камня для игры.\nДлинное нажатие для масштаба.</string>
 	<string name="menuNewEditGameLabel">Новая/Редактировать игру</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -81,6 +80,9 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="edgeTapPaddingOff">Выкл</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Вкл</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Авто</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Координаты</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Выкл</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Вкл</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Настройки экрана</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText">
 		<b>Новая игра</b>
@@ -102,9 +104,6 @@ GNU Go это искусственный интеллект (бот), котор
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Подсчет территории…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Подсчет очков…
 	</string>
 	<string name="BYauthorText">Изначально от</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Поддерживается</string><!-- Translation Provided by ChatGPT -->

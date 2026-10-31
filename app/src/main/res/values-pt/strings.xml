@@ -16,8 +16,7 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="capturesLabelText">Capturas</string>
 	<string name="stonesLabelText">Pedras</string>
 	<string name="moveLabelText">Movimento</string>
-	<string name="territoryLabelText">Território</string>
-	<string name="scoreLabelText">Pontuação</string>
+	<string name="territoryAndScoreLabelText">Território e pontuação</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Toque na pedra para jogar.\nToque longo para ampliar.</string>
 	<string name="menuNewEditGameLabel">Novo/Editar Jogo</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -82,6 +81,9 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="edgeTapPaddingOff">Desativado</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Ativado</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Coordenadas</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Desativado</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Ativado</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Configurações de exibição</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Novo Jogo</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Aplicar Modificações</b></string>
@@ -99,9 +101,6 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Calculando território…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Estimando pontuação…
 	</string>
 	<string name="BYauthorText">Originalmente por</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Mantido por</string><!-- Translation Provided by ChatGPT -->

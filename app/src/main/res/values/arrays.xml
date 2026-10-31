@@ -151,8 +151,7 @@
 		<item>@string/moveLabelText</item>
 
 		<item>@string/stonesLabelText</item>
-		<item>@string/territoryLabelText</item>
-		<item>@string/scoreLabelText</item>
+		<item>@string/territoryAndScoreLabelText</item>
 		<item>@string/chooseVariationText</item>
 	</array>
 	<array name="scoreView4LinesColumns">

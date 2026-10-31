@@ -15,8 +15,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="capturesLabelText">Vankeja</string>
 	<string name="stonesLabelText">Kiviä</string>
 	<string name="moveLabelText">Siirto</string>
-	<string name="territoryLabelText">Alue</string>
-	<string name="scoreLabelText">Tulos</string>
+	<string name="territoryAndScoreLabelText">Alue ja tulos</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Paina kiveä pelataksesi.\nPaina pitkään zoomataksesi.</string>
 	<string name="menuNewEditGameLabel">Uusi/Muokkaa Peliä</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -80,6 +79,9 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="edgeTapPaddingOff">Pois</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Päällä</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Koordinaatit</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Pois</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Päällä</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Näyttöasetukset</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Uusi peli</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Toteuta muutokset</b></string>
@@ -97,9 +99,6 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Lasketaan alueiden tilannetta…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Arvioidaan pistetilannetta…
 	</string>
 	<string name="BYauthorText">Alun perin</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Ylläpitää</string><!-- Translation Provided by ChatGPT -->

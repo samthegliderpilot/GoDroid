@@ -15,8 +15,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="capturesLabelText">Prisonniers</string>
 	<string name="stonesLabelText">Pierres</string>
 	<string name="moveLabelText">Coup</string>
-	<string name="territoryLabelText">Territoire</string>
-	<string name="scoreLabelText">Score</string>
+	<string name="territoryAndScoreLabelText">Territoire et score</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Tapoter la pierre pour valider.\nAppuie long pour zoomer.</string>
 	<string name="menuNewEditGameLabel">Nouveau/Modifier Partie</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -81,6 +80,9 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="edgeTapPaddingOff">Désactivé</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Activé</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Coordonnées</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Désactivé</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Activé</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Paramètres d\'affichage</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nouvelle Partie</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Modifier</b></string>
@@ -98,9 +100,6 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Calcul des territoires…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Calcul du score…
 	</string>
 	<string name="BYauthorText">À l’origine par</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Maintenu par</string><!-- Translation Provided by ChatGPT -->

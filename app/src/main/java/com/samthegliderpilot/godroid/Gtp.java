@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
 
 import android.content.res.Resources;
 import android.graphics.Point;
@@ -52,7 +50,8 @@ enum Command
 	LOAD_GAME,
 	RESTART_GAME,
 	SHOW_TERRITORY,
-	SHARE_GAME;
+	SHARE_GAME,
+	RESUME_SCORED_GAME;
 
 	int _cmd;
 }
@@ -84,7 +83,6 @@ enum GtpCommand
 	GET_CAPTURES ("captures "),
 	LIST_LEGAL ("all_legal "),
 	LIST_FINAL_STATUS ("final_status_list "),
-	ESTIMATE_SCORE ("estimate_score"),
 	SET_HANDICAP ("fixed_handicap "),
 	UNDO ("gg-undo ");
 
@@ -102,13 +100,11 @@ enum GtpCommand
 static final
 String
 	_POSITION_LETTERS_STR = "ABCDEFGHJKLMNOPQRST",
-	_ESTIMIATED_SCORE_PATTERN = "^(B|W)(.[0-9]+\\.[0-9]+)",
 	_SGF_VALUE_PATTERN_STRING = "\\[([^]]+)\\]",
 	_SGF_COLOR_2_PLAY_PATTERN_STRING = "PL",
 	_SGF_COLOR_2_PLAY_WHITE = "W",
 	_SGF_COLOR_2_PLAY_BLACK = "B",
-	_SGF_TMP_FILE_SUFFIX = "_tmp",
-	_ESTIMATED_SCORE_BLACK_WINS_LETTER = "B";
+	_SGF_TMP_FILE_SUFFIX = "_tmp";
 
 static final
 char[] _POSITION_LETTERS_CHARS = _POSITION_LETTERS_STR.toCharArray ();
@@ -587,6 +583,14 @@ void handleMessage (
 			setLegalMoves (gameInfo, playerBlackMoves);
 		}
 		return;
+	case RESUME_SCORED_GAME:
+		// Queued (not called directly) from reStartGame() so it runs after
+		// the INIT_BOARD/DRAW_BOARD commands drawBoard() posted ahead of
+		// it - see the comment there.
+		score (gameInfo, true);
+		finishGame (gameInfo, playerIsMachine (gameInfo),
+			otherPlayerIsMachine (gameInfo));
+		return;
 	case PLAY_MOVE:
 		showScore (0, 0, null);
 		final boolean playerBlackMovesPlayMove = gameInfo._playerBlackMoves;
@@ -625,10 +629,9 @@ void handleMessage (
 				passed = _PASS.equals(move) || resigned;
 		if (genMove)
 		{
-			showMove(playerBlackMovesPlayMove,
-					passed ? _mainActivity.getPassedText(resigned) : move);
 			if (resigned)
 			{
+				showMove(playerBlackMovesPlayMove, _mainActivity.getPassedText(true));
 				showScore(0, 0, null);
 				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
 				return;
@@ -658,6 +661,16 @@ void handleMessage (
 			remainingDelay = 0;
 		}
 		Runnable continueRunnable = () -> {
+			if (genMove)
+			{
+				// Reveal the AI's actual move at the same time the board
+				// redraws, not as soon as it was computed - otherwise the
+				// "thinking" spinner clears the instant genmove returns,
+				// well before the (possibly much longer) Slow AI Moves
+				// pacing delay this runnable is already waiting out below.
+				showMove(playerBlackMovesPlayMove,
+					passed ? _mainActivity.getPassedText(false) : move);
+			}
 			drawBoard(gameInfo);
 			if (nextPlayerIsMachine)
 			{
@@ -797,6 +810,27 @@ void reStartGame (
 	gtpCommand (GtpCommand.SET_RULES, pGameInfo._chineseRules ? "1" : "0");
 	drawBoard (pGameInfo, pInit);
 	_boardView.lockScreen (false);
+	// A resumed game (app (re)launch, or Activity recreation - e.g. a
+	// rotation, since this app has no configChanges and gets fully
+	// recreated) can already be in its finished, both-passed state. Without
+	// this check, resuming one used to always fall into the "still in
+	// progress" branch below - silently resetting the UI to the normal
+	// captures/move display and re-enabling Pass as if nothing had been
+	// decided, even though the move list itself still correctly ended on
+	// two passes. Scoring it immediately instead mirrors exactly what
+	// happens when both-passed is reached live, during PLAY_MOVE/UNDO_MOVE.
+	//
+	// This has to be queued (RESUME_SCORED_GAME), not called directly here:
+	// drawBoard(pGameInfo, pInit) above only POSTS its INIT_BOARD/DRAW_BOARD
+	// commands to this same handler, it doesn't run them synchronously - a
+	// direct score() call here used to run before INIT_BOARD, crashing with
+	// a NullPointerException on board geometry (_gridShape etc.) that
+	// initBoard() hadn't set up yet. Queuing keeps the ordering correct.
+	if (pGameInfo.bothPlayersPassed ())
+	{
+		executeCommand (Command.RESUME_SCORED_GAME, pGameInfo);
+		return;
+	}
 	if (playerIsMachine (pGameInfo))
 	{
 		nextMove (pGameInfo);
@@ -840,26 +874,6 @@ void score (
 		_boardView.lockScreen (true);
 	}
 	final Resources resources = _mainActivity.getResources ();
-	if (pFinalScore
-		&& pGameInfo._playerBlackHuman && pGameInfo._playerWhiteHuman)
-	{
-		drawBoard (pGameInfo);
-		showWaitProgress (resources.
-			getString (R.string.waitProgressEstimatingScoreMessage));
-		final Matcher matcher =
-			Pattern.compile (_ESTIMIATED_SCORE_PATTERN).matcher (
-				gtpCommand (GtpCommand.ESTIMATE_SCORE, null));
-		if (matcher.find ())
-		{
-			final boolean blackWins =
-				_ESTIMATED_SCORE_BLACK_WINS_LETTER.equals (matcher.group (1));
-			showScore (blackWins ? MainActivity._SHOW_ESTIMATED_SCORE : 0,
-				blackWins ? 0 : MainActivity._SHOW_ESTIMATED_SCORE,
-				matcher.group (2));
-		}
-		return;
-	}
-
 	showWaitProgress (resources.
 		getString (R.string.waitProgressFinalScoreMessage));
 	final BoardView boardView = _boardView;

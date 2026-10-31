@@ -24,6 +24,7 @@ private val PLAYER_WHITE_HUMAN_KEY = booleanPreferencesKey("playerWhiteHuman")
 private val AI_DELAY_KEY = intPreferencesKey("aiDelay")
 private val ALLOW_RESIGNATION_KEY = booleanPreferencesKey("allowResignation")
 private val EDGE_TAP_PADDING_KEY = stringPreferencesKey("edgeTapPaddingMode")
+private val SHOW_COORDINATES_KEY = booleanPreferencesKey("showCoordinates")
 
 // Keys migrated one-time from the legacy "app_prefs" SharedPreferences file - exactly the
 // 9 New Game dialog settings plus edge-tap padding. "lastSaveLoadUri" and
@@ -163,6 +164,17 @@ class SettingsDataStore(context: Context) {
      * mirrors the old `SharedPreferences` read it replaces, which was synchronous too. */
     fun getEdgeTapPaddingModeBlocking(): EdgeTapPaddingMode = runBlocking {
         edgeTapPaddingMode.first()
+    }
+
+    val showCoordinates: Flow<Boolean> =
+        dataStore.data.map { it[SHOW_COORDINATES_KEY] ?: true }
+    suspend fun setShowCoordinates(value: Boolean) =
+        dataStore.edit { it[SHOW_COORDINATES_KEY] = value }
+
+    /** One-time blocking read for `MainActivity.onCreate`'s synchronous startup flow -
+     * same reasoning as [getEdgeTapPaddingModeBlocking]. */
+    fun getShowCoordinatesBlocking(): Boolean = runBlocking {
+        showCoordinates.first()
     }
 
     /** Java-callable blocking read/write pair for the New Game dialog's 9 settings -

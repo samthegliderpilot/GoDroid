@@ -16,8 +16,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="capturesLabelText">Gefangene</string>
 	<string name="stonesLabelText">Steine</string>
 	<string name="moveLabelText">Zug</string>
-	<string name="territoryLabelText">Gebiet</string>
-	<string name="scoreLabelText">Punkte</string>
+	<string name="territoryAndScoreLabelText">Gebiet &amp; Punkte</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">
 		Tippen zum Setzen\nDrücken für Zoom
 	</string>
@@ -85,6 +84,9 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="edgeTapPaddingOff">Aus</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">An</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Koordinaten</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Aus</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">An</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Anzeigeeinstellungen</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Neues Spiel</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Übernehmen</b></string>
@@ -102,9 +104,6 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Berechnet Gebiets-Status…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Schätzt Spielergebnis…
 	</string>
 	<string name="BYauthorText">Ursprünglich von</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Betreut von</string><!-- Translation Provided by ChatGPT -->

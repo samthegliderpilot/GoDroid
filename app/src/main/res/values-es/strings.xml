@@ -16,8 +16,7 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="capturesLabelText">Capturas</string>
 	<string name="stonesLabelText">Piedras</string>
 	<string name="moveLabelText">Movimiento</string>
-	<string name="territoryLabelText">Territorio</string>
-	<string name="scoreLabelText">Puntuación</string>
+	<string name="territoryAndScoreLabelText">Territorio y puntuación</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Pulsa sobre una piedra para jugar.\nLong pulsa para acercar.</string>
 	<string name="menuNewEditGameLabel">Nuevo/Editar Partida</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -81,6 +80,9 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="edgeTapPaddingOff">Desactivado</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Activado</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Coordenadas</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Desactivado</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Activado</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Ajustes de pantalla</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nueva Partida</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Guardar cambios</b></string>
@@ -98,9 +100,6 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Calculando estado del territorio…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Calculando puntuacion…
 	</string>
 	<string name="BYauthorText">Originalmente por</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Mantenido por</string><!-- Translation Provided by ChatGPT -->

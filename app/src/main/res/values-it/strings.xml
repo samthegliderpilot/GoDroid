@@ -16,8 +16,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="capturesLabelText">Catture</string>
 	<string name="stonesLabelText">Pietre</string>
 	<string name="moveLabelText">Mossa</string>
-	<string name="territoryLabelText">Territorio</string>
-	<string name="scoreLabelText">Punteggio</string>
+	<string name="territoryAndScoreLabelText">Territorio e punteggio</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Tocca per giocare.\nPremi per ingrandire.</string>
 	<string name="menuNewEditGameLabel">Nuova/Modifica Partita</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -82,6 +81,9 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="edgeTapPaddingOff">Disattivato</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Attivato</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Coordinate</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Disattivato</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Attivato</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Impostazioni schermo</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nuova Partita</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Applica Cambiamenti</b></string>
@@ -99,9 +101,6 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Calcolo dello stato dei territori…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Stima punteggio…
 	</string>
 	<string name="BYauthorText">Originariamente da</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Gestito da</string><!-- Translation Provided by ChatGPT -->

@@ -16,8 +16,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="capturesLabelText">Prizonieri</string>
 	<string name="stonesLabelText">Piese</string>
 	<string name="moveLabelText">Mutare</string>
-	<string name="territoryLabelText">Teritoriu</string>
-	<string name="scoreLabelText">Scor</string>
+	<string name="territoryAndScoreLabelText">Teritoriu și scor</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Apăsati de două ori în acelaşi loc pentru a juca o piesă.\nŢine apăsat lung pentru a mări.</string>
 	<string name="menuNewEditGameLabel">Joc Nou/Editare</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -82,6 +81,9 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="edgeTapPaddingOff">Dezactivat</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Activat</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Coordonate</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Dezactivat</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Activat</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Setări afișare</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Joc Nou</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Acceptă modificările</b></string>
@@ -99,9 +101,6 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Calculez teritoriile…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Estimez scorul…
 	</string>
 	<string name="BYauthorText">Original de</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Întreținut de</string><!-- Translation Provided by ChatGPT -->

@@ -3,7 +3,9 @@ package com.samthegliderpilot.godroid
 import android.app.Dialog
 import android.view.Window
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -13,11 +15,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
-import androidx.compose.material3.ExposedDropdownMenuBox
-import androidx.compose.material3.ExposedDropdownMenuDefaults
-import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -25,6 +23,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
@@ -147,7 +146,10 @@ private fun isApplyEnabled(original: NewGameSettings, current: NewGameSettings):
         original.allowResignation != current.allowResignation
 }
 
-@OptIn(ExperimentalMaterial3Api::class)
+/** A compact single-row "label ... value ▾" control instead of a full
+ * Material text-field-styled dropdown (label line + a 56dp+ bordered field
+ * each) - with 8 of these stacked in one dialog, the field chrome was most
+ * of why it needed scrolling to see the Start/Apply buttons. */
 @Composable
 private fun <T> SettingDropdown(
     label: String,
@@ -156,30 +158,56 @@ private fun <T> SettingDropdown(
     onSelected: (T) -> Unit
 ) {
     var expanded by remember { mutableStateOf(false) }
-    Column(modifier = Modifier.padding(vertical = 6.dp)) {
-        Text(text = label, style = MaterialTheme.typography.labelLarge)
-        ExposedDropdownMenuBox(expanded = expanded, onExpandedChange = { expanded = it }) {
-            OutlinedTextField(
-                value = stringResource(options.first { it.first == selected }.second),
-                onValueChange = {},
-                readOnly = true,
-                trailingIcon = { ExposedDropdownMenuDefaults.TrailingIcon(expanded = expanded) },
-                modifier = Modifier.menuAnchor(
-                    androidx.compose.material3.MenuAnchorType.PrimaryNotEditable
-                ).fillMaxWidth()
+    Column {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clickable { expanded = true }
+                .padding(vertical = 10.dp),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
+            // The label keeps its natural width so a short label (e.g. "Human
+            // plays") never gets squeezed into a mid-word wrap by a long
+            // value (e.g. "Both (human vs. human)") - the value takes
+            // whatever's left and wraps instead, which reads fine.
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyLarge,
+                modifier = Modifier.padding(end = 8.dp),
             )
-            DropdownMenu(
-                expanded = expanded,
-                onDismissRequest = { expanded = false }
+            // DropdownMenu anchors to its own containing layout node's
+            // top-left corner, not to wherever it's tapped from. A Box sized
+            // to the whole remaining row width (weight(1f)) puts that corner
+            // right after the label - the middle of the row, nowhere near a
+            // finger tapping the value text at the right edge. Wrapping it
+            // tightly around just the value text instead (wrapContentWidth,
+            // end-aligned within the outer weight(1f) slot) puts the anchor's
+            // top-left where the value text itself starts, so the menu opens
+            // right under/near it.
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterEnd,
             ) {
-                options.forEach { (value, labelRes) ->
-                    DropdownMenuItem(
-                        text = { Text(stringResource(labelRes)) },
-                        onClick = {
-                            onSelected(value)
-                            expanded = false
-                        }
+                Box {
+                    Text(
+                        text = stringResource(options.first { it.first == selected }.second) + " ▾",
+                        style = MaterialTheme.typography.bodyLarge,
+                        color = MaterialTheme.colorScheme.primary,
                     )
+                    DropdownMenu(
+                        expanded = expanded,
+                        onDismissRequest = { expanded = false }
+                    ) {
+                        options.forEach { (value, labelRes) ->
+                            DropdownMenuItem(
+                                text = { Text(stringResource(labelRes)) },
+                                onClick = {
+                                    onSelected(value)
+                                    expanded = false
+                                }
+                            )
+                        }
+                    }
                 }
             }
         }
@@ -256,7 +284,7 @@ fun NewGameScreen(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 16.dp),
+                .padding(top = 8.dp),
             horizontalArrangement = Arrangement.Center
         ) {
             Button(

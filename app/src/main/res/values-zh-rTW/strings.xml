@@ -16,8 +16,7 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="capturesLabelText">提子</string>
     <string name="stonesLabelText">活子</string>
     <string name="moveLabelText">落子</string>
-    <string name="territoryLabelText">實地</string>
-    <string name="scoreLabelText">得分</string>
+    <string name="territoryAndScoreLabelText">實地與得分</string>  <!-- Translation Provided by Claude -->
     <string name="tapHintText">點棋落子\n長按放大</string>
     <string name="menuNewEditGameLabel">新增/編輯對局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
@@ -68,6 +67,9 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="edgeTapPaddingOff">關閉</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingOn">開啟</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingAuto">自動</string>  <!-- Translation Provided by Claude -->
+    <string name="coordinatesLabel">座標</string>  <!-- Translation Provided by Claude -->
+    <string name="coordinatesOff">關閉</string>  <!-- Translation Provided by Claude -->
+    <string name="coordinatesOn">開啟</string>  <!-- Translation Provided by Claude -->
     <string name="menuDisplaySettingsLabel">顯示設定</string>  <!-- Translation Provided by Claude -->
     <string name="newGameDialogStartButtonText"><b>開始棋局</b></string>
     <string name="newGameDialogApplytButtonText"><b>應用設置</b></string>
@@ -81,7 +83,6 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="passedDialogMessageText" formatted="false">%s %s.</string>
     <string name="waitProgressLastMoveMessage">等待最後壹步完成 …</string>
     <string name="waitProgressFinalScoreMessage">計算實地 …</string>
-    <string name="waitProgressEstimatingScoreMessage">估算得分 …</string>
     <string name="BYauthorText">原始作者：</string><!-- Translation Provided by ChatGPT -->
     <string name="RefreshedByAuthorText">維護者：</string><!-- Translation Provided by ChatGPT -->
     <string name="oldProjectHomepageText">專案原始主頁</string><!-- Translation Provided by ChatGPT -->

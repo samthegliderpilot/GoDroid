@@ -90,6 +90,8 @@ float _activeCellWidth;
 
 EdgeTapPaddingMode _edgeTapPaddingMode = EdgeTapPaddingMode.AUTO;
 
+private boolean _showCoordinates = true;
+
 private
 float
 	_zoomFactor, // todo preferences
@@ -193,7 +195,6 @@ void surfaceChanged ( // 4
 	final boolean isLandscape = pWidth > pHeight;
 
 	final MainActivity mainActivity = _mainActivity;
-	showScoreBackground (true);
 
 	final Bitmap boardBitmap = _boardBitmap;
 	// Compare the raw surface dimensions directly, not a derived square size
@@ -201,7 +202,22 @@ void surfaceChanged ( // 4
 	// width/height exactly, that derived value is unchanged across the swap,
 	// which used to skip re-layout entirely and leave the board using the
 	// wrong orientation's offsets after rotating.
-	if (boardBitmap != null && _boardWidth == pWidth && _boardHeight == pHeight)
+	//
+	// The comparison tolerates a few px of jitter rather than demanding an
+	// exact match: confirmed via logging that the score panel above this
+	// view (Compose, text-content-driven height) can report a height a
+	// handful of px different from one recomposition to the next - e.g.
+	// right as scoring finishes and the row's label/value text changes -
+	// with no real resize involved. Treating that as a real resize used to
+	// recreate _boardBitmap from scratch and redraw it via a plain
+	// mainActivity.drawBoard(true), which doesn't know about the territory
+	// markers Gtp.score() had just drawn onto the old bitmap moments
+	// earlier - wiping them. A real resize (rotation, fold/unfold) moves
+	// this by hundreds of px, far outside this tolerance.
+	final int SIZE_JITTER_TOLERANCE_PX = 16;
+	if (boardBitmap != null
+		&& Math.abs (_boardWidth - pWidth) <= SIZE_JITTER_TOLERANCE_PX
+		&& Math.abs (_boardHeight - pHeight) <= SIZE_JITTER_TOLERANCE_PX)
 	{
 		drawBoard2Surface ();
 		return;
@@ -231,6 +247,18 @@ void surfaceChanged ( // 4
 	else
 	{
 		mainActivity.drawBoard (true);
+		// drawBoard() redraws from GameInfo's move list alone - it has no
+		// idea a finished game is showing territory/dead-stone markers on
+		// top (that only exists via GTP queries Gtp.score() ran, not in
+		// GameInfo), so a real resize would otherwise silently lose them.
+		// Re-running the same query the "Show Territory" menu action uses
+		// puts them back; it's a cheap, already-exercised GTP round-trip,
+		// posted after drawBoard()'s own commands so it runs once the
+		// board geometry is settled for the new size.
+		if (mainActivity.isGameScored ())
+		{
+			mainActivity.showTerritory ();
+		}
 	}
 }
 
@@ -239,6 +267,13 @@ void setEdgeTapPaddingMode (
 	)
 {
 	_edgeTapPaddingMode = pMode;
+}
+
+void setShowCoordinates (
+	final boolean pShow
+	)
+{
+	_showCoordinates = pShow;
 }
 
 void initBoard (
@@ -509,40 +544,43 @@ void drawBoard (
 	paint.setStyle (Paint.Style.FILL);
 	_markersShape.draw (canvas, paint);
 
-	paint.setTextAlign (Paint.Align.CENTER);
-	paint.setTextSize (realCellWidthDIV2 - 2);
-	final int sizeMin1 = size -1;
-	final float realCellWidhtDIV4 = realCellWidthDIV2 / 2,
-		textYOffset = realCellWidthDIV2 + realCellWidhtDIV4,
-		// _drawnBoardWidth is the grid's actual on-screen size, which shrinks when
-		// edge tap padding is active - unlike boardWidth/boardHeight here, which are
-		// this View's fixed full pixel dimensions and don't track that margin, so
-		// using them left the right-edge coordinate numbers behind where the grid
-		// actually ends.
-		textXPos = _drawnBoardWidth - realCellWidhtDIV4;
-	for (int idx=0; idx < size; idx++)
+	if (_showCoordinates)
 	{
-		final float pos = textYOffset + idx * realCellWidth;
-		final String numberText = String.valueOf (size - idx);
-		canvas.drawText (numberText, realCellWidhtDIV4, pos, paint);
-		if (idx < sizeMin1)
+		paint.setTextAlign (Paint.Align.CENTER);
+		paint.setTextSize (realCellWidthDIV2 - 2);
+		final int sizeMin1 = size -1;
+		final float realCellWidhtDIV4 = realCellWidthDIV2 / 2,
+			textYOffset = realCellWidthDIV2 + realCellWidhtDIV4,
+			// _drawnBoardWidth is the grid's actual on-screen size, which shrinks when
+			// edge tap padding is active - unlike boardWidth/boardHeight here, which are
+			// this View's fixed full pixel dimensions and don't track that margin, so
+			// using them left the right-edge coordinate numbers behind where the grid
+			// actually ends.
+			textXPos = _drawnBoardWidth - realCellWidhtDIV4;
+		for (int idx=0; idx < size; idx++)
 		{
-			canvas.drawText (numberText, textXPos, pos, paint);
+			final float pos = textYOffset + idx * realCellWidth;
+			final String numberText = String.valueOf (size - idx);
+			canvas.drawText (numberText, realCellWidhtDIV4, pos, paint);
+			if (idx < sizeMin1)
+			{
+				canvas.drawText (numberText, textXPos, pos, paint);
+			}
 		}
-	}
-	final char [] lettersText = Gtp._POSITION_LETTERS_CHARS;
-	// Replace drawPosText for _textPosUpper
-	for (int i = 0; i < sizeMin1; i++) {
-		float x = _textPosUpper[i * 2];
-		float y = _textPosUpper[i * 2 + 1];
-		canvas.drawText(lettersText, i, 1, x, y, paint);
-	}
+		final char [] lettersText = Gtp._POSITION_LETTERS_CHARS;
+		// Replace drawPosText for _textPosUpper
+		for (int i = 0; i < sizeMin1; i++) {
+			float x = _textPosUpper[i * 2];
+			float y = _textPosUpper[i * 2 + 1];
+			canvas.drawText(lettersText, i, 1, x, y, paint);
+		}
 
-// Replace drawPosText for _textPosLower
-	for (int i = 0; i < size; i++) {
-		float x = _textPosLower[i * 2];
-		float y = _textPosLower[i * 2 + 1];
-		canvas.drawText(lettersText, i, 1, x, y, paint);
+	// Replace drawPosText for _textPosLower
+		for (int i = 0; i < size; i++) {
+			float x = _textPosLower[i * 2];
+			float y = _textPosLower[i * 2 + 1];
+			canvas.drawText(lettersText, i, 1, x, y, paint);
+		}
 	}
 	canvas.translate (-xBoardOffset, -yBoardOffset);
 	if (isZoom)
@@ -937,14 +975,6 @@ void setZoom (
 	)
 {
 	_isZoom = pZoom;
-}
-
-void showScoreBackground (
-	final boolean pShow
-	)
-{
-	final View scoreView = _mainActivity.findViewById(R.id.scoreView);
-	scoreView.setBackground (null);
 }
 
 public

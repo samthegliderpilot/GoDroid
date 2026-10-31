@@ -95,7 +95,6 @@ String
 
 static final
 int
-	_SHOW_ESTIMATED_SCORE = -1,
 	_SHOW_MESSAGE = -2;
 
 enum MainCommand
@@ -253,6 +252,7 @@ void onCreate ( // 0
 	setContentView (R.layout.main);
 	_boardView = findViewById (R.id.boardView);
 	_boardView.setEdgeTapPaddingMode (_settingsDataStore.getEdgeTapPaddingModeBlocking ());
+	_boardView.setShowCoordinates (_settingsDataStore.getShowCoordinatesBlocking ());
 	//if (Build.VERSION.SDK_INT >= 34) {
 	//	EdgeToEdge.enable(this);
 	//}
@@ -267,7 +267,8 @@ void onCreate ( // 0
 	menuButton.setOnClickListener(new View.OnClickListener() {
 		@Override
 		public void onClick(View v) {
-			PopupMenu popup = new PopupMenu(MainActivity.this, v);
+			PopupMenu popup = new PopupMenu(
+				new android.view.ContextThemeWrapper(MainActivity.this, R.style.CompactPopupMenu), v);
 			popup.getMenuInflater().inflate(R.menu.menu, popup.getMenu());
 			popup.setOnMenuItemClickListener(new PopupMenu.OnMenuItemClickListener() {
 				@Override
@@ -703,10 +704,19 @@ void redo ()
 	_gtp.redoMove (_gameInfo);
 }
 
-private
+// Package-private (not private): BoardView also calls this directly, to
+// redraw territory after a real resize - see its surfaceChanged.
 void showTerritory ()
 {
 	_gtp.showTerritory (_gameInfo);
+}
+
+// Package-private: lets BoardView.surfaceChanged decide whether a real
+// resize needs to replay territory/dead-stone markers via showTerritory()
+// above, without exposing _gameInfo itself.
+boolean isGameScored ()
+{
+	return _gameInfo != null && _gameInfo.bothPlayersPassed ();
 }
 
 
@@ -1153,9 +1163,6 @@ void showMove (
 {
 	final boolean showProgressBar = pMoveText == null;
 	final GameInfo gameInfo = _gameInfo;
-	_boardView.showScoreBackground (!showProgressBar
-		&& !(Gtp.otherPlayerIsMachine (gameInfo)
-			&& Gtp.playerIsMachine (gameInfo)));
 	final String text = showProgressBar ? "" : (pMoveText.length () == 0
 		&& ((pBlack && gameInfo._playerBlackHuman
 				&& gameInfo._playerBlackMoves)
@@ -1163,7 +1170,8 @@ void showMove (
 				&& !gameInfo._playerBlackMoves)) ?
 					_yourTurnText.toString () : pMoveText);
 	_scoreViewState.setValue (ScoreScreenKt.withMove (
-		_scoreViewState.getValue (), pBlack, showProgressBar, text));
+		_scoreViewState.getValue (), pBlack, showProgressBar, text,
+		gameInfo._playerBlackMoves));
 }
 
 private
@@ -1218,7 +1226,6 @@ void showScore (
 	final Object pStatus
 	)
 {
-	_boardView.showScoreBackground (true);
 	if (pStatus == null)
 	{
 		_scoreViewState.setValue (ScoreScreenKt.withNormalScore (_scoreViewState.getValue ()));
@@ -1228,14 +1235,6 @@ void showScore (
 	{
 		_scoreViewState.setValue (ScoreScreenKt.withMessageScore (
 			_scoreViewState.getValue (), (String)pStatus));
-		return;
-	}
-	if (pBlackTerritory == _SHOW_ESTIMATED_SCORE
-		|| pWhiteTerritory == _SHOW_ESTIMATED_SCORE)
-	{
-		_scoreViewState.setValue (ScoreScreenKt.withEstimatedScore (
-			_scoreViewState.getValue (),
-			pBlackTerritory == _SHOW_ESTIMATED_SCORE, (String)pStatus));
 		return;
 	}
 	final GameInfo gameInfo = (GameInfo)pStatus;
@@ -1259,6 +1258,20 @@ void showDisplaySettingsDialog ()
 				)
 			{
 				_boardView.setEdgeTapPaddingMode (pMode);
+				if (_gameInfo != null)
+				{
+					_gtp.drawBoard (_gameInfo, true);
+				}
+			}
+		},
+		new ShowCoordinatesListener ()
+		{
+			public
+			void onShowCoordinatesChanged (
+				final boolean pShow
+				)
+			{
+				_boardView.setShowCoordinates (pShow);
 				if (_gameInfo != null)
 				{
 					_gtp.drawBoard (_gameInfo, true);

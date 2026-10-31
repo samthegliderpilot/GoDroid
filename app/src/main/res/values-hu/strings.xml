@@ -15,8 +15,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="capturesLabelText">Foglyok</string>
 	<string name="stonesLabelText">Kövek</string>
 	<string name="moveLabelText">Lépés</string>
-	<string name="territoryLabelText">Terület</string>
-	<string name="scoreLabelText">Eredmény</string>
+	<string name="territoryAndScoreLabelText">Terület és eredmény</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Érintse meg a követ a lépéshez.\nHosszú érintéssel nagyíthat.</string>
 	<string name="menuNewEditGameLabel">Új/Játék Szerkesztése</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">U</string>
@@ -81,6 +80,9 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="edgeTapPaddingOff">Ki</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Be</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Koordináták</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Ki</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">Be</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Megjelenítési beállítások</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Új játék</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Módosítások alkalmazása</b></string>
@@ -98,9 +100,6 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Terület kiértékelés…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Eredmény becslés…
 	</string>
 	<string name="BYauthorText">Eredetileg</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Fentartja</string><!-- Translation Provided by ChatGPT -->

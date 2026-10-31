@@ -14,8 +14,7 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="capturesLabelText">Fanger</string>
 	<string name="stonesLabelText">Sten</string>
 	<string name="moveLabelText">Trekk</string>
-	<string name="territoryLabelText">Territorium</string>
-	<string name="scoreLabelText">Poeng</string>
+	<string name="territoryAndScoreLabelText">Territorium &amp; poeng</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Rør stenen for å legge.\nHold inne for å zoome.</string>
 	<string name="menuNewEditGameLabel">Nyt/Rediger Spill</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -80,6 +79,9 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="edgeTapPaddingOff">Av</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">På</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingAuto">Auto</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesLabel">Koordinater</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOff">Av</string>  <!-- Translation Provided by Claude -->
+	<string name="coordinatesOn">På</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Skjerminnstillinger</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText">
 		<b>Nytt Parti</b>
@@ -101,9 +103,6 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	</string>
 	<string name="waitProgressFinalScoreMessage">
 		Regner ut territorium status…
-	</string>
-	<string name="waitProgressEstimatingScoreMessage">
-		Beregner resultat…
 	</string>
 	<string name="BYauthorText">Opprinnelig av</string><!-- Translation Provided by ChatGPT -->
 	<string name="RefreshedByAuthorText">Vedlikeholdes av</string><!-- Translation Provided by ChatGPT -->

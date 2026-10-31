@@ -17,8 +17,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="capturesLabelText">取った石</string>
     <string name="stonesLabelText">石</string>
     <string name="moveLabelText">着手</string>
-    <string name="territoryLabelText">地</string>
-    <string name="scoreLabelText">勝敗点数</string>
+    <string name="territoryAndScoreLabelText">地と勝敗点数</string>  <!-- Translation Provided by Claude -->
     <string name="tapHintText">石をタップして打つ。\n長押しで拡大。</string>
     <string name="menuNewEditGameLabel">新規／編集対局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
@@ -68,6 +67,9 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="edgeTapPaddingOff">オフ</string>
     <string name="edgeTapPaddingOn">オン</string>
     <string name="edgeTapPaddingAuto">自動</string>
+    <string name="coordinatesLabel">座標</string>
+    <string name="coordinatesOff">オフ</string>
+    <string name="coordinatesOn">オン</string>
     <string name="menuDisplaySettingsLabel">表示設定</string>
     <string name="newGameDialogStartButtonText"><b>新局開始</b></string>
     <string name="newGameDialogApplytButtonText"><b>変更を適用</b></string>
@@ -81,7 +83,6 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="passedDialogMessageText" formatted="false">%s %s。</string>
     <string name="waitProgressLastMoveMessage">最後の手の処理を待っています…</string>
     <string name="waitProgressFinalScoreMessage">地の計算中…</string>
-    <string name="waitProgressEstimatingScoreMessage">勝敗点の見積中…</string>
     <string name="BYauthorText">元々の作者：</string><!-- Translation Provided by ChatGPT -->
     <string name="RefreshedByAuthorText">保守者：</string><!-- Translation Provided by ChatGPT -->
     <string name="oldProjectHomepageText">元のプロジェクトホームページ</string><!-- Translation Provided by ChatGPT -->

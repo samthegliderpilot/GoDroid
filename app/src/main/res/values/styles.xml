@@ -45,6 +45,14 @@
 	<style name="TableLayoutTextCentered" parent="@style/TableLayoutText">
 		<item name="android:gravity">center_horizontal</item>
 	</style>
+	<!-- Shrinks the options-menu popup's per-item row height - the platform
+	default (listPreferredItemHeightSmall) is generous enough that on a
+	large/tall screen the ~11-item menu needs scrolling to see the bottom.
+	Applied only to that one PopupMenu instance via a ContextThemeWrapper,
+	not the whole app theme. -->
+	<style name="CompactPopupMenu">
+		<item name="android:listPreferredItemHeightSmall">36dp</item>
+	</style>
 	<style name="MenuButton" parent="@style/WrapContent">
 		<!--
 		<item name="android:layout_alignParentRight">true</item>

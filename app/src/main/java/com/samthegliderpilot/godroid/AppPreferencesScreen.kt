@@ -29,6 +29,11 @@ interface EdgeTapPaddingModeListener {
     fun onEdgeTapPaddingModeChanged(mode: EdgeTapPaddingMode)
 }
 
+/** Java-callable, same reasoning as [EdgeTapPaddingModeListener]. */
+interface ShowCoordinatesListener {
+    fun onShowCoordinatesChanged(show: Boolean)
+}
+
 private fun labelFor(mode: EdgeTapPaddingMode): Int = when (mode) {
     EdgeTapPaddingMode.OFF -> R.string.edgeTapPaddingOff
     EdgeTapPaddingMode.ON -> R.string.edgeTapPaddingOn
@@ -38,7 +43,9 @@ private fun labelFor(mode: EdgeTapPaddingMode): Int = when (mode) {
 @Composable
 fun AppPreferencesScreen(
     currentMode: EdgeTapPaddingMode,
-    onModeSelected: (EdgeTapPaddingMode) -> Unit
+    onModeSelected: (EdgeTapPaddingMode) -> Unit,
+    showCoordinates: Boolean,
+    onShowCoordinatesSelected: (Boolean) -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -58,6 +65,24 @@ fun AppPreferencesScreen(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = stringResource(R.string.coordinatesLabel),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        val coordinateOptions = listOf(false, true)
+        SingleChoiceSegmentedButtonRow {
+            coordinateOptions.forEachIndexed { index, show ->
+                SegmentedButton(
+                    selected = show == showCoordinates,
+                    onClick = { onShowCoordinatesSelected(show) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = coordinateOptions.size)
+                ) {
+                    Text(stringResource(if (show) R.string.coordinatesOn else R.string.coordinatesOff))
+                }
+            }
+        }
     }
 }
 
@@ -69,7 +94,8 @@ fun AppPreferencesScreen(
 fun showAppPreferencesDialog(
     activity: AppCompatActivity,
     settingsDataStore: SettingsDataStore,
-    listener: EdgeTapPaddingModeListener
+    listener: EdgeTapPaddingModeListener,
+    coordinatesListener: ShowCoordinatesListener,
 ) {
     val composeView = ComposeView(activity).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
@@ -80,12 +106,20 @@ fun showAppPreferencesDialog(
                     val currentMode by settingsDataStore.edgeTapPaddingMode.collectAsState(
                         initial = EdgeTapPaddingMode.AUTO
                     )
+                    val showCoordinates by settingsDataStore.showCoordinates.collectAsState(
+                        initial = true
+                    )
                     AppPreferencesScreen(
                         currentMode = currentMode,
                         onModeSelected = { mode ->
                             scope.launch { settingsDataStore.setEdgeTapPaddingMode(mode) }
                             listener.onEdgeTapPaddingModeChanged(mode)
-                        }
+                        },
+                        showCoordinates = showCoordinates,
+                        onShowCoordinatesSelected = { show ->
+                            scope.launch { settingsDataStore.setShowCoordinates(show) }
+                            coordinatesListener.onShowCoordinatesChanged(show)
+                        },
                     )
                 }
             }
