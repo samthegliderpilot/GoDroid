@@ -196,6 +196,42 @@ class GameInfo {
         return pNewNode
     }
 
+    /** Writes both colors' current clock totals onto the most recent move node (or
+     * the setup node, if called before any move) - SGF's standard per-move
+     * time-bookkeeping properties (`BL`/`WL`), reused here to record elapsed *used*
+     * time rather than time *left* under a limit, since this app enforces no limit.
+     * Called from the clock's own ticker ([GameClock]), not from `Gtp.java`'s
+     * move-commit flow, so adding this never touches the orchestration code in
+     * `Gtp.java`'s `PLAY_MOVE`/`UNDO_MOVE`/`NEW_GAME` (deliberately left alone - see
+     * the roadmap). */
+    fun recordElapsedTime(pBlackSeconds: Float, pWhiteSeconds: Float) {
+        val node = _currentNode ?: return
+        node.addProperty(toPropertyValue(PropertyName.BackTimeLeft, pBlackSeconds.toString()))
+        node.addProperty(toPropertyValue(PropertyName.WhiteTimeLeft, pWhiteSeconds.toString()))
+    }
+
+    /** Walks backward from the current node (same direction [undo]/[getPreviousMoves]
+     * already walk) to the most recent node carrying a recorded clock total, so
+     * resuming a game (app relaunch, or an Activity recreation from rotation - this
+     * app has no `configChanges`) can restore both players' elapsed time instead of
+     * silently resetting it to zero. Returns null for a fresh game with nothing
+     * recorded yet. */
+    fun lastRecordedElapsedTime(): FloatArray? {
+        var node = _currentNode
+        while (node != null) {
+            val blackValue = node.getPropertyValue(PropertyName.BackTimeLeft)
+            val whiteValue = node.getPropertyValue(PropertyName.WhiteTimeLeft)
+            if (blackValue != null && whiteValue != null) {
+                return floatArrayOf(
+                    blackValue.toFloatOrNull() ?: 0f,
+                    whiteValue.toFloatOrNull() ?: 0f
+                )
+            }
+            node = node.previousPropertyNode()
+        }
+        return null
+    }
+
     fun restartGame() {
         val setupNode = _setupNode ?: return
         setCurrentNode(setupNode)

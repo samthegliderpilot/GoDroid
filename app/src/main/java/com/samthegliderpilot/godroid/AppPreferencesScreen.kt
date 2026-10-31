@@ -34,6 +34,11 @@ interface ShowCoordinatesListener {
     fun onShowCoordinatesChanged(show: Boolean)
 }
 
+/** Java-callable, same reasoning as [EdgeTapPaddingModeListener]. */
+interface ClockEnabledListener {
+    fun onClockEnabledChanged(enabled: Boolean)
+}
+
 private fun labelFor(mode: EdgeTapPaddingMode): Int = when (mode) {
     EdgeTapPaddingMode.OFF -> R.string.edgeTapPaddingOff
     EdgeTapPaddingMode.ON -> R.string.edgeTapPaddingOn
@@ -46,6 +51,8 @@ fun AppPreferencesScreen(
     onModeSelected: (EdgeTapPaddingMode) -> Unit,
     showCoordinates: Boolean,
     onShowCoordinatesSelected: (Boolean) -> Unit,
+    clockEnabled: Boolean,
+    onClockEnabledSelected: (Boolean) -> Unit,
 ) {
     Column(modifier = Modifier.padding(16.dp)) {
         Text(
@@ -83,6 +90,24 @@ fun AppPreferencesScreen(
                 }
             }
         }
+        Spacer(modifier = Modifier.height(20.dp))
+        Text(
+            text = stringResource(R.string.clockLabel),
+            style = MaterialTheme.typography.titleMedium
+        )
+        Spacer(modifier = Modifier.height(12.dp))
+        val clockOptions = listOf(false, true)
+        SingleChoiceSegmentedButtonRow {
+            clockOptions.forEachIndexed { index, enabled ->
+                SegmentedButton(
+                    selected = enabled == clockEnabled,
+                    onClick = { onClockEnabledSelected(enabled) },
+                    shape = SegmentedButtonDefaults.itemShape(index = index, count = clockOptions.size)
+                ) {
+                    Text(stringResource(if (enabled) R.string.clockOn else R.string.clockOff))
+                }
+            }
+        }
     }
 }
 
@@ -96,6 +121,7 @@ fun showAppPreferencesDialog(
     settingsDataStore: SettingsDataStore,
     listener: EdgeTapPaddingModeListener,
     coordinatesListener: ShowCoordinatesListener,
+    clockListener: ClockEnabledListener,
 ) {
     val composeView = ComposeView(activity).apply {
         setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnDetachedFromWindow)
@@ -109,6 +135,9 @@ fun showAppPreferencesDialog(
                     val showCoordinates by settingsDataStore.showCoordinates.collectAsState(
                         initial = true
                     )
+                    val clockEnabled by settingsDataStore.clockEnabled.collectAsState(
+                        initial = true
+                    )
                     AppPreferencesScreen(
                         currentMode = currentMode,
                         onModeSelected = { mode ->
@@ -119,6 +148,11 @@ fun showAppPreferencesDialog(
                         onShowCoordinatesSelected = { show ->
                             scope.launch { settingsDataStore.setShowCoordinates(show) }
                             coordinatesListener.onShowCoordinatesChanged(show)
+                        },
+                        clockEnabled = clockEnabled,
+                        onClockEnabledSelected = { enabled ->
+                            scope.launch { settingsDataStore.setClockEnabled(enabled) }
+                            clockListener.onClockEnabledChanged(enabled)
                         },
                     )
                 }

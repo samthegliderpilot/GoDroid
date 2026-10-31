@@ -59,6 +59,12 @@ fun withMove(
 fun withCaptures(current: ScoreViewState, black: Int, white: Int): ScoreViewState =
     current.copy(blackCaptures = black, whiteCaptures = white)
 
+fun withClockTimes(current: ScoreViewState, black: String, white: String): ScoreViewState =
+    current.copy(blackTimeText = black, whiteTimeText = white)
+
+fun withClockEnabled(current: ScoreViewState, enabled: Boolean): ScoreViewState =
+    current.copy(clockEnabled = enabled)
+
 fun withNormalScore(current: ScoreViewState): ScoreViewState = current.copy(
     capturesLabelRes = R.string.capturesLabelText,
     moveLabelRes = R.string.moveLabelText,
@@ -139,6 +145,13 @@ fun ScoreScreen(state: ScoreViewState) {
                     modifier = Modifier.fillMaxWidth().padding(top = 8.dp)
                 )
             }
+        }
+        // A separate row (not merged into the Box above) since the App Preferences
+        // toggle that shows/hides it changes rarely, not as part of a fast
+        // play<->scoring transition - the alpha-everywhere trick above exists
+        // specifically to dodge *that* kind of resize, which doesn't apply here.
+        if (state.clockEnabled) {
+            ScoreRow(stringResource(R.string.timeLabelText), state.blackTimeText, state.whiteTimeText)
         }
     }
 }

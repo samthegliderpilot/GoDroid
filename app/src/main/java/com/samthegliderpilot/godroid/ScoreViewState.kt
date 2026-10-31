@@ -26,6 +26,13 @@ data class ScoreViewState(
     val scoreRowVisible: Boolean = false,
     val messageText: String? = null,
     val blackToMove: Boolean = true,
+    // Purely informational elapsed-time-per-color display (no enforcement, no time
+    // limit - see GameClock). clockEnabled mirrors the App Preferences setting;
+    // GameClock itself keeps ticking underneath regardless, so toggling this back on
+    // mid-game never shows a stale/zeroed value.
+    val blackTimeText: String = "0:00",
+    val whiteTimeText: String = "0:00",
+    val clockEnabled: Boolean = true,
 )
 
 data class MoveCellState(

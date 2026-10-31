@@ -17,6 +17,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="stonesLabelText">Pietre</string>
 	<string name="moveLabelText">Mossa</string>
 	<string name="territoryAndScoreLabelText">Territorio e punteggio</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Tempo</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Tocca per giocare.\nPremi per ingrandire.</string>
 	<string name="menuNewEditGameLabel">Nuova/Modifica Partita</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -84,6 +85,9 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="coordinatesLabel">Coordinate</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Disattivato</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Attivato</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Orologio di gioco</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Disattivato</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Attivato</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Impostazioni schermo</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nuova Partita</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Applica Cambiamenti</b></string>

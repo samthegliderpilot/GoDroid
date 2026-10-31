@@ -185,6 +185,9 @@ private
 androidx.compose.runtime.MutableState <ScoreViewState> _scoreViewState;
 
 private
+GameClock _gameClock;
+
+private
 MenuItem
 	_saveLoadMenuItem,
 	_passMenuItem,
@@ -258,6 +261,20 @@ void onCreate ( // 0
 	//}
 
 	_scoreViewState = ScoreScreenKt.createScoreViewState ();
+	_scoreViewState.setValue (ScoreScreenKt.withClockEnabled (
+		_scoreViewState.getValue (), _settingsDataStore.getClockEnabledBlocking ()));
+	_gameClock = new GameClock (new GameClockListener ()
+	{
+		public
+		void onClockTick (
+			final String pBlackTime,
+			final String pWhiteTime
+			)
+		{
+			_scoreViewState.setValue (ScoreScreenKt.withClockTimes (
+				_scoreViewState.getValue (), pBlackTime, pWhiteTime));
+		}
+	});
 	ScoreScreenKt.setUpScoreComposeView (
 		(androidx.compose.ui.platform.ComposeView)findViewById (R.id.scoreComposeView),
 		_scoreViewState);
@@ -461,6 +478,23 @@ protected void onResume() {
 
 	// Because background is dark, force light icons
 	insetsController.setAppearanceLightStatusBars(false);
+}
+
+@Override
+public void onWindowFocusChanged(boolean hasFocus) {
+	super.onWindowFocusChanged(hasFocus);
+	// Fires false both when the app is truly backgrounded and whenever any of
+	// this app's own dialogs (New/Edit Game, App Preferences, the overflow
+	// PopupMenu - all separate windows) take focus, so this one hook covers
+	// everything the game clock should pause for without special-casing each
+	// dialog or adding onPause/onStop.
+	if (_gameClock != null) {
+		if (hasFocus) {
+			_gameClock.resume();
+		} else {
+			_gameClock.pause();
+		}
+	}
 }
 
 @Override
@@ -1101,6 +1135,18 @@ GameInfo getGameInfo ()
 	return _gameInfo;
 }
 
+// Package-private: called from Gtp.reStartGame() once a (re)loaded game's move
+// tree is actually populated - see the comment there for why that's the right
+// moment, not MainActivity.newGame()'s earlier _gameInfo assignment.
+void attachGameClock ()
+{
+	final GameInfo gameInfo = _gameInfo;
+	if (gameInfo != null)
+	{
+		_gameClock.attachToGame (gameInfo);
+	}
+}
+
 AlertDialog showMessage (
 	final String pMessage
 	)
@@ -1172,6 +1218,11 @@ void showMove (
 	_scoreViewState.setValue (ScoreScreenKt.withMove (
 		_scoreViewState.getValue (), pBlack, showProgressBar, text,
 		gameInfo._playerBlackMoves));
+	// Same UI-reveal-accurate signal as the withMove() call just above, not a raw
+	// GameInfo._playerBlackMoves poll on a timer - that flips the instant GnuGo
+	// *computes* its move, well before the Slow AI Moves delay actually reveals it,
+	// which used to charge the AI's thinking time to whoever moves next instead.
+	_gameClock.setActiveMover (gameInfo._playerBlackMoves);
 }
 
 private
@@ -1276,6 +1327,17 @@ void showDisplaySettingsDialog ()
 				{
 					_gtp.drawBoard (_gameInfo, true);
 				}
+			}
+		},
+		new ClockEnabledListener ()
+		{
+			public
+			void onClockEnabledChanged (
+				final boolean pEnabled
+				)
+			{
+				_scoreViewState.setValue (ScoreScreenKt.withClockEnabled (
+					_scoreViewState.getValue (), pEnabled));
 			}
 		});
 }

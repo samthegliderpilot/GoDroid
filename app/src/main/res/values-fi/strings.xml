@@ -16,6 +16,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="stonesLabelText">Kiviä</string>
 	<string name="moveLabelText">Siirto</string>
 	<string name="territoryAndScoreLabelText">Alue ja tulos</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Aika</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Paina kiveä pelataksesi.\nPaina pitkään zoomataksesi.</string>
 	<string name="menuNewEditGameLabel">Uusi/Muokkaa Peliä</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -82,6 +83,9 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="coordinatesLabel">Koordinaatit</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Pois</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Päällä</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Peliajastin</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Pois</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Päällä</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Näyttöasetukset</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Uusi peli</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Toteuta muutokset</b></string>

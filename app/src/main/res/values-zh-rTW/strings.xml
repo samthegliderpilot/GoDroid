@@ -17,6 +17,7 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="stonesLabelText">活子</string>
     <string name="moveLabelText">落子</string>
     <string name="territoryAndScoreLabelText">實地與得分</string>  <!-- Translation Provided by Claude -->
+    <string name="timeLabelText">時間</string>  <!-- Translation Provided by Claude -->
     <string name="tapHintText">點棋落子\n長按放大</string>
     <string name="menuNewEditGameLabel">新增/編輯對局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
@@ -70,6 +71,9 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="coordinatesLabel">座標</string>  <!-- Translation Provided by Claude -->
     <string name="coordinatesOff">關閉</string>  <!-- Translation Provided by Claude -->
     <string name="coordinatesOn">開啟</string>  <!-- Translation Provided by Claude -->
+    <string name="clockLabel">對局計時</string>  <!-- Translation Provided by Claude -->
+    <string name="clockOff">關閉</string>  <!-- Translation Provided by Claude -->
+    <string name="clockOn">開啟</string>  <!-- Translation Provided by Claude -->
     <string name="menuDisplaySettingsLabel">顯示設定</string>  <!-- Translation Provided by Claude -->
     <string name="newGameDialogStartButtonText"><b>開始棋局</b></string>
     <string name="newGameDialogApplytButtonText"><b>應用設置</b></string>

@@ -15,6 +15,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="stonesLabelText">Камни</string>
 	<string name="moveLabelText">Ход</string>
 	<string name="territoryAndScoreLabelText">Территория и очки</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Время</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Коснитесь камня для игры.\nДлинное нажатие для масштаба.</string>
 	<string name="menuNewEditGameLabel">Новая/Редактировать игру</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -83,6 +84,9 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="coordinatesLabel">Координаты</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Выкл</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Вкл</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Игровые часы</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Выкл</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Вкл</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Настройки экрана</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText">
 		<b>Новая игра</b>

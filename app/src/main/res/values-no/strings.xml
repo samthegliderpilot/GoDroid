@@ -15,6 +15,7 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="stonesLabelText">Sten</string>
 	<string name="moveLabelText">Trekk</string>
 	<string name="territoryAndScoreLabelText">Territorium &amp; poeng</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Tid</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Rør stenen for å legge.\nHold inne for å zoome.</string>
 	<string name="menuNewEditGameLabel">Nyt/Rediger Spill</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -82,6 +83,9 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="coordinatesLabel">Koordinater</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Av</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">På</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Spillklokke</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Av</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">På</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Skjerminnstillinger</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText">
 		<b>Nytt Parti</b>

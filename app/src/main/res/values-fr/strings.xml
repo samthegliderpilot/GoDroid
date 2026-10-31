@@ -16,6 +16,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="stonesLabelText">Pierres</string>
 	<string name="moveLabelText">Coup</string>
 	<string name="territoryAndScoreLabelText">Territoire et score</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Temps</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Tapoter la pierre pour valider.\nAppuie long pour zoomer.</string>
 	<string name="menuNewEditGameLabel">Nouveau/Modifier Partie</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -83,6 +84,9 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="coordinatesLabel">Coordonnées</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Désactivé</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Activé</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Horloge de partie</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Désactivé</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Activé</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Paramètres d\'affichage</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Nouvelle Partie</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Modifier</b></string>

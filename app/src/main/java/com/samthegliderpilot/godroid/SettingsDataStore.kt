@@ -25,6 +25,7 @@ private val AI_DELAY_KEY = intPreferencesKey("aiDelay")
 private val ALLOW_RESIGNATION_KEY = booleanPreferencesKey("allowResignation")
 private val EDGE_TAP_PADDING_KEY = stringPreferencesKey("edgeTapPaddingMode")
 private val SHOW_COORDINATES_KEY = booleanPreferencesKey("showCoordinates")
+private val CLOCK_ENABLED_KEY = booleanPreferencesKey("clockEnabled")
 
 // Keys migrated one-time from the legacy "app_prefs" SharedPreferences file - exactly the
 // 9 New Game dialog settings plus edge-tap padding. "lastSaveLoadUri" and
@@ -175,6 +176,17 @@ class SettingsDataStore(context: Context) {
      * same reasoning as [getEdgeTapPaddingModeBlocking]. */
     fun getShowCoordinatesBlocking(): Boolean = runBlocking {
         showCoordinates.first()
+    }
+
+    val clockEnabled: Flow<Boolean> =
+        dataStore.data.map { it[CLOCK_ENABLED_KEY] ?: true }
+    suspend fun setClockEnabled(value: Boolean) =
+        dataStore.edit { it[CLOCK_ENABLED_KEY] = value }
+
+    /** One-time blocking read for `MainActivity.onCreate`'s synchronous startup flow -
+     * same reasoning as [getEdgeTapPaddingModeBlocking]. */
+    fun getClockEnabledBlocking(): Boolean = runBlocking {
+        clockEnabled.first()
     }
 
     /** Java-callable blocking read/write pair for the New Game dialog's 9 settings -

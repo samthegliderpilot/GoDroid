@@ -16,6 +16,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="stonesLabelText">Kövek</string>
 	<string name="moveLabelText">Lépés</string>
 	<string name="territoryAndScoreLabelText">Terület és eredmény</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Idő</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Érintse meg a követ a lépéshez.\nHosszú érintéssel nagyíthat.</string>
 	<string name="menuNewEditGameLabel">Új/Játék Szerkesztése</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">U</string>
@@ -83,6 +84,9 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="coordinatesLabel">Koordináták</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Ki</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Be</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Játékóra</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Ki</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Be</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Megjelenítési beállítások</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Új játék</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Módosítások alkalmazása</b></string>

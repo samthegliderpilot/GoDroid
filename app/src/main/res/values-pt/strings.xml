@@ -17,6 +17,7 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="stonesLabelText">Pedras</string>
 	<string name="moveLabelText">Movimento</string>
 	<string name="territoryAndScoreLabelText">Território e pontuação</string>  <!-- Translation Provided by Claude -->
+	<string name="timeLabelText">Tempo</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Toque na pedra para jogar.\nToque longo para ampliar.</string>
 	<string name="menuNewEditGameLabel">Novo/Editar Jogo</string> <!-- Translation Provided by ChatGPT -->
 	<string name="menuNewGameShortcut">N</string>
@@ -84,6 +85,9 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="coordinatesLabel">Coordenadas</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOff">Desativado</string>  <!-- Translation Provided by Claude -->
 	<string name="coordinatesOn">Ativado</string>  <!-- Translation Provided by Claude -->
+	<string name="clockLabel">Relógio do jogo</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOff">Desativado</string>  <!-- Translation Provided by Claude -->
+	<string name="clockOn">Ativado</string>  <!-- Translation Provided by Claude -->
 	<string name="menuDisplaySettingsLabel">Configurações de exibição</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStartButtonText"><b>Novo Jogo</b></string>
 	<string name="newGameDialogApplytButtonText"><b>Aplicar Modificações</b></string>

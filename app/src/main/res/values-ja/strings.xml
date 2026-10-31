@@ -18,6 +18,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="stonesLabelText">石</string>
     <string name="moveLabelText">着手</string>
     <string name="territoryAndScoreLabelText">地と勝敗点数</string>  <!-- Translation Provided by Claude -->
+    <string name="timeLabelText">時間</string>  <!-- Translation Provided by Claude -->
     <string name="tapHintText">石をタップして打つ。\n長押しで拡大。</string>
     <string name="menuNewEditGameLabel">新規／編集対局</string> <!-- Translation Provided by ChatGPT -->
     <string name="menuNewGameShortcut">N</string>
@@ -70,6 +71,9 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="coordinatesLabel">座標</string>
     <string name="coordinatesOff">オフ</string>
     <string name="coordinatesOn">オン</string>
+    <string name="clockLabel">対局時計</string>  <!-- Translation Provided by Claude -->
+    <string name="clockOff">オフ</string>  <!-- Translation Provided by Claude -->
+    <string name="clockOn">オン</string>  <!-- Translation Provided by Claude -->
     <string name="menuDisplaySettingsLabel">表示設定</string>
     <string name="newGameDialogStartButtonText"><b>新局開始</b></string>
     <string name="newGameDialogApplytButtonText"><b>変更を適用</b></string>

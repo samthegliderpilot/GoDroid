@@ -803,6 +803,13 @@ void reStartGame (
 	final boolean pInit
 	)
 {
+	// By this point (after NEW_GAME's loadSavedGame switch, or directly for
+	// CHANGE_GAME) pGameInfo's move tree is fully populated if there was
+	// anything to resume - the natural point to re-seed the game clock's
+	// elapsed-time display from whatever's recorded on it (GameInfo.
+	// lastRecordedElapsedTime), rather than MainActivity.newGame()'s earlier
+	// _gameInfo assignment, which runs before that tree is loaded.
+	_mainActivity.attachGameClock ();
 	gtpCommand (GtpCommand.SET_LEVEL, String.valueOf (pGameInfo._level));
 	gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi);
 	gtpCommand (GtpCommand.SET_RESIGN, pGameInfo._allowResignation ? "1" : "0");
