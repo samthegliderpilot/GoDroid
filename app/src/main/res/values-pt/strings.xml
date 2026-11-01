@@ -73,11 +73,16 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="newGameDialogHumanPlaysLabelText">Jogador humano</string>
 	<string name="newGameDialogBoardSizeLabel">Tamanho do tabuleiro</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Motor</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Força</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Pontuação</string>
 	<string name="newGameDialogAIDelayLabel">Movimentos lentos da IA (s)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Permitir rendição</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Tempo de reflexão (seg)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Limite de desistência</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Margem de toque na borda</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Desativado</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Ativado</string>  <!-- Translation Provided by Claude -->
@@ -94,6 +99,7 @@ GNU Go é um programa de IA que joga Go entre os níveis 8 e 12 kyu de força.
 	<string name="yourTurnText">Sua vez</string>
 	<string name="resignedText">desistiu</string>
 	<string name="passedText">passa</string>
+	<string name="resignationMessageText">%1$s desiste, %2$s vence</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Não é possível desfazer</string>
 	<string name="noRedoHintText">Não é possível refazer</string>
 	<string name="undoHintText">Arraste para esquerda aqui para desfazer</string>

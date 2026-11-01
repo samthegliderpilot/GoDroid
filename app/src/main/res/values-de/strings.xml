@@ -76,11 +76,16 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="newGameDialogHumanPlaysLabelText">Du spielst</string>
 	<string name="newGameDialogBoardSizeLabel">Brettgröße</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Engine</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Stärke</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Regeln</string>
 	<string name="newGameDialogAIDelayLabel">Langsame KI-Züge (Sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Aufgabe erlauben</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Bedenkzeit (Sek.)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Aufgabeschwelle</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Randabstand für Tippen</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Aus</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">An</string>  <!-- Translation Provided by Claude -->
@@ -97,6 +102,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="yourTurnText">Dein Zug</string>
 	<string name="resignedText">Gibt auf</string>
 	<string name="passedText">Passt</string>
+	<string name="resignationMessageText">%1$s gibt auf, %2$s gewinnt</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Rückgängig nicht möglich</string>
 	<string name="noRedoHintText">Wiederherstellen nicht möglich</string>
 	<string name="undoHintText">Rückgängig\nHier links wischen</string>

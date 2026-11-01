@@ -71,11 +71,16 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="newGameDialogHumanPlaysLabelText">Menneske spiller</string>
 	<string name="newGameDialogBoardSizeLabel">Brettstørrelse</string>
 	<string name="newGameDialogHandicapLabel">Handikap</string>
+	<string name="newGameDialogEngineLabel">Motor</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Styrke</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Poengberegning</string>
 	<string name="newGameDialogAIDelayLabel">Sakte AI-trekk (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Tillat overgivelse</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Tenketid (sek)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Oppgivelsesgrense</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Kantmargin ved trykk</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Av</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">På</string>  <!-- Translation Provided by Claude -->
@@ -96,6 +101,7 @@ GNU Go er en AI-motor som spiller Go på omtrent 8 til 12 kyu styrke.
 	<string name="yourTurnText">Ditt trekk</string>
 	<string name="resignedText">gir opp</string>
 	<string name="passedText">passes</string>
+	<string name="resignationMessageText">%1$s gir opp, %2$s vinner</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Angre er ikke mulig</string>
 	<string name="noRedoHintText">Gjenta er ikke mulig</string>
 	<string name="undoHintText">Skli til venste for å angre</string>

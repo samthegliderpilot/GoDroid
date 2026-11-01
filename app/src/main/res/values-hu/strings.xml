@@ -72,11 +72,16 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="newGameDialogHumanPlaysLabelText">Az Ön színe</string>
 	<string name="newGameDialogBoardSizeLabel">Táblaméret</string>
 	<string name="newGameDialogHandicapLabel">Előnykő</string>
+	<string name="newGameDialogEngineLabel">Motor</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Erő</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Szabály</string>
 	<string name="newGameDialogAIDelayLabel">Lassú AI lépések (mp)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Lemondás engedélyezése</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Gondolkodási idő (mp)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Feladási küszöb</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Széli érintési margó</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Ki</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Be</string>  <!-- Translation Provided by Claude -->
@@ -93,6 +98,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="yourTurnText">Ön lép</string>
 	<string name="resignedText">feladja</string>
 	<string name="passedText">passzol</string>
+	<string name="resignationMessageText">%1$s feladja, %2$s nyer</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Visszalépés nem lehetséges</string>
 	<string name="noRedoHintText">Előrelépés nem lehetséges</string>
 	<string name="undoHintText">Itt balra húzva visszalép</string>

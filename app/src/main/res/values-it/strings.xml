@@ -73,11 +73,16 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="newGameDialogHumanPlaysLabelText">Giocatore umano</string>
 	<string name="newGameDialogBoardSizeLabel">Dimensione Tavola</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Motore</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Forza</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Regole Punteggio</string>
 	<string name="newGameDialogAIDelayLabel">Mosse lente dell\'IA (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Consenti la resa</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Tempo di pensiero (sec)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Soglia di resa</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Margine tocco bordo</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Disattivato</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Attivato</string>  <!-- Translation Provided by Claude -->
@@ -94,6 +99,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="yourTurnText">Tuo turno</string>
 	<string name="resignedText">si arrende</string>
 	<string name="passedText">passa</string>
+	<string name="resignationMessageText">%1$s si arrende, %2$s vince</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Impossibile annullare</string>
 	<string name="noRedoHintText">Impossibile ripetere</string>
 	<string name="undoHintText">Scorri qui verso destra per annullare</string>

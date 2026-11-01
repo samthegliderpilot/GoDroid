@@ -73,11 +73,16 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="newGameDialogHumanPlaysLabelText">Omul joacă cu</string>
 	<string name="newGameDialogBoardSizeLabel">Dimensiunea tablei</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Motor</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Tărie</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Calcularea scorului</string>
 	<string name="newGameDialogAIDelayLabel">Întârziere mișcări AI (sec)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Permite renunțarea</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Timp de gândire (sec)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Prag de renunțare</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Margine de atingere la margine</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Dezactivat</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Activat</string>  <!-- Translation Provided by Claude -->
@@ -94,6 +99,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="yourTurnText">Rândul tău</string>
 	<string name="resignedText">a cedat</string>
 	<string name="passedText">a jucat pas</string>
+	<string name="resignationMessageText">%1$s renunță, %2$s câștigă</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Nu este posibilă revenirea la poziţia anterioară</string>
 	<string name="noRedoHintText">Nu este posibilă refacerea poziţiei initiale</string>
 	<string name="undoHintText">Cu o mişcare spre stânga aici poţi reveni la poziţia anterioră</string>

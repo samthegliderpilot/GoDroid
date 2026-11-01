@@ -72,11 +72,16 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="newGameDialogHumanPlaysLabelText">Играет человек</string>
 	<string name="newGameDialogBoardSizeLabel">Размер доски</string>
 	<string name="newGameDialogHandicapLabel">Фора</string>
+	<string name="newGameDialogEngineLabel">Движок</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Сила</string>
 	<string name="newGameDialogKomiLabel">Коми</string>
 	<string name="newGameDialogScoringLabel">Правила</string>
 	<string name="newGameDialogAIDelayLabel">Задержка ходов ИИ (сек)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Разрешить сдачу</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Время на обдумывание (сек)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Порог сдачи</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Отступ у края для касания</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Выкл</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Вкл</string>  <!-- Translation Provided by Claude -->
@@ -97,6 +102,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="yourTurnText">Ваш ход</string>
 	<string name="resignedText">сдался</string>
 	<string name="passedText">спасовал</string>
+	<string name="resignationMessageText">%1$s сдался, %2$s выигрывает</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Отмена невозможна</string>
 	<string name="noRedoHintText">Возврат невозможен</string>
 	<string name="undoHintText">Скользните влево для отмены хода</string>

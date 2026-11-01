@@ -60,10 +60,15 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="newGameDialogHumanPlaysLabelText">人間が先手</string>
     <string name="newGameDialogBoardSizeLabel">盤のサイズ</string>
     <string name="newGameDialogHandicapLabel">ハンディキャップ</string>
+    <string name="newGameDialogEngineLabel">エンジン</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
     <string name="newGameDialogStrengthLabel">強さ</string>
     <string name="newGameDialogKomiLabel">コミ</string>
     <string name="newGameDialogScoringLabel">ルール</string>
     <string name="newGameAllowResignationLabel">投了を許可</string>
+    <string name="newGameDialogPachiThinkSecondsLabel">思考時間 (秒)</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogPachiResignThresholdLabel">投了のしきい値</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingLabel">端タップの余白</string>
     <string name="edgeTapPaddingOff">オフ</string>
     <string name="edgeTapPaddingOn">オン</string>
@@ -80,6 +85,7 @@ GNU Go は、およそ8〜12級の強さで碁を打つAIです。
     <string name="yourTurnText">あなたの手番</string>
     <string name="resignedText">投了</string>
     <string name="passedText">パス</string>
+    <string name="resignationMessageText">%1$sが投了、%2$sの勝ち</string>  <!-- Translation Provided by Claude -->
     <string name="noUndoHintText">取り消し不可</string>
     <string name="noRedoHintText">やり直し不可</string>
     <string name="undoHintText">左にスワイプして取り消し</string>

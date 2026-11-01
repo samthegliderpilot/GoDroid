@@ -72,11 +72,16 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="newGameDialogHumanPlaysLabelText">Le Joueur joue les</string>
 	<string name="newGameDialogBoardSizeLabel">Taille du plateau</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Moteur</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Force</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Règles</string>
 	<string name="newGameDialogAIDelayLabel">Délais pour les coups de l\'IA (s)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Autoriser l\'abandon</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Temps de réflexion (s)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Seuil d\'abandon</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Marge de touche sur les bords</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Désactivé</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Activé</string>  <!-- Translation Provided by Claude -->
@@ -93,6 +98,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="yourTurnText">A vous</string>
 	<string name="resignedText">abandon</string>
 	<string name="passedText">passe</string>
+	<string name="resignationMessageText">%1$s abandonne, %2$s gagne</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Impossible d\'annuler</string>
 	<string name="noRedoHintText">Impossible de recommencer</string>
 	<string name="undoHintText">Glisser à gauche pour annuler le coup</string>

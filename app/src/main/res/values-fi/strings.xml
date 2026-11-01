@@ -71,11 +71,16 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="newGameDialogHumanPlaysLabelText">Ihminen pelaa</string>
 	<string name="newGameDialogBoardSizeLabel">Laudan koko</string>
 	<string name="newGameDialogHandicapLabel">Tasoitus</string>
+	<string name="newGameDialogEngineLabel">Moottori</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Tietokoneen taso</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Pisteytys</string>
 	<string name="newGameDialogAIDelayLabel">Hidasta tekoälyn siirtoja (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Salli luovutus</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Ajatteluaika (s)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Luovutuskynnys</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Reunan kosketustila</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Pois</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Päällä</string>  <!-- Translation Provided by Claude -->
@@ -92,6 +97,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="yourTurnText">Sinun vuorosi</string>
 	<string name="resignedText">luovuttaa</string>
 	<string name="passedText">passaa</string>
+	<string name="resignationMessageText">%1$s luovuttaa, %2$s voittaa</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Ei voi perua</string>
 	<string name="noRedoHintText">Ei voi tehdä uudelleen</string>
 	<string name="undoHintText">Pyyhkäise vasemmalle peruaksesi</string>

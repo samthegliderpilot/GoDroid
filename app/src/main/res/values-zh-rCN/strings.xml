@@ -59,11 +59,16 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="newGameDialogHumanPlaysLabelText">棋手</string>
     <string name="newGameDialogBoardSizeLabel">棋盘</string>
     <string name="newGameDialogHandicapLabel">让子</string>
+    <string name="newGameDialogEngineLabel">引擎</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
     <string name="newGameDialogStrengthLabel">难度</string>
     <string name="newGameDialogKomiLabel">贴目</string>
     <string name="newGameDialogScoringLabel">计分</string>
     <string name="newGameDialogAIDelayLabel">延迟AI落子（秒）</string> <!-- Translation Provided by ChatGPT -->
     <string name="newGameAllowResignationLabel">允许认输</string>  <!-- Translation Provided by ChatGPT -->
+    <string name="newGameDialogPachiThinkSecondsLabel">思考时间（秒）</string>  <!-- Translation Provided by Claude -->
+    <string name="newGameDialogPachiResignThresholdLabel">认输阈值</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingLabel">边缘点击边距</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingOff">关闭</string>  <!-- Translation Provided by Claude -->
     <string name="edgeTapPaddingOn">开启</string>  <!-- Translation Provided by Claude -->
@@ -80,6 +85,7 @@ GNU Go 是 一个AI 引擎将展示6-8个难度级别。
     <string name="yourTurnText">该你了</string>
     <string name="resignedText">同意</string>
     <string name="passedText">虚手</string>
+    <string name="resignationMessageText">%1$s认输，%2$s获胜</string>  <!-- Translation Provided by Claude -->
     <string name="noUndoHintText">不能撤消</string>
     <string name="noRedoHintText">不能恢复</string>
     <string name="undoHintText">这里向左滑动撤消</string>

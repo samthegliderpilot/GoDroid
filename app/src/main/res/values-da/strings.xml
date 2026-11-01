@@ -71,11 +71,16 @@ GNU Go er en AI motor som spiller Go på ca. 8 til 12 kyu styrke.
 	<string name="newGameDialogHumanPlaysLabelText">Menneske spiller</string>
 	<string name="newGameDialogBoardSizeLabel">Bræt størrelse</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Motor</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>  <!-- Translation Provided by Claude -->
 	<string name="newGameDialogStrengthLabel">Styrke</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Scoring</string>
 	<string name="newGameDialogAIDelayLabel">Forsink AI-træk (sek)</string> <!-- Translation Provided by ChatGPT -->
 	<string name="newGameAllowResignationLabel">Tillad overgivelse</string>  <!-- Translation Provided by ChatGPT -->
+	<string name="newGameDialogPachiThinkSecondsLabel">Tænketid (sek)</string>  <!-- Translation Provided by Claude -->
+	<string name="newGameDialogPachiResignThresholdLabel">Opgivelsesgrænse</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingLabel">Kantmargin ved tryk</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOff">Fra</string>  <!-- Translation Provided by Claude -->
 	<string name="edgeTapPaddingOn">Til</string>  <!-- Translation Provided by Claude -->
@@ -96,6 +101,7 @@ GNU Go er en AI motor som spiller Go på ca. 8 til 12 kyu styrke.
 	<string name="yourTurnText">Din tur</string>
 	<string name="resignedText">giver op</string>
 	<string name="passedText">passer</string>
+	<string name="resignationMessageText">%1$s giver op, %2$s vinder</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Angre er ikke mulig</string>
 	<string name="noRedoHintText">Gentag er ikke mulig</string>
 	<string name="undoHintText">Smut til venste her for at angre</string>
