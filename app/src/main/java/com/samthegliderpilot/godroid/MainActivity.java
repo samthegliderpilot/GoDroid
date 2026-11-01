@@ -1172,6 +1172,23 @@ void ensureEngine (
 	_goEngineViewModel.ensurePachiEngine (pEngineType == EngineType.Pachi);
 }
 
+// See GoEngineViewModel.pachiNeedsSync/markPachiSynced's own comments - lets
+// reStartGame skip GameInfo.syncPachiHistory's full replay when Pachi's
+// still-live process has already been caught up to this exact move count.
+boolean pachiNeedsSync (
+	final int pMoveNumber
+	)
+{
+	return _goEngineViewModel.pachiNeedsSync (pMoveNumber);
+}
+
+void markPachiSynced (
+	final int pMoveNumber
+	)
+{
+	_goEngineViewModel.markPachiSynced (pMoveNumber);
+}
+
 AlertDialog showMessage (
 	final String pMessage
 	)

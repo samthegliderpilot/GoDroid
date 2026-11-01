@@ -549,11 +549,7 @@ class GameInfo {
                 return LoadGameStatus.SUCCESS
             }
             Collections.reverse(moves)
-            for (point in moves) {
-                Gtp.playMove(false, blackMoves, point, this)
-                blackMoves = !blackMoves
-                _moveNumber++
-            }
+            blackMoves = replayAlternating(moves, blackMoves, EngineType.GnuGo, pCountMoves = true)
             _playerBlackMoves = blackMoves
             _currentNode = recentNode
             return LoadGameStatus.SUCCESS
@@ -665,14 +661,7 @@ class GameInfo {
     }
 
     fun setupStones(pBlack: Boolean, pNode: PropertyNode) {
-        val propertyName = if (pBlack) PropertyName.AddBlack else PropertyName.AddWhite
-        val moves = pNode.getPropertyValues(propertyName) ?: return
-        for (move in moves) {
-            val point = fromMovePropertyValue(propertyName, move, Point())
-            if (point != null) {
-                Gtp.playMove(false, pBlack, point, this)
-            }
-        }
+        replaySingleColor(setupStonePoints(pBlack, pNode), pBlack, EngineType.GnuGo)
     }
 
     /** Replays this game's full history onto Pachi via plain GTP `play` commands -
@@ -696,12 +685,8 @@ class GameInfo {
      * stone's been replayed. */
     fun syncPachiHistory() {
         val setupNode = _setupNode ?: return
-        for (point in setupStonePoints(true, setupNode)) {
-            Gtp.playMove(false, true, point, this, EngineType.Pachi)
-        }
-        for (point in setupStonePoints(false, setupNode)) {
-            Gtp.playMove(false, false, point, this, EngineType.Pachi)
-        }
+        replaySingleColor(setupStonePoints(true, setupNode), true, EngineType.Pachi)
+        replaySingleColor(setupStonePoints(false, setupNode), false, EngineType.Pachi)
         // _moveNumber, not some large sentinel: getPreviousMoves pre-sizes its
         // ArrayList to this count (Generics.newArrayList(pNumMoves)) rather
         // than growing it as it walks, so Int.MAX_VALUE here was an instant
@@ -714,17 +699,50 @@ class GameInfo {
         // initSGF/loadGame, which both set _playerBlackMoves = false the
         // moment a handicap is placed) - the same convention this app
         // already enforces everywhere else, not a guess made here.
-        var blackMoves = _handicap == 0
-        for (point in moves) {
-            Gtp.playMove(false, blackMoves, point, this, EngineType.Pachi)
-            blackMoves = !blackMoves
-        }
+        replayAlternating(moves, _handicap == 0, EngineType.Pachi, pCountMoves = false)
     }
 
     private fun setupStonePoints(pBlack: Boolean, pNode: PropertyNode): List<Point> {
         val propertyName = if (pBlack) PropertyName.AddBlack else PropertyName.AddWhite
         val values = pNode.getPropertyValues(propertyName) ?: return emptyList()
         return values.mapNotNull { fromMovePropertyValue(propertyName, it, Point()) }
+    }
+
+    /** Plays every point as the same, fixed [pBlack] color, to [pEngine] - setup/
+     * handicap/free-placement stones are all one color as a group, unlike a real
+     * move sequence (see [replayAlternating]). Shared by [setupStones] (GnuGo)
+     * and [syncPachiHistory] (Pachi) instead of each having its own copy. */
+    private fun replaySingleColor(pPoints: List<Point>, pBlack: Boolean, pEngine: EngineType) {
+        for (point in pPoints) {
+            Gtp.playMove(false, pBlack, point, this, pEngine)
+        }
+    }
+
+    /** Plays every point in order, alternating color starting from [pStartBlack] -
+     * a real move sequence. Returns the color whose turn is next (the
+     * alternation's final flip). Increments [_moveNumber] per move when
+     * [pCountMoves] is true ([loadGame] establishing it fresh from a loaded
+     * SGF); false when just mirroring an already-established count onto a
+     * second engine ([syncPachiHistory]). Shared instead of [loadGame] and
+     * [syncPachiHistory] each hand-rolling this loop - this diff's own
+     * `Int.MAX_VALUE`-sized-ArrayList bug (see [syncPachiHistory]'s comment)
+     * happened in exactly this class of code, so one copy is one less place
+     * for a similar bug, or a convention change, to drift between copies. */
+    private fun replayAlternating(
+        pPoints: List<Point>,
+        pStartBlack: Boolean,
+        pEngine: EngineType,
+        pCountMoves: Boolean
+    ): Boolean {
+        var blackMoves = pStartBlack
+        for (point in pPoints) {
+            Gtp.playMove(false, blackMoves, point, this, pEngine)
+            blackMoves = !blackMoves
+            if (pCountMoves) {
+                _moveNumber++
+            }
+        }
+        return blackMoves
     }
 
     fun toPropertyValue(pProperty: PropertyName, pValue: String): PropertyName.Property {

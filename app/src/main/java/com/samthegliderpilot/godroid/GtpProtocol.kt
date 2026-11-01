@@ -33,15 +33,28 @@ object GtpProtocol {
      * ("="-prefixed) - [cleanReply] can't answer this on its own, since it
      * strips a real error down to the same "" as an ordinary no-data success
      * reply (e.g. `play`'s). Needed wherever a command's success/failure
-     * itself matters, not just its payload - see `Gtp.playMoveOnGnuGo`.
+     * itself matters, not just its payload - see `Gtp.gtpCommandSucceeded`.
      */
     @JvmStatic
     fun isError(rawReply: String?): Boolean = rawReply?.trimStart()?.startsWith("?") ?: true
 
-    /** A GTP vertex like "C5" -> board coordinates, or null for a null vertex. */
+    /**
+     * A GTP vertex like "C5" -> board coordinates, or null for a null vertex
+     * - or anything else that doesn't actually parse as one. Different GTP
+     * engines don't agree on exact spelling for everything (GnuGo replies
+     * "PASS" to genmove, Pachi replies "pass" - a real crash this hit once,
+     * parsing "ass" as a row number), so this can't assume its input is
+     * always a well-formed vertex; callers decide what an unparsable one
+     * means for them (see `Gtp.java`'s own genmove-reply handling) instead
+     * of this throwing.
+     */
     @JvmStatic
-    fun vertex2Point(vertex: String?, boardSize: Int): Point? = vertex?.let {
-        Point(POSITION_LETTERS.indexOf(it[0]), boardSize - it.substring(1).toInt())
+    fun vertex2Point(vertex: String?, boardSize: Int): Point? {
+        if (vertex.isNullOrEmpty()) return null
+        val column = POSITION_LETTERS.indexOf(vertex[0])
+        val row = vertex.substring(1).toIntOrNull()
+        if (column < 0 || row == null) return null
+        return Point(column, boardSize - row)
     }
 
     /**

@@ -31,7 +31,9 @@ import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.TextRange
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
@@ -242,16 +244,36 @@ private fun <T> SettingDropdown(
  * not Material's `TextField` - that one brings a filled background and an
  * underline indicator, both out of place next to [SettingDropdown]'s
  * chrome-free rows (the same reasoning that rules out `OutlinedTextField`
- * there). [text] is the field's raw, possibly-mid-edit string; parsing/
- * validating it back into the actual setting value is the caller's job (see
- * its use below), so a momentarily unparsable string (e.g. a bare "-" while
- * typing) doesn't lose what the user already typed. */
+ * there).
+ *
+ * Owns its own mid-edit text buffer (as a `TextFieldValue`, so it can also
+ * place the cursor explicitly - see below), seeded from [text] and otherwise
+ * independent of it: [onTextChanged]'s own raw, possibly-unparsable string
+ * (e.g. a bare "-" while typing) is reported upward, but a momentarily
+ * unparsable edit doesn't get overwritten by [text] simply not having
+ * changed. The buffer only resets to [text] when [resetKey] itself changes
+ * - [text] changing on every keystroke (because the caller's own value only
+ * updates once a parse succeeds) must NOT itself reset the buffer, or an
+ * in-progress edit like "0." would be wiped back to "0" after every digit.
+ * [resetKey] is the caller's own value identity for when [text] legitimately
+ * needs to resync from outside this field (e.g. switching to this field's
+ * setting and back within one dialog instance, via Compose state surviving
+ * across the composable being removed from and re-added to the tree).
+ *
+ * The initial `TextFieldValue`'s selection is the end of [text], not Compose's
+ * own default of the start - the usual reason to edit one of these fields is
+ * to delete the existing number and type a new one, which otherwise needs a
+ * careful tap just past the digits first. */
 @Composable
 private fun NumberSettingField(
     label: String,
     text: String,
+    resetKey: Any,
     onTextChanged: (String) -> Unit,
 ) {
+    var fieldValue by remember(resetKey) {
+        mutableStateOf(TextFieldValue(text, TextRange(text.length)))
+    }
     Row(
         modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
         verticalAlignment = Alignment.CenterVertically,
@@ -262,8 +284,11 @@ private fun NumberSettingField(
             modifier = Modifier.padding(end = 8.dp),
         )
         BasicTextField(
-            value = text,
-            onValueChange = onTextChanged,
+            value = fieldValue,
+            onValueChange = { newValue ->
+                fieldValue = newValue
+                onTextChanged(newValue.text)
+            },
             singleLine = true,
             textStyle = MaterialTheme.typography.bodyLarge.copy(
                 color = MaterialTheme.colorScheme.primary,
@@ -356,24 +381,28 @@ fun NewGameScreen(
                 )
             }
             EngineType.Pachi -> {
-                var thinkSecondsText by remember { mutableStateOf(current.pachiThinkSeconds.toString()) }
-                var resignThresholdText by remember {
-                    mutableStateOf(current.pachiResignThreshold.toString())
-                }
                 NumberSettingField(
                     label = stringResource(R.string.newGameDialogPachiThinkSecondsLabel),
-                    text = thinkSecondsText,
+                    text = current.pachiThinkSeconds.toString(),
+                    resetKey = current.engineType,
                     onTextChanged = { text ->
-                        thinkSecondsText = text
                         text.toIntOrNull()?.let { current = current.copy(pachiThinkSeconds = it) }
                     }
                 )
                 NumberSettingField(
                     label = stringResource(R.string.newGameDialogPachiResignThresholdLabel),
-                    text = resignThresholdText,
+                    text = current.pachiResignThreshold.toString(),
+                    resetKey = current.engineType,
                     onTextChanged = { text ->
-                        resignThresholdText = text
-                        text.toFloatOrNull()
+                        // A device/keyboard set to a comma-decimal locale (most
+                        // of this app's own translated locales: German, French,
+                        // Italian, Spanish, Portuguese, Russian, Polish,
+                        // Romanian, Danish, Finnish, Norwegian) commonly types
+                        // "," for a decimal point - toFloatOrNull() only ever
+                        // accepts ".", so typing e.g. "0,3" would otherwise
+                        // silently leave pachiResignThreshold at its old value
+                        // with no error shown.
+                        text.replace(',', '.').toFloatOrNull()
                             ?.let { current = current.copy(pachiResignThreshold = it) }
                     }
                 )

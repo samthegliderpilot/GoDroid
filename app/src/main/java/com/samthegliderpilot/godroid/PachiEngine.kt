@@ -1,20 +1,14 @@
 package com.samthegliderpilot.godroid
 
 import android.content.Context
-import android.util.Log
-import com.samthegliderpilot.util.Logging.isEnabledFor
-import com.samthegliderpilot.util.Logging.log
-import java.io.BufferedReader
-import java.io.BufferedWriter
 import java.io.File
 import java.io.IOException
-import java.io.InputStreamReader
-import java.io.OutputStreamWriter
 
 /**
  * Runs Pachi as a subprocess and talks to it over GTP, the same way
- * [GnuGoEngine] does - see that class for the shared rationale (subprocess
- * over JNI, the `libpachi.so` packaging trick). This is a plain MCTS/UCT
+ * [GnuGoEngine] does - the actual read/write/stderr-drain loop lives in
+ * their shared [SubprocessGoEngine] base; this class is just that plus
+ * Pachi's own process launch and data-file setup. This is a plain MCTS/UCT
  * build (DCNN and JOSEKIFIX compiled out - see `patches/pachi/Android.mk`),
  * so with no command-line flags Pachi's own `main()` already runs exactly
  * the GTP-over-stdio loop this needs - unlike GnuGo, no custom minimal
@@ -27,42 +21,8 @@ import java.io.OutputStreamWriter
  * a `DATA_DIR` environment variable, and ~1MB is cheap enough to just always
  * re-extract on each engine start rather than tracking whether it's stale.
  */
-class PachiEngine private constructor(private val process: Process) : GoEngine {
-
-    private val writer: BufferedWriter =
-        BufferedWriter(OutputStreamWriter(process.outputStream))
-    private val reader: BufferedReader =
-        BufferedReader(InputStreamReader(process.inputStream))
-
-    @Synchronized
-    override fun sendCommand(command: String): String {
-        writer.write(command)
-        writer.write("\n")
-        writer.flush()
-
-        val response = StringBuilder()
-        var line = reader.readLine()
-            ?: throw EngineDiedException(command)
-        while (line.isNotEmpty()) {
-            response.append(line).append('\n')
-            line = reader.readLine() ?: break
-        }
-        return response.toString()
-    }
-
-    override fun isAlive(): Boolean = process.isAlive
-
-    override fun shutdown() {
-        try {
-            sendCommand("quit")
-        } catch (ignored: Exception) {
-            // Already gone - nothing to clean up on the protocol side.
-        }
-        process.destroy()
-    }
-
-    class EngineDiedException(command: String) :
-        RuntimeException("Pachi process ended while waiting for a response to: $command")
+class PachiEngine private constructor(process: Process) :
+    SubprocessGoEngine("Pachi", process) {
 
     companion object {
         private const val EXECUTABLE_NAME = "libpachi.so"
@@ -84,7 +44,6 @@ class PachiEngine private constructor(private val process: Process) : GoEngine {
             val process = ProcessBuilder(executable.absolutePath)
                 .directory(extractDataFiles(context))
                 .start()
-            startStderrDrain(process)
             return PachiEngine(process)
         }
 
@@ -97,23 +56,6 @@ class PachiEngine private constructor(private val process: Process) : GoEngine {
                 }
             }
             return dataDir
-        }
-
-        private fun startStderrDrain(process: Process) {
-            Thread({
-                BufferedReader(InputStreamReader(process.errorStream)).use { reader ->
-                    var line = reader.readLine()
-                    while (line != null) {
-                        if (isEnabledFor(MainActivity._LOG_TAG, Log.WARN)) {
-                            log(MainActivity._LOG_TAG, Log.WARN, "pachi stderr: '$line'")
-                        }
-                        line = reader.readLine()
-                    }
-                }
-            }, "PachiEngine-stderr").apply {
-                isDaemon = true
-                start()
-            }
         }
     }
 }
