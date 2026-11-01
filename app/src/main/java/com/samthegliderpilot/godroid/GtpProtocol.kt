@@ -28,6 +28,16 @@ object GtpProtocol {
         return reply.takeUnless { it.isEmpty() || it[0] == '?' } ?: ""
     }
 
+    /**
+     * Whether a raw GTP reply is an error ("?"-prefixed) rather than success
+     * ("="-prefixed) - [cleanReply] can't answer this on its own, since it
+     * strips a real error down to the same "" as an ordinary no-data success
+     * reply (e.g. `play`'s). Needed wherever a command's success/failure
+     * itself matters, not just its payload - see `Gtp.playMoveOnGnuGo`.
+     */
+    @JvmStatic
+    fun isError(rawReply: String?): Boolean = rawReply?.trimStart()?.startsWith("?") ?: true
+
     /** A GTP vertex like "C5" -> board coordinates, or null for a null vertex. */
     @JvmStatic
     fun vertex2Point(vertex: String?, boardSize: Int): Point? = vertex?.let {

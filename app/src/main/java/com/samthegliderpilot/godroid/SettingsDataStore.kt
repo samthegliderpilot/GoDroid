@@ -6,6 +6,7 @@ import androidx.datastore.migrations.SharedPreferencesMigration
 import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.booleanPreferencesKey
 import androidx.datastore.preferences.core.edit
+import androidx.datastore.preferences.core.floatPreferencesKey
 import androidx.datastore.preferences.core.intPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import androidx.datastore.preferences.preferencesDataStore
@@ -26,6 +27,9 @@ private val ALLOW_RESIGNATION_KEY = booleanPreferencesKey("allowResignation")
 private val EDGE_TAP_PADDING_KEY = stringPreferencesKey("edgeTapPaddingMode")
 private val SHOW_COORDINATES_KEY = booleanPreferencesKey("showCoordinates")
 private val CLOCK_ENABLED_KEY = booleanPreferencesKey("clockEnabled")
+private val ENGINE_TYPE_KEY = stringPreferencesKey("engineType")
+private val PACHI_THINK_SECONDS_KEY = intPreferencesKey("pachiThinkSeconds")
+private val PACHI_RESIGN_THRESHOLD_KEY = floatPreferencesKey("pachiResignThreshold")
 
 // Keys migrated one-time from the legacy "app_prefs" SharedPreferences file - exactly the
 // 9 New Game dialog settings plus edge-tap padding. "lastSaveLoadUri" and
@@ -189,7 +193,31 @@ class SettingsDataStore(context: Context) {
         clockEnabled.first()
     }
 
-    /** Java-callable blocking read/write pair for the New Game dialog's 9 settings -
+    val engineType: Flow<EngineType> =
+        dataStore.data.map { preferences ->
+            val stored = preferences[ENGINE_TYPE_KEY]
+            try {
+                if (stored != null) EngineType.valueOf(stored) else GameInfo._DEFAULT_ENGINE_TYPE
+            } catch (e: IllegalArgumentException) {
+                GameInfo._DEFAULT_ENGINE_TYPE
+            }
+        }
+    suspend fun setEngineType(value: EngineType) =
+        dataStore.edit { it[ENGINE_TYPE_KEY] = value.name }
+
+    val pachiThinkSeconds: Flow<Int> =
+        dataStore.data.map { it[PACHI_THINK_SECONDS_KEY] ?: GameInfo._DEFAULT_PACHI_THINK_SECONDS }
+    suspend fun setPachiThinkSeconds(value: Int) =
+        dataStore.edit { it[PACHI_THINK_SECONDS_KEY] = value }
+
+    val pachiResignThreshold: Flow<Float> =
+        dataStore.data.map {
+            it[PACHI_RESIGN_THRESHOLD_KEY] ?: GameInfo._DEFAULT_PACHI_RESIGN_THRESHOLD
+        }
+    suspend fun setPachiResignThreshold(value: Float) =
+        dataStore.edit { it[PACHI_RESIGN_THRESHOLD_KEY] = value }
+
+    /** Java-callable blocking read/write pair for the New Game dialog's settings -
      * mirrors `MainActivity`'s old `restoreGameInfo`/`storeGameInfo`, which were
      * synchronous `SharedPreferences` reads/a blocking `commit()` too. */
     fun loadNewGameSettingsBlocking(): NewGameSettings = runBlocking {
@@ -202,7 +230,10 @@ class SettingsDataStore(context: Context) {
             komi = komi.first(),
             chineseRules = chineseRules.first(),
             aiDelaySeconds = aiDelaySeconds.first(),
-            allowResignation = allowResignation.first()
+            allowResignation = allowResignation.first(),
+            engineType = engineType.first(),
+            pachiThinkSeconds = pachiThinkSeconds.first(),
+            pachiResignThreshold = pachiResignThreshold.first()
         )
     }
 
@@ -216,5 +247,8 @@ class SettingsDataStore(context: Context) {
         setChineseRules(settings.chineseRules)
         setAiDelaySeconds(settings.aiDelaySeconds)
         setAllowResignation(settings.allowResignation)
+        setEngineType(settings.engineType)
+        setPachiThinkSeconds(settings.pachiThinkSeconds)
+        setPachiResignThreshold(settings.pachiResignThreshold)
     }
 }

@@ -1,3 +1,6 @@
 [submodule "third_party/gnugo-3.8"]
 	path = third_party/gnugo-3.8
 	url = https://git.savannah.gnu.org/git/gnugo.git
+[submodule "pachi"]
+	path = third_party/pachi
+	url = https://github.com/pasky/pachi.git

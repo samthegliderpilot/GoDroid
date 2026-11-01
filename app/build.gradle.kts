@@ -8,6 +8,8 @@ plugins {
 }
 apply(from = "$rootDir/app/prepareGnugo.gradle.kts")
 apply(from = "$rootDir/app/buildGnugoExecutable.gradle.kts")
+apply(from = "$rootDir/app/preparePachi.gradle.kts")
+apply(from = "$rootDir/app/buildPachiExecutable.gradle.kts")
 android {
     namespace = "com.samthegliderpilot.godroid"
     compileSdk = 36

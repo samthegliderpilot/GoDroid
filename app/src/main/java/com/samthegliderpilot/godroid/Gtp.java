@@ -17,6 +17,7 @@ import static com.samthegliderpilot.godroid.GameInfo.Passed;
 import static com.samthegliderpilot.godroid.MainActivity.MainCommand;
 import static com.samthegliderpilot.godroid.MainActivity._LOG_TAG;
 import static com.samthegliderpilot.godroid.MainActivity.playGTP;
+import static com.samthegliderpilot.godroid.MainActivity.playPachiGTP;
 import com.samthegliderpilot.util.Generics;
 import static com.samthegliderpilot.util.Logging.isEnabledFor;
 import static com.samthegliderpilot.util.Logging.log;
@@ -33,6 +34,11 @@ String
 	_BLACK_TERRITORY = "black_territory",
 	_WHITE_TERRITORY = "white_territory",
 	_DEAD = "dead";
+
+// How many times playMove retries Pachi's genmove after a mirrored play
+// GnuGo rejects (board desync) before giving up and passing the turn -
+// see playMove's Pachi branch.
+private static final int _PACHI_MOVE_ATTEMPTS = 3;
 
 private
 enum Command
@@ -84,7 +90,27 @@ enum GtpCommand
 	LIST_LEGAL ("all_legal "),
 	LIST_FINAL_STATUS ("final_status_list "),
 	SET_HANDICAP ("fixed_handicap "),
-	UNDO ("gg-undo ");
+	UNDO ("gg-undo "),
+	// Pachi-only - see reStartGame's dispatch. pachi-setoption is confirmed
+	// (from Pachi's own uct.c/gtp.c) to change
+	// engine options like resign_threshold at runtime, no process restart
+	// needed. time_settings is standard GTP, which Pachi honors as long as it
+	// wasn't launched with its own -t command-line override.
+	PACHI_SET_OPTION ("pachi-setoption "),
+	TIME_SETTINGS ("time_settings "),
+	// time_settings only establishes the byoyomi_stones=1 PROTOCOL once, at
+	// game start - it does not by itself reset Pachi's own clock before each
+	// move. Without an explicit time_left before every genmove, Pachi's one
+	// continuous byoyomi period just keeps draining for the entire game
+	// (never refreshing), which is exactly what its own stderr's "LOST ON
+	// TIME internally!" (confirmed live, deficit escalating move after move)
+	// was reporting - not real think time being spent, just this app never
+	// telling Pachi "your clock is full again" between moves.
+	TIME_LEFT ("time_left "),
+	// Pachi has no gg-undo equivalent - plain standard GTP "undo" (no count
+	// argument) already undoes exactly one move, which is all UNDO_MOVE ever
+	// asks for (see its one call site).
+	PACHI_UNDO ("undo");
 
 	final
 	String _gtpCommand;
@@ -407,10 +433,27 @@ String gtpCommand (
 	final String pArgument
 	)
 {
+	return gtpCommand (pCommand, pArgument, EngineType.GnuGo);
+}
+
+// GnuGo is always running - either as the primary engine, or (Pachi games)
+// as the referee for board state/captures/legal moves/scoring, since
+// Pachi's own GTP server has no equivalent commands - see the roadmap. So
+// EngineType.GnuGo is the right default for every existing call site above,
+// unchanged; only the handful of calls that actually need Pachi itself
+// (genmove, its own setoption/time_settings, undo) pass EngineType.Pachi.
+static
+String gtpCommand (
+	final GtpCommand pCommand,
+	final String pArgument,
+	final EngineType pEngine
+	)
+{
 	final String cmd = pCommand._gtpCommand,
 		command = pArgument == null ? cmd : cmd + pArgument;
 
-	final String reply = GtpProtocol.cleanReply (playGTP (command));
+	final String reply = GtpProtocol.cleanReply (
+		pEngine == EngineType.Pachi ? playPachiGTP (command) : playGTP (command));
 
 	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
 	{
@@ -418,6 +461,30 @@ String gtpCommand (
 			+ command + "' reply: '" + reply + "'");
 	}
 	return reply;
+}
+
+// Mirrors one move into GnuGo and reports whether GnuGo actually accepted
+// it - gtpCommand's own cleanReply can't answer that (see GtpProtocol.
+// isError's comment: a real error and an ordinary no-data success reply,
+// which is all a successful `play` ever returns, both clean down to ""), so
+// this checks the raw reply directly instead. Only needed for playMove's
+// Pachi-mirror call, where the two engines' boards could in principle have
+// actually diverged - every other PLAY_MOVE call site already knows its
+// move is legal (a human tap, already checked against all_legal; a redo;
+// GnuGo's own genmove) and doesn't need this.
+private static
+boolean playMoveOnGnuGo (
+	final String pColorAndVertex
+	)
+{
+	final String command = GtpCommand.PLAY_MOVE._gtpCommand + pColorAndVertex;
+	final String rawReply = playGTP (command);
+	if (isEnabledFor (_LOG_TAG, Log.DEBUG))
+	{
+		log (_LOG_TAG, Log.DEBUG, "command: '"
+			+ command + "' reply: '" + rawReply + "'");
+	}
+	return !GtpProtocol.isError (rawReply);
 }
 
 final
@@ -476,7 +543,16 @@ void handleMessage (
 					return;
 				}
 				undoPoint = undoPoints.isEmpty () ? null : undoPoints.get (0);
+				// GnuGo (gg-undo, its own custom extension) always gets this -
+				// it's the referee in both modes. Pachi has no gg-undo
+				// equivalent, just plain GTP "undo" (PACHI_UNDO) - sent too,
+				// when it's the active engine, so its own board stays correct
+				// for its next genmove.
 				gtpCommand (GtpCommand.UNDO, "1");
+				if (gameInfo._engineType == EngineType.Pachi)
+				{
+					gtpCommand (GtpCommand.PACHI_UNDO, null, EngineType.Pachi);
+				}
 				enablePassMenu (true);
 			}
 			else
@@ -497,10 +573,18 @@ void handleMessage (
 					break;
 				}
 				undoPoint = undoPoints.get (0);
-				gtpCommand (GtpCommand.PLAY_MOVE,
-					(playerBlackMoves ? _BLACK : _WHITE) + " "
-						+ (undoPoint instanceof Passed ? _PASS
-							: point2Vertex (undoPoint, gameInfo._boardSize)));
+				final String redoColorArg = (playerBlackMoves ? _BLACK : _WHITE) + " "
+					+ (undoPoint instanceof Passed ? _PASS
+						: point2Vertex (undoPoint, gameInfo._boardSize));
+				gtpCommand (GtpCommand.PLAY_MOVE, redoColorArg);
+				if (gameInfo._engineType == EngineType.Pachi)
+				{
+					// Same gap as playMove's non-genmove branch - a redo is
+					// another move GnuGo (the referee) gets told about
+					// directly, bypassing playMove entirely, so it needs its
+					// own explicit mirror to keep Pachi's board in sync too.
+					gtpCommand (GtpCommand.PLAY_MOVE, redoColorArg, EngineType.Pachi);
+				}
 				playerBlackMoves = !playerBlackMoves;
 			}
 		}
@@ -619,20 +703,53 @@ void handleMessage (
 
 		// Generate move (synchronous)
 		final String move = playMove(genMove, playerBlackMovesPlayMove, lastMove,
-				gameInfo._boardSize);
+				gameInfo);
 		if (gameInfo._invalid)
 		{
 			return;
 		}
+		if (!genMove && gameInfo._engineType == EngineType.Pachi)
+		{
+			// playMove's non-genmove branch above only ever tells GnuGo (the
+			// referee) - a human move or a chosen redo otherwise never
+			// reaches Pachi at all. Without this, Pachi's own board silently
+			// stops matching reality the moment the human plays their first
+			// move: it keeps analyzing (and re-proposing) the stale position
+			// from before that move, which is exactly what made it play so
+			// badly, propose the same move repeatedly, and generate "illegal"-
+			// looking moves GnuGo then rejected.
+			playMove (false, playerBlackMovesPlayMove, lastMove, gameInfo,
+				EngineType.Pachi);
+		}
 
-		final boolean resigned = _RESIGN.equals(move),
-				passed = _PASS.equals(move) || resigned;
+		// Case-insensitive: GnuGo replies "PASS" (uppercase) to genmove, but
+		// Pachi replies "pass" (lowercase) - matching _PASS's own casing
+		// exactly here let a Pachi pass fall through to vertex2Point as if
+		// it were a real board coordinate, crashing trying to parse "ass"
+		// (the substring after its first letter) as a number.
+		final boolean resigned = _RESIGN.equalsIgnoreCase(move),
+				passed = _PASS.equalsIgnoreCase(move) || resigned;
 		if (genMove)
 		{
 			if (resigned)
 			{
 				showMove(playerBlackMovesPlayMove, _mainActivity.getPassedText(true));
-				showScore(0, 0, null);
+				// A resignation otherwise ends the game with far less visual
+				// confirmation than a normal (double-pass) finish - that one
+				// goes through score(), which draws the whole territory/dead-
+				// stone breakdown; this skips straight to finishGame(), so
+				// without an explicit message here, the only sign anything
+				// happened is the small "resigns" text showMove just set next
+				// to the turn indicator. Reuses the same _SHOW_MESSAGE
+				// mechanism "Choose variation" already uses for a clear,
+				// prominent status line instead of a numeric score.
+				final Resources resources = _mainActivity.getResources ();
+				showScore (MainActivity._SHOW_MESSAGE, 0, resources.getString (
+					R.string.resignationMessageText,
+					resources.getString (playerBlackMovesPlayMove
+						? R.string.blackColorText : R.string.whiteColorText),
+					resources.getString (playerBlackMovesPlayMove
+						? R.string.whiteColorText : R.string.blackColorText)));
 				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
 				return;
 			}
@@ -786,14 +903,84 @@ static String playMove(
 		final boolean pGenMove,
 		final boolean pBlack,
 		final Point pMove,
-		final int pBoardSize
+		final GameInfo pGameInfo
 ) {
-	return gtpCommand(
-			pGenMove ? GtpCommand.GEN_MOVE : GtpCommand.PLAY_MOVE,
-			(pBlack ? _BLACK : _WHITE)
-					+ (pGenMove ? "" :
-					(" " + (pMove instanceof Passed ? _PASS : point2Vertex(pMove, pBoardSize))))
-	);
+	return playMove (pGenMove, pBlack, pMove, pGameInfo, EngineType.GnuGo);
+}
+
+// pTargetEngine only matters for the non-genmove branch below - it exists
+// for GameInfo.syncPachiHistory's catch-up replay (see reStartGame), which
+// needs to send the exact same historical plays to Pachi instead of GnuGo.
+// Every other call site uses the 4-arg overload above, unchanged (always
+// GnuGo, same as every other board-state command - see gtpCommand's
+// comment).
+static String playMove(
+		final boolean pGenMove,
+		final boolean pBlack,
+		final Point pMove,
+		final GameInfo pGameInfo,
+		final EngineType pTargetEngine
+) {
+	final String colorArg = pBlack ? _BLACK : _WHITE;
+	if (!pGenMove)
+	{
+		return gtpCommand (GtpCommand.PLAY_MOVE,
+			colorArg + " " + (pMove instanceof Passed ? _PASS
+				: point2Vertex (pMove, pGameInfo._boardSize)), pTargetEngine);
+	}
+	final boolean usePachi = pGameInfo._engineType == EngineType.Pachi;
+	if (!usePachi)
+	{
+		return gtpCommand (GtpCommand.GEN_MOVE, colorArg, EngineType.GnuGo);
+	}
+	// A desynced mirror should be rare (both boards are kept in lockstep
+	// everywhere else), so a couple of retries - Pachi's UCT search isn't
+	// deterministic, so a retry isn't just asking the same rejected move
+	// again - costs little and avoids surprising a human with a mystery
+	// pass when a legal move was very likely still available.
+	for (int attempt = 0; attempt < _PACHI_MOVE_ATTEMPTS; attempt++)
+	{
+		// Refill Pachi's clock immediately before every attempt - see
+		// TIME_LEFT's own comment for why this can't just be set once.
+		gtpCommand (GtpCommand.TIME_LEFT,
+			colorArg + " " + pGameInfo._pachiThinkSeconds + " 1", EngineType.Pachi);
+		final String move = gtpCommand (GtpCommand.GEN_MOVE, colorArg, EngineType.Pachi);
+		if (_RESIGN.equalsIgnoreCase (move))
+		{
+			return move;
+		}
+		// genmove only commits on the engine that generated it - mirror
+		// Pachi's move into GnuGo (the referee) so its board state doesn't
+		// drift out of sync with Pachi's.
+		//
+		// Checked, not fire-and-forget: if GnuGo rejects it, the two boards
+		// have actually diverged, and silently treating the move as having
+		// happened anyway - as this used to - left a stray "last move" ring
+		// marker on an empty point (gameInfo.addMove, back in the caller,
+		// still recorded the move regardless, but GnuGo's own list_stones -
+		// what's actually drawn as stones - never had one there).
+		if (playMoveOnGnuGo (colorArg + " " + move))
+		{
+			return move;
+		}
+		if (isEnabledFor (_LOG_TAG, Log.WARN))
+		{
+			log (_LOG_TAG, Log.WARN, "Pachi generated a move GnuGo rejected: '"
+				+ move + "' (attempt " + (attempt +1) + "/" + _PACHI_MOVE_ATTEMPTS + ")");
+		}
+		// Pachi's own genmove already committed this move on ITS board even
+		// though GnuGo just refused it - undo that commit too, so both
+		// engines agree again instead of staying diverged for the rest of
+		// the game (and so Pachi's next genmove attempt starts from the
+		// same position GnuGo is actually at, not from the rejected move).
+		gtpCommand (GtpCommand.PACHI_UNDO, null, EngineType.Pachi);
+	}
+	if (isEnabledFor (_LOG_TAG, Log.WARN))
+	{
+		log (_LOG_TAG, Log.WARN, "Pachi and GnuGo stayed desynced after "
+			+ _PACHI_MOVE_ATTEMPTS + " attempts - passing this turn");
+	}
+	return _PASS;
 }
 
 
@@ -810,11 +997,54 @@ void reStartGame (
 	// lastRecordedElapsedTime), rather than MainActivity.newGame()'s earlier
 	// _gameInfo assignment, which runs before that tree is loaded.
 	_mainActivity.attachGameClock ();
+	// Starts/stops Pachi to match this game's choice - a no-op for the common
+	// case (another game, same engine). GnuGo itself is never touched here;
+	// it's always running (primary engine or referee - see gtpCommand's
+	// comment), so its own setup below is sent unconditionally too. Has to
+	// happen before any setup commands below so Pachi is actually there to
+	// receive its own.
+	_mainActivity.ensureEngine (pGameInfo._engineType);
 	gtpCommand (GtpCommand.SET_LEVEL, String.valueOf (pGameInfo._level));
 	gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi);
 	gtpCommand (GtpCommand.SET_RESIGN, pGameInfo._allowResignation ? "1" : "0");
-
 	gtpCommand (GtpCommand.SET_RULES, pGameInfo._chineseRules ? "1" : "0");
+	if (pGameInfo._engineType == EngineType.Pachi)
+	{
+		// Pachi defaults to 19x19 internally if never told otherwise - it was
+		// never sent its own boardsize, so a non-19x19 game had it generating
+		// moves valid on its own (wrong) idea of the board, silently rejected
+		// when mirrored into GnuGo (which did have the right size), leaving
+		// GnuGo's referee board never reflecting any of Pachi's moves.
+		gtpCommand (GtpCommand.SET_BOARDSIZE,
+			String.valueOf (pGameInfo._boardSize), EngineType.Pachi);
+		// Komi (above) was only ever sent to GnuGo - Pachi scores/resigns off
+		// its own idea of komi, which defaulted to 7.5 regardless of what the
+		// game was actually set to.
+		gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi, EngineType.Pachi);
+		// Whether/how Pachi exposes a Chinese/Japanese rules toggle over GTP
+		// at all is still unverified, so chineseRules isn't sent here yet -
+		// GnuGo (above) is the one actually refereeing rules/scoring anyway.
+		gtpCommand (GtpCommand.PACHI_SET_OPTION,
+			"resign_threshold=" + pGameInfo._pachiResignThreshold, EngineType.Pachi);
+		// GTP time_settings is <main_time> <byoyomi_time> <byoyomi_stones> -
+		// "<thinkSeconds> 0 0" (tried first) gives thinkSeconds of MAIN time
+		// for the WHOLE GAME, not per move, so Pachi burned through it almost
+		// immediately and then had ~0 time for every move after - looking
+		// like it ignored the setting entirely and explaining the weak play.
+		// 0 main time + byoyomi_stones=1 is the standard "N seconds, every
+		// move, forever" idiom: main time starts already exhausted, so every
+		// move is its own one-move byoyomi period of the full think time.
+		gtpCommand (GtpCommand.TIME_SETTINGS,
+			"0 " + pGameInfo._pachiThinkSeconds + " 1", EngineType.Pachi);
+		// Pachi only ever sees GTP commands sent to it directly - a freshly
+		// (re)started process otherwise starts from an empty board no matter
+		// how far the real game has progressed (fresh handicap stones, or an
+		// entire resumed/reloaded game's move history, including every
+		// rotation/relaunch since this app has no configChanges). See
+		// GameInfo.syncPachiHistory's own comment for why it's a full replay
+		// rather than a GnuGo list_stones snapshot.
+		pGameInfo.syncPachiHistory ();
+	}
 	drawBoard (pGameInfo, pInit);
 	_boardView.lockScreen (false);
 	// A resumed game (app (re)launch, or Activity recreation - e.g. a

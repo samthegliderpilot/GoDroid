@@ -47,6 +47,16 @@ class GameInfo {
     @JvmField var _handicap: Int = _DEFAULT_HANDICAP
     @JvmField var _aiDelaySeconds: Int = _DEFAULT_AI_DELAY
 
+    // Which GTP engine plays this game, and that engine's own settings - kept as
+    // the engine's own explicit fields (not a generic options map) since there
+    // are only ever a couple of engines and each has a genuinely different shape
+    // of options (GnuGo: an integer level + a resign on/off; Pachi: a think-time
+    // budget + a resign threshold). _level/_allowResignation above are GnuGo-only
+    // now, not shared.
+    @JvmField var _engineType: EngineType = _DEFAULT_ENGINE_TYPE
+    @JvmField var _pachiThinkSeconds: Int = _DEFAULT_PACHI_THINK_SECONDS
+    @JvmField var _pachiResignThreshold: Float = _DEFAULT_PACHI_RESIGN_THRESHOLD
+
     @JvmField var _komi: String = _DEFAULT_KOMI
 
     @JvmField var _chineseRules: Boolean = _DEFAULT_CHINESE_RULES
@@ -539,9 +549,8 @@ class GameInfo {
                 return LoadGameStatus.SUCCESS
             }
             Collections.reverse(moves)
-            val boardSize = _boardSize
             for (point in moves) {
-                Gtp.playMove(false, blackMoves, point, boardSize)
+                Gtp.playMove(false, blackMoves, point, this)
                 blackMoves = !blackMoves
                 _moveNumber++
             }
@@ -658,13 +667,64 @@ class GameInfo {
     fun setupStones(pBlack: Boolean, pNode: PropertyNode) {
         val propertyName = if (pBlack) PropertyName.AddBlack else PropertyName.AddWhite
         val moves = pNode.getPropertyValues(propertyName) ?: return
-        val boardSize = _boardSize
         for (move in moves) {
             val point = fromMovePropertyValue(propertyName, move, Point())
             if (point != null) {
-                Gtp.playMove(false, pBlack, point, boardSize)
+                Gtp.playMove(false, pBlack, point, this)
             }
         }
+    }
+
+    /** Replays this game's full history onto Pachi via plain GTP `play` commands -
+     * handicap/free-placement setup stones first, then every regular move, in
+     * chronological order. GnuGo (the referee) already has all of this, from
+     * whichever path built it up (fresh handicap placement, or [loadGame]'s own
+     * replay) - but Pachi only ever sees GTP commands this app sends it
+     * directly, so a freshly (re)started Pachi process otherwise starts from an
+     * empty board regardless of how far the real game has actually progressed.
+     * Called from [Gtp.reStartGame] once Pachi's boardsize/komi are set, for
+     * every game (fresh handicap, resumed, or reloaded after a rotation - this
+     * app has no `configChanges`, so a rotation hits this just as often as an
+     * explicit resume). A no-op for a fresh, empty, no-handicap game.
+     *
+     * Replayed via [Gtp.playMove]'s plain `play` command rather than
+     * [Gtp.getPreviousMoves]'s own `list_stones` snapshot of GnuGo's current
+     * board, specifically to preserve move order - playing stones out of their
+     * real order risks Pachi computing a capture mid-replay that never really
+     * happened yet at that point (e.g. a group only alive because of a
+     * same-color stone placed later), leaving its board wrong even after every
+     * stone's been replayed. */
+    fun syncPachiHistory() {
+        val setupNode = _setupNode ?: return
+        for (point in setupStonePoints(true, setupNode)) {
+            Gtp.playMove(false, true, point, this, EngineType.Pachi)
+        }
+        for (point in setupStonePoints(false, setupNode)) {
+            Gtp.playMove(false, false, point, this, EngineType.Pachi)
+        }
+        // _moveNumber, not some large sentinel: getPreviousMoves pre-sizes its
+        // ArrayList to this count (Generics.newArrayList(pNumMoves)) rather
+        // than growing it as it walks, so Int.MAX_VALUE here was an instant
+        // ~8GB allocation attempt - a guaranteed OOM crash on every launch,
+        // not a safe "walk until null" sentinel. _moveNumber is already the
+        // exact count of regular (non-setup) moves played so far.
+        val moves = getPreviousMoves(!_playerBlackMoves, _moveNumber)
+        Collections.reverse(moves)
+        // No handicap -> black moves first; handicap -> white does (see
+        // initSGF/loadGame, which both set _playerBlackMoves = false the
+        // moment a handicap is placed) - the same convention this app
+        // already enforces everywhere else, not a guess made here.
+        var blackMoves = _handicap == 0
+        for (point in moves) {
+            Gtp.playMove(false, blackMoves, point, this, EngineType.Pachi)
+            blackMoves = !blackMoves
+        }
+    }
+
+    private fun setupStonePoints(pBlack: Boolean, pNode: PropertyNode): List<Point> {
+        val propertyName = if (pBlack) PropertyName.AddBlack else PropertyName.AddWhite
+        val values = pNode.getPropertyValues(propertyName) ?: return emptyList()
+        return values.mapNotNull { fromMovePropertyValue(propertyName, it, Point()) }
     }
 
     fun toPropertyValue(pProperty: PropertyName, pValue: String): PropertyName.Property {
@@ -808,6 +868,10 @@ class GameInfo {
         const val _DEFAULT_LEVEL = 1
         const val _DEFAULT_HANDICAP = 0
         const val _DEFAULT_AI_DELAY = 0
+
+        val _DEFAULT_ENGINE_TYPE: EngineType = EngineType.GnuGo
+        const val _DEFAULT_PACHI_THINK_SECONDS = 10
+        const val _DEFAULT_PACHI_RESIGN_THRESHOLD = 0.2f
 
         val _RECENT_MOVE_PROPERTY: PropertyName.Property =
             PropertyName.RecentMove.newProperty(_RECENT_MOVE_NAME)

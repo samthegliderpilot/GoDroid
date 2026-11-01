@@ -73,10 +73,15 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 	<string name="newGameDialogHumanPlaysLabelText">Human plays</string>
 	<string name="newGameDialogBoardSizeLabel">Board Size</string>
 	<string name="newGameDialogHandicapLabel">Handicap</string>
+	<string name="newGameDialogEngineLabel">Engine</string>
+	<string name="newGameDialogEngineGnuGoLabel">GnuGo</string>
+	<string name="newGameDialogEnginePachiLabel">Pachi</string>
 	<string name="newGameDialogStrengthLabel">Strength</string>
 	<string name="newGameDialogKomiLabel">Komi</string>
 	<string name="newGameDialogScoringLabel">Rules</string>
 	<string name="newGameAllowResignationLabel">Allow Resignation</string>
+	<string name="newGameDialogPachiThinkSecondsLabel">Think Time (sec)</string>
+	<string name="newGameDialogPachiResignThresholdLabel">Resign Threshold</string>
 	<string name="edgeTapPaddingLabel">Edge Tap Padding</string>
 	<string name="edgeTapPaddingOff">Off</string>
 	<string name="edgeTapPaddingOn">On</string>
@@ -182,6 +187,7 @@ GNU Go is an AI engine that plays Go at about 8 to 12 kyu strength.
 		Failed to save to file \'%s\'.
 	</string>
 	<string name="chooseVariationText">Choose variation</string>
+	<string name="resignationMessageText">%1$s resigns, %2$s wins</string>
 	<string name="menuToStartLabel">To first move</string>
 	<string name="goProblemFileInfo">Go problem</string>
 	<string name="menuShareGameLabel">Share SGF</string>

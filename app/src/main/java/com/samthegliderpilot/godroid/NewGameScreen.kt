@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
@@ -25,9 +27,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.platform.ComposeView
 import androidx.compose.ui.platform.ViewCompositionStrategy
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 
 /** Mirrors `GameInfo`'s 9 new-game-setup fields - built from the current `GameInfo` by
@@ -42,7 +47,13 @@ data class NewGameSettings(
     val komi: String,
     val chineseRules: Boolean,
     val aiDelaySeconds: Int,
-    val allowResignation: Boolean
+    val allowResignation: Boolean,
+    // Which GTP engine plays this game, and that engine's own settings - see the
+    // matching comment on GameInfo's own fields for why these aren't a generic
+    // options map.
+    val engineType: EngineType,
+    val pachiThinkSeconds: Int,
+    val pachiResignThreshold: Float
 )
 
 /** Java-callable: both Apply and Start funnel into the same existing
@@ -128,13 +139,21 @@ private val ALLOW_RESIGNATIONS = listOf(
     false to R.string.no,
 )
 
+private val ENGINE_TYPES = listOf(
+    EngineType.GnuGo to R.string.newGameDialogEngineGnuGoLabel,
+    EngineType.Pachi to R.string.newGameDialogEnginePachiLabel,
+)
+
 /** Enabled only when a "must-change" setting (player assignment/strength/komi/AI
  * delay/allow-resignation) changed, and no "must-restart" setting (board size/handicap/
  * scoring) changed - exactly the rule the old `SpinnerEnum._mustChange` flags encoded. */
 private fun isApplyEnabled(original: NewGameSettings, current: NewGameSettings): Boolean {
+    // Switching engines mid-game isn't a thing - a different engine means a
+    // different subprocess, so it's must-restart just like board size/handicap.
     val mustRestartChanged = original.boardSize != current.boardSize ||
         original.handicap != current.handicap ||
-        original.chineseRules != current.chineseRules
+        original.chineseRules != current.chineseRules ||
+        original.engineType != current.engineType
     if (mustRestartChanged) {
         return false
     }
@@ -143,7 +162,9 @@ private fun isApplyEnabled(original: NewGameSettings, current: NewGameSettings):
         original.level != current.level ||
         original.komi != current.komi ||
         original.aiDelaySeconds != current.aiDelaySeconds ||
-        original.allowResignation != current.allowResignation
+        original.allowResignation != current.allowResignation ||
+        original.pachiThinkSeconds != current.pachiThinkSeconds ||
+        original.pachiResignThreshold != current.pachiResignThreshold
 }
 
 /** A compact single-row "label ... value ▾" control instead of a full
@@ -214,6 +235,47 @@ private fun <T> SettingDropdown(
     }
 }
 
+/** A "label ... [value]" row with an editable numeric field in place of
+ * [SettingDropdown]'s dropdown - for settings with no small fixed set of
+ * sensible choices (Pachi's think-time/resign-threshold are a continuous
+ * range, unlike everything else in this dialog). A plain `BasicTextField`,
+ * not Material's `TextField` - that one brings a filled background and an
+ * underline indicator, both out of place next to [SettingDropdown]'s
+ * chrome-free rows (the same reasoning that rules out `OutlinedTextField`
+ * there). [text] is the field's raw, possibly-mid-edit string; parsing/
+ * validating it back into the actual setting value is the caller's job (see
+ * its use below), so a momentarily unparsable string (e.g. a bare "-" while
+ * typing) doesn't lose what the user already typed. */
+@Composable
+private fun NumberSettingField(
+    label: String,
+    text: String,
+    onTextChanged: (String) -> Unit,
+) {
+    Row(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 10.dp),
+        verticalAlignment = Alignment.CenterVertically,
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.padding(end = 8.dp),
+        )
+        BasicTextField(
+            value = text,
+            onValueChange = onTextChanged,
+            singleLine = true,
+            textStyle = MaterialTheme.typography.bodyLarge.copy(
+                color = MaterialTheme.colorScheme.primary,
+                textAlign = TextAlign.End,
+            ),
+            cursorBrush = SolidColor(MaterialTheme.colorScheme.primary),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            modifier = Modifier.weight(1f),
+        )
+    }
+}
+
 @Composable
 fun NewGameScreen(
     original: NewGameSettings,
@@ -251,10 +313,10 @@ fun NewGameScreen(
             }
         )
         SettingDropdown(
-            label = stringResource(R.string.newGameDialogStrengthLabel),
-            options = STRENGTHS,
-            selected = current.level,
-            onSelected = { current = current.copy(level = it) }
+            label = stringResource(R.string.newGameDialogEngineLabel),
+            options = ENGINE_TYPES,
+            selected = current.engineType,
+            onSelected = { current = current.copy(engineType = it) }
         )
         SettingDropdown(
             label = stringResource(R.string.newGameDialogKomiLabel),
@@ -274,12 +336,49 @@ fun NewGameScreen(
             selected = current.aiDelaySeconds,
             onSelected = { current = current.copy(aiDelaySeconds = it) }
         )
-        SettingDropdown(
-            label = stringResource(R.string.newGameAllowResignationLabel),
-            options = ALLOW_RESIGNATIONS,
-            selected = current.allowResignation,
-            onSelected = { current = current.copy(allowResignation = it) }
-        )
+        // The engine chosen above decides which strength/resignation controls
+        // apply - each engine has a genuinely different shape of options (see
+        // the comment on NewGameSettings), not just different values for the
+        // same control.
+        when (current.engineType) {
+            EngineType.GnuGo -> {
+                SettingDropdown(
+                    label = stringResource(R.string.newGameDialogStrengthLabel),
+                    options = STRENGTHS,
+                    selected = current.level,
+                    onSelected = { current = current.copy(level = it) }
+                )
+                SettingDropdown(
+                    label = stringResource(R.string.newGameAllowResignationLabel),
+                    options = ALLOW_RESIGNATIONS,
+                    selected = current.allowResignation,
+                    onSelected = { current = current.copy(allowResignation = it) }
+                )
+            }
+            EngineType.Pachi -> {
+                var thinkSecondsText by remember { mutableStateOf(current.pachiThinkSeconds.toString()) }
+                var resignThresholdText by remember {
+                    mutableStateOf(current.pachiResignThreshold.toString())
+                }
+                NumberSettingField(
+                    label = stringResource(R.string.newGameDialogPachiThinkSecondsLabel),
+                    text = thinkSecondsText,
+                    onTextChanged = { text ->
+                        thinkSecondsText = text
+                        text.toIntOrNull()?.let { current = current.copy(pachiThinkSeconds = it) }
+                    }
+                )
+                NumberSettingField(
+                    label = stringResource(R.string.newGameDialogPachiResignThresholdLabel),
+                    text = resignThresholdText,
+                    onTextChanged = { text ->
+                        resignThresholdText = text
+                        text.toFloatOrNull()
+                            ?.let { current = current.copy(pachiResignThreshold = it) }
+                    }
+                )
+            }
+        }
 
         Row(
             modifier = Modifier

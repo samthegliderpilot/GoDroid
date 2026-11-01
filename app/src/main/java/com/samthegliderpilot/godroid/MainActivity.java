@@ -225,6 +225,12 @@ String playGTP (String pInput)
 	return _goEngineViewModel.playGTP (pInput);
 }
 
+static
+String playPachiGTP (String pInput)
+{
+	return _goEngineViewModel.playPachiGTP (pInput);
+}
+
 public
 void onCreate ( // 0
 	final Bundle pSavedInstanceState
@@ -704,7 +710,8 @@ void showNewGame ()
 		currentGameInfo._playerBlackHuman, currentGameInfo._playerWhiteHuman,
 		currentGameInfo._level, currentGameInfo._komi,
 		currentGameInfo._chineseRules, currentGameInfo._aiDelaySeconds,
-		currentGameInfo._allowResignation);
+		currentGameInfo._allowResignation, currentGameInfo._engineType,
+		currentGameInfo._pachiThinkSeconds, currentGameInfo._pachiResignThreshold);
 	NewGameScreenKt.showNewGameDialog (this, original,
 		(settings, startFresh) ->
 		{
@@ -718,6 +725,9 @@ void showNewGame ()
 			gameInfo._chineseRules = settings.getChineseRules ();
 			gameInfo._aiDelaySeconds = settings.getAiDelaySeconds ();
 			gameInfo._allowResignation = settings.getAllowResignation ();
+			gameInfo._engineType = settings.getEngineType ();
+			gameInfo._pachiThinkSeconds = settings.getPachiThinkSeconds ();
+			gameInfo._pachiResignThreshold = settings.getPachiResignThreshold ();
 			newGame (storeGameInfo (gameInfo), startFresh);
 		});
 }
@@ -1047,7 +1057,8 @@ GameInfo storeGameInfo (
 		pGameInfo._playerBlackHuman, pGameInfo._playerWhiteHuman,
 		pGameInfo._level, pGameInfo._komi,
 		pGameInfo._chineseRules, pGameInfo._aiDelaySeconds,
-		pGameInfo._allowResignation));
+		pGameInfo._allowResignation, pGameInfo._engineType,
+		pGameInfo._pachiThinkSeconds, pGameInfo._pachiResignThreshold));
 	return pGameInfo;
 }
 
@@ -1067,6 +1078,9 @@ GameInfo restoreGameInfo (
 	pGameInfo._playerWhiteHuman = settings.getPlayerWhiteHuman ();
 	pGameInfo._aiDelaySeconds = settings.getAiDelaySeconds ();
 	pGameInfo._allowResignation = settings.getAllowResignation ();
+	pGameInfo._engineType = settings.getEngineType ();
+	pGameInfo._pachiThinkSeconds = settings.getPachiThinkSeconds ();
+	pGameInfo._pachiResignThreshold = settings.getPachiResignThreshold ();
 	return pGameInfo;
 }
 
@@ -1145,6 +1159,17 @@ void attachGameClock ()
 	{
 		_gameClock.attachToGame (gameInfo);
 	}
+}
+
+// Package-private: called from Gtp.reStartGame(), before any setup GTP commands
+// for the (re)loaded game are sent, so Pachi is actually there to receive its
+// own setup when chosen. GnuGo itself is always running - see
+// GoEngineViewModel's class doc for why - so this only starts/stops Pachi.
+void ensureEngine (
+	final EngineType pEngineType
+	)
+{
+	_goEngineViewModel.ensurePachiEngine (pEngineType == EngineType.Pachi);
 }
 
 AlertDialog showMessage (
