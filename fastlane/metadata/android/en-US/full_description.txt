@@ -1,12 +1,14 @@
-GoDroid lets you play the ancient game of Go on your Android phone or tablet - against the GnuGo computer engine, or against a friend sitting next to you.
+GoDroid lets you play the ancient game of Go on your Android phone or tablet - against the GnuGo or Pachi computer engines, or against a friend sitting next to you.
 
 Features
-• Play against GnuGo or another person on the same device
+• Play against GnuGo or Pachi, or another person on the same device
 • Japanese and Chinese rules
 • 9×9, 13×13 and 19×19 boards
-• Handicap stones, adjustable komi and adjustable computer strength
+• Handicap stones and adjustable komi
+• Adjustable computer strength (GnuGo) or think time and resign threshold (Pachi)
 • Touch controls designed for placing stones accurately, including a mode that adds margins at the screen edges
 • Undo, redo and pass
+• Optional on-screen game clock and board coordinates
 • Save and load games in the standard SGF format, in any folder you choose; add several games to one file
 • Open .sgf files from other apps and share your games
 • Optional delay before the computer moves, and an option to stop the computer from resigning

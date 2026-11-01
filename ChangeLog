@@ -1,3 +1,26 @@
+Unreleased
+- Added Pachi as a second computer opponent alongside GnuGo, with its own
+think time and resign threshold settings (GnuGo still available as before)
+- Added an optional on-screen game clock
+- Added an on/off setting for board coordinates
+- Fixed a human-vs-human scoring bug
+- Territory markers now survive a screen rotation or relaunch
+- New/Edit Game dialog redesigned for quicker access to Start/Apply
+- Various score panel readability and bugfixes
+
+2026-10-20 GoDroid v1.5.2
+- Fixed a reported tap-accuracy issue
+- Smaller app size (enabled minification)
+
+2026-10-17 GoDroid v1.5.1
+- Now available on F-Droid
+
+2026-10-14 GoDroid v1.5.0
+- Added the option to move saved games to another folder
+- Board now shrinks automatically if the screen isn't wide enough
+- Bigger, more visible star points
+- Minimum supported Android version raised to 7.0
+
 2025-10-16 GoDroid 1.4.1
 - Fixing star points not showing up when resuming a session
 - Maybe fixing all edge-to-edge and depreceated api calls

@@ -1,1 +1,1 @@
-Play Go against the GnuGo engine or a friend, on your phone or tablet
+Play Go against GnuGo, Pachi, or a friend, on your phone or tablet
