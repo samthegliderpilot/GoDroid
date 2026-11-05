@@ -99,6 +99,7 @@ Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle
 	<string name="resignedText">abandon</string>
 	<string name="passedText">passe</string>
 	<string name="resignationMessageText">%1$s abandonne, %2$s gagne</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d prises)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Impossible d\'annuler</string>
 	<string name="noRedoHintText">Impossible de recommencer</string>
 	<string name="undoHintText">Glisser à gauche pour annuler le coup</string>

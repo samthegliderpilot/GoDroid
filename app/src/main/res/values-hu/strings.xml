@@ -99,6 +99,7 @@ GNU go (v3.8) felhasználói felület. A GNU Go egy 8-12 kyu erejű AI motor.
 	<string name="resignedText">feladja</string>
 	<string name="passedText">passzol</string>
 	<string name="resignationMessageText">%1$s feladja, %2$s nyer</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d elfogva)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Visszalépés nem lehetséges</string>
 	<string name="noRedoHintText">Előrelépés nem lehetséges</string>
 	<string name="undoHintText">Itt balra húzva visszalép</string>

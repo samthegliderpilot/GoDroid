@@ -98,6 +98,7 @@ Sisältää käyttöliittymän GNU Go (versio 3.8) tekoälymoottoriin, joka on n
 	<string name="resignedText">luovuttaa</string>
 	<string name="passedText">passaa</string>
 	<string name="resignationMessageText">%1$s luovuttaa, %2$s voittaa</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d vangittua)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Ei voi perua</string>
 	<string name="noRedoHintText">Ei voi tehdä uudelleen</string>
 	<string name="undoHintText">Pyyhkäise vasemmalle peruaksesi</string>

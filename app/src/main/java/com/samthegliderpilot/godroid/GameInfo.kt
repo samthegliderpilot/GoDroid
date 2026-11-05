@@ -120,6 +120,15 @@ class GameInfo {
 
     @JvmField var _invalid: Boolean = false
 
+    // Set by Gtp.finishGame() on any game-ending path, resignation included -
+    // bothPlayersPassed() alone can't detect that one, since a resignation
+    // never adds a pass to the move tree. Not SGF-persisted (an app restart
+    // after a resigned computer-vs-computer game can still auto-generate one
+    // further move on resume - a narrower, pre-existing gap this doesn't
+    // close). Cleared on undo/redo leaving the finished state - see Gtp's
+    // UNDO_MOVE/REDO_MOVE handling.
+    @JvmField var _gameOver: Boolean = false
+
     fun copy(pGameInfo: GameInfo): GameInfo {
         _playerBlackMoves = pGameInfo._playerBlackMoves
         _gameNode = pGameInfo._gameNode
@@ -127,6 +136,7 @@ class GameInfo {
         _currentNode = pGameInfo._currentNode
         _moveNumber = pGameInfo._moveNumber
         _collectionIdx = pGameInfo._collectionIdx
+        _gameOver = pGameInfo._gameOver
         return copyCollection(pGameInfo)
     }
 
@@ -251,6 +261,7 @@ class GameInfo {
         _moveNumber = 0
         _redoPoints = null
         _aiDelaySeconds = 0
+        _gameOver = false
     }
 
     fun getPreviousMoves(pPlayerBlackColor: Boolean, pNumMoves: Int): MutableList<Point> {

@@ -99,6 +99,7 @@ GNU Go es un motor de IA que juega al Go con nivel de entre 8 a 12 kyu.
 	<string name="resignedText">abandona</string>
 	<string name="passedText">pasa</string>
 	<string name="resignationMessageText">%1$s abandona, %2$s gana</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d capturadas)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Imposible deshacer</string>
 	<string name="noRedoHintText">Imposible rehacer</string>
 	<string name="undoHintText">Desliza hacia la izquierda para deshacer</string>

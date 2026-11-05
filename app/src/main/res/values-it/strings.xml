@@ -100,6 +100,7 @@ GNU Go è un software libero che gioca a Go ad un livello da 8 a circa 12 kyu.
 	<string name="resignedText">si arrende</string>
 	<string name="passedText">passa</string>
 	<string name="resignationMessageText">%1$s si arrende, %2$s vince</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d catturate)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Impossibile annullare</string>
 	<string name="noRedoHintText">Impossibile ripetere</string>
 	<string name="undoHintText">Scorri qui verso destra per annullare</string>

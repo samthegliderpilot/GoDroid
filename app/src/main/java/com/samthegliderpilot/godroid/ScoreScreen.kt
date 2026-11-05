@@ -72,6 +72,9 @@ fun withNormalScore(current: ScoreViewState): ScoreViewState = current.copy(
     messageText = null,
     blackScoreText = null,
     whiteScoreText = null,
+    engineScoreText = null,
+    blackCapturedCount = null,
+    whiteCapturedCount = null,
 )
 
 fun withMessageScore(current: ScoreViewState, message: String): ScoreViewState =
@@ -84,6 +87,15 @@ fun withFinalScore(
     whiteTerritory: Int,
     blackScore: String,
     whiteScore: String,
+    engineScore: String?,
+    blackCaptured: Int,
+    whiteCaptured: Int,
+    // False for a territory redisplay (surface resize, resuming an
+    // already-scored game) that never re-queried the engine - that case must
+    // leave the engine-score row and captured counts as they were, not blank
+    // them, or a resize racing with a real scoring event would clobber a row
+    // that was just correctly filled in. See Gtp.score()'s pFinalScore.
+    freshScore: Boolean = true,
 ): ScoreViewState = current.copy(
     messageText = null,
     scoreRowVisible = true,
@@ -98,6 +110,14 @@ fun withFinalScore(
     whiteMove = MoveCellState(showProgress = false, text = "$whiteTerritory / $whiteScore"),
     blackScoreText = blackScore,
     whiteScoreText = whiteScore,
+    engineScoreText = if (freshScore) engineScore else current.engineScoreText,
+    // Only shown under Chinese rules - under Japanese rules the Captures row
+    // above already displays this exact number, so a parenthetical repeat
+    // would be redundant noise.
+    blackCapturedCount = if (!freshScore) current.blackCapturedCount
+        else if (chineseRules) blackCaptured else null,
+    whiteCapturedCount = if (!freshScore) current.whiteCapturedCount
+        else if (chineseRules) whiteCaptured else null,
 )
 
 /**
@@ -118,8 +138,8 @@ fun ScoreScreen(state: ScoreViewState) {
     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
         GridRow(
             label = {},
-            black = { SideHeader(stringResource(R.string.blackColorText), winner == Side.BLACK, active == Side.BLACK) },
-            white = { SideHeader(stringResource(R.string.whiteColorText), winner == Side.WHITE, active == Side.WHITE) },
+            black = { SideHeader(stringResource(R.string.blackColorText), winner == Side.BLACK, active == Side.BLACK, engineMarginSuffix(state, Side.BLACK)) },
+            white = { SideHeader(stringResource(R.string.whiteColorText), winner == Side.WHITE, active == Side.WHITE, engineMarginSuffix(state, Side.WHITE)) },
         )
         // The normal captures+move rows and a status message (e.g. "Calculating
         // territory status...", shown while Gtp.score() is still querying GnuGo)
@@ -131,7 +151,11 @@ fun ScoreScreen(state: ScoreViewState) {
         // the "calculating" message.
         Box(modifier = Modifier.fillMaxWidth().heightIn(min = 64.dp)) {
             Column(modifier = Modifier.alpha(if (state.messageText == null) 1f else 0f)) {
-                ScoreRow(stringResource(state.capturesLabelRes), state.blackCaptures.toString(), state.whiteCaptures.toString())
+                ScoreRow(
+                    stringResource(state.capturesLabelRes),
+                    stonesValueText(state.blackCaptures, state.blackCapturedCount),
+                    stonesValueText(state.whiteCaptures, state.whiteCapturedCount),
+                )
                 GridRow(
                     label = { OutlinedText(stringResource(state.moveLabelRes), style = MaterialTheme.typography.titleMedium) },
                     black = { MoveCell(state.blackMove) },
@@ -156,6 +180,22 @@ fun ScoreScreen(state: ScoreViewState) {
     }
 }
 
+/** The engine's own cross-check score (e.g. "B+75.5") read onto whichever
+ * side it names, as a "+<margin>" suffix for that side's header - rather
+ * than a 5th row, since the Black/White header row already has room next to
+ * the winner's star. Null for the other side, and for both when the engine
+ * hasn't produced a score (see Gtp.score()/ScoreViewState.engineScoreText). */
+private fun engineMarginSuffix(state: ScoreViewState, side: Side): String? {
+    val text = state.engineScoreText ?: return null
+    val prefix = if (side == Side.BLACK) "B+" else "W+"
+    return if (text.startsWith(prefix)) " +${text.substring(prefix.length)}" else null
+}
+
+@Composable
+private fun stonesValueText(stones: Int, captured: Int?): String =
+    if (captured != null) stringResource(R.string.stonesWithCapturesFormat, stones, captured)
+    else stones.toString()
+
 private enum class Side { BLACK, WHITE }
 
 private fun winningSide(state: ScoreViewState): Side? {
@@ -174,8 +214,9 @@ private fun winningSide(state: ScoreViewState): Side? {
 }
 
 @Composable
-private fun SideHeader(name: String, isWinning: Boolean, isActive: Boolean) {
-    val label = if (isWinning) "$name ★" else if (isActive) "● $name" else name
+private fun SideHeader(name: String, isWinning: Boolean, isActive: Boolean, engineMargin: String? = null) {
+    val base = if (isWinning) "$name ★" else if (isActive) "● $name" else name
+    val label = if (engineMargin != null) "$base$engineMargin" else base
     OutlinedText(
         text = label,
         style = MaterialTheme.typography.titleLarge,

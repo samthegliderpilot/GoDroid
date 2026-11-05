@@ -103,6 +103,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="resignedText">сдался</string>
 	<string name="passedText">спасовал</string>
 	<string name="resignationMessageText">%1$s сдался, %2$s выигрывает</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (взято %2$d)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Отмена невозможна</string>
 	<string name="noRedoHintText">Возврат невозможен</string>
 	<string name="undoHintText">Скользните влево для отмены хода</string>

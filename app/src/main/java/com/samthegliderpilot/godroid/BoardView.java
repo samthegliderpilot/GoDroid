@@ -219,6 +219,23 @@ void surfaceChanged ( // 4
 		&& Math.abs (_boardWidth - pWidth) <= SIZE_JITTER_TOLERANCE_PX
 		&& Math.abs (_boardHeight - pHeight) <= SIZE_JITTER_TOLERANCE_PX)
 	{
+		// This fires whenever the Surface itself gets recreated, including a
+		// plain background/foreground cycle (backgrounding the app destroys
+		// the SurfaceView's Surface; returning recreates it at the same
+		// size) - not just a real resize. drawMovingStone's tap-preview
+		// ("ghost") stone is drawn directly onto that Surface, never baked
+		// into _boardBitmap, so recreating it from _boardBitmap alone
+		// silently wipes an in-progress preview with no visual trace - but
+		// _gestureListener's own pending-tap state (lastPoint/lastX/lastY/
+		// _stonePositionChanged) lives in memory, independent of the
+		// Surface, and was never touched. Tapping that exact same spot
+		// again afterward then reads as the tap-to-COMMIT half of a
+		// two-tap sequence whose first half the user never actually saw -
+		// confirmed live: background the app with a preview showing, come
+		// back to no preview, tap that same point, and it plays
+		// immediately. reset() (the same call the full drawBoard() path
+		// below already makes) puts both back in sync.
+		_gestureListener.reset (_activeCellWidth);
 		drawBoard2Surface ();
 		return;
 	}

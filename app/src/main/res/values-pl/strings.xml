@@ -99,6 +99,7 @@ GNU Go jest prgogamem do gry w Go na poziomie około 8 do 12 kyu.
 	<string name="resignedText">rezygnuje</string>
 	<string name="passedText">pasuje</string>
 	<string name="resignationMessageText">%1$s poddaje się, %2$s wygrywa</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d zbitych)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Cofnięcie niemożliwe</string>
 	<string name="noRedoHintText">Ponowienie niemożliwe</string>
 	<string name="undoHintText">Przesuń palcem w lewo by cofnąć ruch</string>

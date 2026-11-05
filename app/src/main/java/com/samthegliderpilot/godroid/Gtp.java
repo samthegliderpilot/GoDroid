@@ -89,6 +89,14 @@ enum GtpCommand
 	GET_CAPTURES ("captures "),
 	LIST_LEGAL ("all_legal "),
 	LIST_FINAL_STATUS ("final_status_list "),
+	// Standard GTP, implemented by both engines - unlike LIST_FINAL_STATUS's
+	// per-point breakdown (used to draw dead stones/territory and reconstruct
+	// a score client-side), this is the engine's own single authoritative
+	// "B+7.5"/"W+3" total (Pachi computes it via Tromp-Taylor flood-fill
+	// scoring, not the same confidence-based estimate the per-point query
+	// uses) - shown alongside our own number as a cross-check, not used to
+	// draw anything. See Gtp.score()'s own comment.
+	FINAL_SCORE ("final_score"),
 	SET_HANDICAP ("fixed_handicap "),
 	UNDO ("gg-undo "),
 	// Pachi-only - see reStartGame's dispatch. pachi-setoption is confirmed
@@ -474,19 +482,15 @@ String gtpCommand (
 	return reply;
 }
 
-// Sends a command and reports whether it actually succeeded - gtpCommand's
-// own cleanReply can't answer that (see GtpProtocol.isError's comment: a
-// real error and an ordinary no-data success reply, which is all a
-// successful `play` ever returns, both clean down to ""), so this checks
-// the raw reply directly instead. Shares gtpCommand's own command-building
-// and debug-log shape rather than duplicating it, so the two can't drift
-// apart. Used both directions a move gets mirrored between engines (Pachi's
-// own generated move into GnuGo, and a live human/redo move into Pachi) -
-// every other call site already knows its move is legal (a human tap,
-// already checked against all_legal; a redo; GnuGo's own genmove) and
-// doesn't need this.
+// Shared low-level primitive for the two callers below, which both need the
+// RAW reply - gtpCommand's own cleanReply collapses a real error down to the
+// same "" an ordinary no-data success reply produces (see GtpProtocol.
+// isError's comment), so neither "did this actually succeed" nor "null on
+// error instead of a misleading empty string" can be answered from it.
+// Shares gtpCommand's own command-building and debug-log shape rather than
+// duplicating it, so the three can't drift apart.
 private static
-boolean gtpCommandSucceeded (
+String rawGtpReply (
 	final GtpCommand pCommand,
 	final String pArgument,
 	final EngineType pEngine
@@ -501,7 +505,40 @@ boolean gtpCommandSucceeded (
 		log (_LOG_TAG, Log.DEBUG, "command: '"
 			+ command + "' reply: '" + rawReply + "'");
 	}
-	return !GtpProtocol.isError (rawReply);
+	return rawReply;
+}
+
+// Used both directions a move gets mirrored between engines (Pachi's own
+// generated move into GnuGo, and a live human/redo move into Pachi) - every
+// other call site already knows its move is legal (a human tap, already
+// checked against all_legal; a redo; GnuGo's own genmove) and doesn't need
+// this.
+private static
+boolean gtpCommandSucceeded (
+	final GtpCommand pCommand,
+	final String pArgument,
+	final EngineType pEngine
+	)
+{
+	return !GtpProtocol.isError (rawGtpReply (pCommand, pArgument, pEngine));
+}
+
+// Like gtpCommand, but null on an actual GTP error instead of silently
+// collapsing it to the same "" an ordinary no-data success produces - used
+// where that distinction matters to the caller. See Gtp.score()'s
+// FINAL_SCORE query: a position the engine doesn't consider settled enough
+// to score errors here (confirmed live: Pachi's cmd_final_score guards
+// against being asked mid-game), and should hide the engine-score row
+// entirely, not show a blank one.
+private static
+String gtpCommandOrNull (
+	final GtpCommand pCommand,
+	final String pArgument,
+	final EngineType pEngine
+	)
+{
+	final String rawReply = rawGtpReply (pCommand, pArgument, pEngine);
+	return GtpProtocol.isError (rawReply) ? null : GtpProtocol.cleanReply (rawReply);
 }
 
 // Undoes one move on GnuGo (the referee, always) and, if Pachi is the
@@ -648,6 +685,12 @@ void handleMessage (
 		}
 		else
 		{
+			// Undo out of a resignation, or redo back out of a position that
+			// was both-passed - either way the game is active again, so the
+			// _gameOver flag finishGame() set has to come back off too (see
+			// its own comment), or a later resume/menu-open would still treat
+			// this as a finished game.
+			gameInfo._gameOver = false;
 			if (gameInfo._redoPoints == null)
 			{
 				showScore (0, 0, null);
@@ -722,8 +765,7 @@ void handleMessage (
 		// the INIT_BOARD/DRAW_BOARD commands drawBoard() posted ahead of
 		// it - see the comment there.
 		score (gameInfo, true);
-		finishGame (gameInfo, playerIsMachine (gameInfo),
-			otherPlayerIsMachine (gameInfo));
+		finishGame (gameInfo);
 		return;
 	case PLAY_MOVE:
 		showScore (0, 0, null);
@@ -803,7 +845,7 @@ void handleMessage (
 						? R.string.blackColorText : R.string.whiteColorText),
 					resources.getString (playerBlackMovesPlayMove
 						? R.string.whiteColorText : R.string.blackColorText)));
-				finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+				finishGame(gameInfo);
 				return;
 			}
 			// vertex2Point itself can no longer crash on an unparsable reply
@@ -832,7 +874,7 @@ void handleMessage (
 		if (gameInfo.bothPlayersPassed())
 		{
 			score(gameInfo, true);
-			finishGame(gameInfo, playerIsMachine, nextPlayerIsMachine);
+			finishGame(gameInfo);
 			return;
 		}// END TIMING
 		long elapsed = System.currentTimeMillis() - startTime;
@@ -1145,6 +1187,8 @@ void reStartGame (
 	// decided, even though the move list itself still correctly ended on
 	// two passes. Scoring it immediately instead mirrors exactly what
 	// happens when both-passed is reached live, during PLAY_MOVE/UNDO_MOVE.
+	// _gameOver covers the same resume case for a resignation, which
+	// bothPlayersPassed() can't see for itself - see its own comment.
 	//
 	// This has to be queued (RESUME_SCORED_GAME), not called directly here:
 	// drawBoard(pGameInfo, pInit) above only POSTS its INIT_BOARD/DRAW_BOARD
@@ -1152,7 +1196,7 @@ void reStartGame (
 	// direct score() call here used to run before INIT_BOARD, crashing with
 	// a NullPointerException on board geometry (_gridShape etc.) that
 	// initBoard() hadn't set up yet. Queuing keeps the ordering correct.
-	if (pGameInfo.bothPlayersPassed ())
+	if (pGameInfo.bothPlayersPassed () || pGameInfo._gameOver)
 	{
 		executeCommand (Command.RESUME_SCORED_GAME, pGameInfo);
 		return;
@@ -1171,21 +1215,26 @@ void reStartGame (
 
 private
 void finishGame (
-	final GameInfo pGameInfo,
-	final boolean pPlayerIsMachine,
-	final boolean pNextPlayerIsMachine
+	final GameInfo pGameInfo
 	)
 {
-	if (pPlayerIsMachine && pNextPlayerIsMachine)
-	{
-		pGameInfo._playerBlackHuman = true;
-		pGameInfo._playerWhiteHuman = true;
-		_mainActivity.storeGameInfo (pGameInfo);
-	}
+	// Marks the position itself as finished - see GameInfo._gameOver's own
+	// comment for why this can't just be inferred from bothPlayersPassed()
+	// (doesn't cover resignation) and why it used to instead flip both
+	// players to human here: that corrupted the actual Human-plays setting
+	// (New/Edit Game would show "Both" after any computer-vs-computer game)
+	// and, via onPrepareOptionsMenu's own playerIsMachine() check, could
+	// re-enable Pass after a resigned one.
+	pGameInfo._gameOver = true;
 	pGameInfo._redoPoints = null;
 	enableUndoMenu (pGameInfo);
 	enablePassMenu (false);
 	_boardView.lockScreen (true);
+	// The one place every game-over path (resignation, double-pass) actually
+	// ends up - see MainActivity.pauseGameClock's own comment for why a
+	// resignation specifically needed this (it never self-stops the way a
+	// double-pass finish does).
+	_mainActivity.pauseGameClock ();
 }
 
 private
@@ -1203,10 +1252,22 @@ void score (
 	showWaitProgress (resources.
 		getString (R.string.waitProgressFinalScoreMessage));
 	final BoardView boardView = _boardView;
+	// Board state/captures/legality stay GnuGo's job always (the referee -
+	// Pachi's GTP server genuinely has no list_stones/captures/all_legal/
+	// gg-undo), but final scoring is different: Pachi fully implements
+	// final_status_list (dead/alive/seki, plus the same black_territory/
+	// white_territory GnuGo extensions - its own source literally labels
+	// them that), backed by its own MCTS ownermap rather than GnuGo's
+	// pattern-based dead-stone heuristics. Querying GnuGo for a position it
+	// never actually played, using GnuGo's own weaker-under-Chinese-rules
+	// judgment, was never a deliberate choice - just never revisited after
+	// confirming list_stones/captures/all_legal's gap and over-generalizing
+	// it to scoring too.
+	final EngineType scoringEngine = pGameInfo._engineType;
 	final List <Point> blackStones = getStones (true, pGameInfo),
 		whiteStones = getStones (false, pGameInfo),
 		deadStones = verteces2Points (
-			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _DEAD), pGameInfo),
+			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _DEAD, scoringEngine), pGameInfo),
 		blackDeadStones = Generics.newArrayList (),
 		whiteDeadStones = Generics.newArrayList ();
 	for (final Point dead : deadStones)
@@ -1220,10 +1281,10 @@ void score (
 	boardView.drawDeadStones (blackDeadStones, whiteDeadStones);
 	final List <Point>
 		blackTerritory = verteces2Points (
-			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _BLACK_TERRITORY),
+			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _BLACK_TERRITORY, scoringEngine),
 			pGameInfo),
 		whiteTerritory = verteces2Points (
-			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _WHITE_TERRITORY),
+			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _WHITE_TERRITORY, scoringEngine),
 			pGameInfo);
 	boardView.drawTerritory (blackTerritory, whiteTerritory, false);
 	boardView.drawTerritory (whiteDeadStones, blackDeadStones, true);
@@ -1231,13 +1292,36 @@ void score (
 	final int numBlackDeadStones = blackDeadStones.size (),
 		numWhiteDeadStones = whiteDeadStones.size ();
 	final boolean chineseRules = pGameInfo._chineseRules;
+	// GnuGo's own running capture tally - tracked regardless of ruleset, since
+	// it's just "how many stones has each side physically removed from the
+	// board," not a scoring computation. Under Chinese rules the main
+	// captures/stones row switches to a live stone count instead (that's what
+	// Chinese scoring actually counts), so this is surfaced separately -
+	// see showScore below.
+	final int blackCaptured = getCaptures (true),
+		whiteCaptured = getCaptures (false);
 	showCaptures (
-		(chineseRules ? blackStones.size () : getCaptures (true))
+		(chineseRules ? blackStones.size () : blackCaptured)
 			+ numWhiteDeadStones,
-		(chineseRules ? whiteStones.size () : getCaptures (false))
+		(chineseRules ? whiteStones.size () : whiteCaptured)
 			+ numBlackDeadStones);
+	// Cross-check against the engine's own authoritative total - see
+	// FINAL_SCORE's own comment for why this can disagree with the number
+	// just computed above from LIST_FINAL_STATUS's per-point breakdown. Only
+	// attempted once the game is actually over (pFinalScore) -
+	// gtpCommandOrNull (not plain gtpCommand) specifically so an engine that
+	// doesn't consider the position settled enough to score hides this row
+	// entirely instead of showing a blank one.
+	final String engineScore = pFinalScore
+		? gtpCommandOrNull (GtpCommand.FINAL_SCORE, null, scoringEngine) : null;
+	if (pFinalScore && engineScore == null && isEnabledFor (_LOG_TAG, Log.WARN))
+	{
+		log (_LOG_TAG, Log.WARN, "final_score errored - engine doesn't consider "
+			+ "this position settled enough to score; hiding the engine-score row");
+	}
 	showScore (blackTerritory.size () + numWhiteDeadStones,
-		whiteTerritory.size () + numBlackDeadStones, pGameInfo);
+		whiteTerritory.size () + numBlackDeadStones,
+		new Object [] { pGameInfo, engineScore, blackCaptured, whiteCaptured, pFinalScore });
 }
 
 private static

@@ -150,12 +150,24 @@ private val ENGINE_TYPES = listOf(
  * delay/allow-resignation) changed, and no "must-restart" setting (board size/handicap/
  * scoring) changed - exactly the rule the old `SpinnerEnum._mustChange` flags encoded. */
 private fun isApplyEnabled(original: NewGameSettings, current: NewGameSettings): Boolean {
-    // Switching engines mid-game isn't a thing - a different engine means a
-    // different subprocess, so it's must-restart just like board size/handicap.
+    // Only boardSize/handicap genuinely can't be changed on an in-progress
+    // game via Apply (CHANGE_GAME) - the existing stones wouldn't make sense
+    // on a different-sized board, or with handicap stones retroactively
+    // added/removed - so those force Start New Game instead. engineType and
+    // chineseRules were both wrongly lumped in here too: GameInfo.copy()
+    // (what CHANGE_GAME actually uses to splice the new settings onto the
+    // current game) never touches _engineType/_chineseRules/
+    // _pachiThinkSeconds/_pachiResignThreshold in the first place - only the
+    // move tree - and reStartGame already sends SET_RULES/KGS_RULES
+    // unconditionally every time anyway, same as komi, regardless of entry
+    // path. Changing the ruleset doesn't reinterpret past moves, just
+    // future scoring/legality - exactly as safe mid-game as komi or
+    // allow-resignation already are below. Blocking it here just forced
+    // "Start New Game" (discarding the current position) as the only way
+    // to fix a rules mistake mid-game, when Apply (keeping it) already
+    // worked just as well.
     val mustRestartChanged = original.boardSize != current.boardSize ||
-        original.handicap != current.handicap ||
-        original.chineseRules != current.chineseRules ||
-        original.engineType != current.engineType
+        original.handicap != current.handicap
     if (mustRestartChanged) {
         return false
     }
@@ -163,8 +175,10 @@ private fun isApplyEnabled(original: NewGameSettings, current: NewGameSettings):
         original.playerWhiteHuman != current.playerWhiteHuman ||
         original.level != current.level ||
         original.komi != current.komi ||
+        original.chineseRules != current.chineseRules ||
         original.aiDelaySeconds != current.aiDelaySeconds ||
         original.allowResignation != current.allowResignation ||
+        original.engineType != current.engineType ||
         original.pachiThinkSeconds != current.pachiThinkSeconds ||
         original.pachiResignThreshold != current.pachiResignThreshold
 }
@@ -338,12 +352,6 @@ fun NewGameScreen(
             }
         )
         SettingDropdown(
-            label = stringResource(R.string.newGameDialogEngineLabel),
-            options = ENGINE_TYPES,
-            selected = current.engineType,
-            onSelected = { current = current.copy(engineType = it) }
-        )
-        SettingDropdown(
             label = stringResource(R.string.newGameDialogKomiLabel),
             options = KOMIS,
             selected = current.komi,
@@ -355,57 +363,67 @@ fun NewGameScreen(
             selected = current.chineseRules,
             onSelected = { current = current.copy(chineseRules = it) }
         )
-        SettingDropdown(
-            label = stringResource(R.string.newGameDialogAIDelayLabel),
-            options = AI_DELAYS,
-            selected = current.aiDelaySeconds,
-            onSelected = { current = current.copy(aiDelaySeconds = it) }
-        )
-        // The engine chosen above decides which strength/resignation controls
-        // apply - each engine has a genuinely different shape of options (see
-        // the comment on NewGameSettings), not just different values for the
-        // same control.
-        when (current.engineType) {
-            EngineType.GnuGo -> {
-                SettingDropdown(
-                    label = stringResource(R.string.newGameDialogStrengthLabel),
-                    options = STRENGTHS,
-                    selected = current.level,
-                    onSelected = { current = current.copy(level = it) }
-                )
-                SettingDropdown(
-                    label = stringResource(R.string.newGameAllowResignationLabel),
-                    options = ALLOW_RESIGNATIONS,
-                    selected = current.allowResignation,
-                    onSelected = { current = current.copy(allowResignation = it) }
-                )
-            }
-            EngineType.Pachi -> {
-                NumberSettingField(
-                    label = stringResource(R.string.newGameDialogPachiThinkSecondsLabel),
-                    text = current.pachiThinkSeconds.toString(),
-                    resetKey = current.engineType,
-                    onTextChanged = { text ->
-                        text.toIntOrNull()?.let { current = current.copy(pachiThinkSeconds = it) }
-                    }
-                )
-                NumberSettingField(
-                    label = stringResource(R.string.newGameDialogPachiResignThresholdLabel),
-                    text = current.pachiResignThreshold.toString(),
-                    resetKey = current.engineType,
-                    onTextChanged = { text ->
-                        // A device/keyboard set to a comma-decimal locale (most
-                        // of this app's own translated locales: German, French,
-                        // Italian, Spanish, Portuguese, Russian, Polish,
-                        // Romanian, Danish, Finnish, Norwegian) commonly types
-                        // "," for a decimal point - toFloatOrNull() only ever
-                        // accepts ".", so typing e.g. "0,3" would otherwise
-                        // silently leave pachiResignThreshold at its old value
-                        // with no error shown.
-                        text.replace(',', '.').toFloatOrNull()
-                            ?.let { current = current.copy(pachiResignThreshold = it) }
-                    }
-                )
+        // Nothing below here matters with no AI actually playing - it's all
+        // either picking an engine or configuring one.
+        if (!(current.playerBlackHuman && current.playerWhiteHuman)) {
+            SettingDropdown(
+                label = stringResource(R.string.newGameDialogAIDelayLabel),
+                options = AI_DELAYS,
+                selected = current.aiDelaySeconds,
+                onSelected = { current = current.copy(aiDelaySeconds = it) }
+            )
+            SettingDropdown(
+                label = stringResource(R.string.newGameDialogEngineLabel),
+                options = ENGINE_TYPES,
+                selected = current.engineType,
+                onSelected = { current = current.copy(engineType = it) }
+            )
+            // The engine chosen above decides which strength/resignation
+            // controls apply - each engine has a genuinely different shape of
+            // options (see the comment on NewGameSettings), not just
+            // different values for the same control.
+            when (current.engineType) {
+                EngineType.GnuGo -> {
+                    SettingDropdown(
+                        label = stringResource(R.string.newGameDialogStrengthLabel),
+                        options = STRENGTHS,
+                        selected = current.level,
+                        onSelected = { current = current.copy(level = it) }
+                    )
+                    SettingDropdown(
+                        label = stringResource(R.string.newGameAllowResignationLabel),
+                        options = ALLOW_RESIGNATIONS,
+                        selected = current.allowResignation,
+                        onSelected = { current = current.copy(allowResignation = it) }
+                    )
+                }
+                EngineType.Pachi -> {
+                    NumberSettingField(
+                        label = stringResource(R.string.newGameDialogPachiThinkSecondsLabel),
+                        text = current.pachiThinkSeconds.toString(),
+                        resetKey = current.engineType,
+                        onTextChanged = { text ->
+                            text.toIntOrNull()?.let { current = current.copy(pachiThinkSeconds = it) }
+                        }
+                    )
+                    NumberSettingField(
+                        label = stringResource(R.string.newGameDialogPachiResignThresholdLabel),
+                        text = current.pachiResignThreshold.toString(),
+                        resetKey = current.engineType,
+                        onTextChanged = { text ->
+                            // A device/keyboard set to a comma-decimal locale (most
+                            // of this app's own translated locales: German, French,
+                            // Italian, Spanish, Portuguese, Russian, Polish,
+                            // Romanian, Danish, Finnish, Norwegian) commonly types
+                            // "," for a decimal point - toFloatOrNull() only ever
+                            // accepts ".", so typing e.g. "0,3" would otherwise
+                            // silently leave pachiResignThreshold at its old value
+                            // with no error shown.
+                            text.replace(',', '.').toFloatOrNull()
+                                ?.let { current = current.copy(pachiResignThreshold = it) }
+                        }
+                    )
+                }
             }
         }
 

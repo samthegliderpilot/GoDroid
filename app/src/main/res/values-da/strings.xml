@@ -102,6 +102,7 @@ GNU Go er en AI motor som spiller Go på ca. 8 til 12 kyu styrke.
 	<string name="resignedText">giver op</string>
 	<string name="passedText">passer</string>
 	<string name="resignationMessageText">%1$s giver op, %2$s vinder</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d fanget)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Angre er ikke mulig</string>
 	<string name="noRedoHintText">Gentag er ikke mulig</string>
 	<string name="undoHintText">Smut til venste her for at angre</string>

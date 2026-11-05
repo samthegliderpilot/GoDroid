@@ -24,6 +24,19 @@ data class ScoreViewState(
     // blackMove/whiteMove.text like any other move-row content, not behind
     // a second visibility flag - see withFinalScore.
     val scoreRowVisible: Boolean = false,
+    // The scoring engine's own authoritative final_score reply (e.g.
+    // "B+7.5") - a cross-check against blackScoreText/whiteScoreText's own
+    // client-side-reconstructed total (territory + dead-stone credit),
+    // which can disagree in edge cases the per-point breakdown doesn't
+    // handle as completely as the engine's own scoring function does. Null
+    // hides the row entirely - see Gtp.score().
+    val engineScoreText: String? = null,
+    // Stones physically captured during play, shown alongside the Chinese-
+    // rules "Stones" row (which otherwise only shows the live board count) -
+    // null hides it, including under Japanese rules where blackCaptures/
+    // whiteCaptures above already *is* this number. See Gtp.score().
+    val blackCapturedCount: Int? = null,
+    val whiteCapturedCount: Int? = null,
     val messageText: String? = null,
     val blackToMove: Boolean = true,
     // Purely informational elapsed-time-per-color display (no enforcement, no time

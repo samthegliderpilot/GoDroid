@@ -86,6 +86,7 @@ GNU Go 是 壹個AI 引擎將展示6-8個難度級別。
     <string name="resignedText">同意</string>
     <string name="passedText">虛手</string>
     <string name="resignationMessageText">%1$s認輸，%2$s獲勝</string>  <!-- Translation Provided by Claude -->
+    <string name="stonesWithCapturesFormat">%1$d（提子 %2$d）</string>  <!-- Translation Provided by Claude -->
     <string name="noUndoHintText">不能撤消</string>
     <string name="noRedoHintText">不能恢複</string>
     <string name="undoHintText">這裏向左滑動撤消</string>

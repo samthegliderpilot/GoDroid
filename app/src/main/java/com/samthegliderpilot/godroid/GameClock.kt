@@ -102,6 +102,14 @@ class GameClock(private val listener: GameClockListener) {
         val elapsedSeconds = (now - turnStartedAtMillis) / 1000f
         if (lastBlackToMove) blackSeconds += elapsedSeconds else whiteSeconds += elapsedSeconds
         turnStartedAtMillis = now
+        // Persist immediately, not just from tick()'s own periodic write -
+        // pause() (opening a dialog, backgrounding) also banks time here,
+        // and attachToGame() re-seeds from exactly what's persisted. Without
+        // this, Apply (which re-attaches via CHANGE_GAME) picked up whatever
+        // tick() last wrote - as of the last *move*, not as of this pause -
+        // and the clock visibly jumped backward to that older total the
+        // moment Apply was pressed on an in-progress game.
+        gameInfo?.recordElapsedTime(blackSeconds, whiteSeconds)
     }
 
     private fun tick() {

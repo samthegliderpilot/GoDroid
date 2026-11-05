@@ -100,6 +100,7 @@ GNU go este un motor de joc bazat pe algoritmi de inteligenţă artificială cu 
 	<string name="resignedText">a cedat</string>
 	<string name="passedText">a jucat pas</string>
 	<string name="resignationMessageText">%1$s renunță, %2$s câștigă</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d capturate)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Nu este posibilă revenirea la poziţia anterioară</string>
 	<string name="noRedoHintText">Nu este posibilă refacerea poziţiei initiale</string>
 	<string name="undoHintText">Cu o mişcare spre stânga aici poţi reveni la poziţia anterioră</string>
