@@ -76,7 +76,7 @@ class GameClock(private val listener: GameClockListener) {
      * or if the attached game is already finished (nothing left to track). */
     fun resume() {
         val info = gameInfo ?: return
-        if (running || info.bothPlayersPassed()) {
+        if (running || info.isGameOver()) {
             return
         }
         turnStartedAtMillis = System.currentTimeMillis()
@@ -125,7 +125,7 @@ class GameClock(private val listener: GameClockListener) {
             info.recordElapsedTime(blackSeconds, whiteSeconds)
         }
         publish()
-        if (info.bothPlayersPassed()) {
+        if (info.isGameOver()) {
             running = false
             return
         }

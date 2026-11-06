@@ -126,7 +126,8 @@ class GameInfo {
     // after a resigned computer-vs-computer game can still auto-generate one
     // further move on resume - a narrower, pre-existing gap this doesn't
     // close). Cleared on undo/redo leaving the finished state - see Gtp's
-    // UNDO_MOVE/REDO_MOVE handling.
+    // UNDO_MOVE/REDO_MOVE handling. Don't read this directly - see
+    // isGameOver() below, which is what every caller actually wants.
     @JvmField var _gameOver: Boolean = false
 
     fun copy(pGameInfo: GameInfo): GameInfo {
@@ -344,6 +345,13 @@ class GameInfo {
         val point2 = getMoveValue(!playerBlack, node.previousPropertyNode())
         return point2 != null && point1 is Passed && point2 is Passed
     }
+
+    // The one "is this position finished" check every caller should use -
+    // bothPlayersPassed() alone misses a resignation, and _gameOver alone
+    // misses a double-pass reached without ever going through finishGame()
+    // (e.g. loading a both-passed position straight from SGF). Checking
+    // both here, once, means a caller can never forget one of the two.
+    fun isGameOver(): Boolean = _gameOver || bothPlayersPassed()
 
     fun getRecentMoveValue(): Point? {
         val currentNode = _currentNode

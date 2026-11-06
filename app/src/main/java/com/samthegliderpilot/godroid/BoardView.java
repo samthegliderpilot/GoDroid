@@ -263,19 +263,14 @@ void surfaceChanged ( // 4
 	}
 	else
 	{
-		mainActivity.drawBoard (true);
 		// drawBoard() redraws from GameInfo's move list alone - it has no
 		// idea a finished game is showing territory/dead-stone markers on
 		// top (that only exists via GTP queries Gtp.score() ran, not in
 		// GameInfo), so a real resize would otherwise silently lose them.
-		// Re-running the same query the "Show Territory" menu action uses
-		// puts them back; it's a cheap, already-exercised GTP round-trip,
-		// posted after drawBoard()'s own commands so it runs once the
-		// board geometry is settled for the new size.
-		if (mainActivity.isGameScored ())
-		{
-			mainActivity.showTerritory ();
-		}
+		// redrawBoardPreservingScore() is the same redraw-then-restore-if-
+		// scored sequence the display-settings toggles use, for the same
+		// reason - one shared place to get this right instead of two.
+		mainActivity.redrawBoardPreservingScore ();
 	}
 }
 

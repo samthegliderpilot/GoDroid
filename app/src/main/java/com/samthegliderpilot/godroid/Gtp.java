@@ -681,7 +681,13 @@ void handleMessage (
 		enableUndoMenu (gameInfo);
 		if (gameInfo.bothPlayersPassed ())
 		{
+			// Redoing forward can land right back on a double-passed position -
+			// finishGame() has to run here too (not just score()), the same as
+			// every other path that reaches one, or _gameOver never gets set,
+			// the clock never pauses, and the board stays tappable on a
+			// position that's visually final. See isGameOver()'s own comment.
 			score (gameInfo, true);
+			finishGame (gameInfo);
 		}
 		else
 		{
@@ -1187,7 +1193,7 @@ void reStartGame (
 	// decided, even though the move list itself still correctly ended on
 	// two passes. Scoring it immediately instead mirrors exactly what
 	// happens when both-passed is reached live, during PLAY_MOVE/UNDO_MOVE.
-	// _gameOver covers the same resume case for a resignation, which
+	// isGameOver() covers the same resume case for a resignation, which
 	// bothPlayersPassed() can't see for itself - see its own comment.
 	//
 	// This has to be queued (RESUME_SCORED_GAME), not called directly here:
@@ -1196,7 +1202,7 @@ void reStartGame (
 	// direct score() call here used to run before INIT_BOARD, crashing with
 	// a NullPointerException on board geometry (_gridShape etc.) that
 	// initBoard() hadn't set up yet. Queuing keeps the ordering correct.
-	if (pGameInfo.bothPlayersPassed () || pGameInfo._gameOver)
+	if (pGameInfo.isGameOver ())
 	{
 		executeCommand (Command.RESUME_SCORED_GAME, pGameInfo);
 		return;
@@ -1233,9 +1239,89 @@ void finishGame (
 	// The one place every game-over path (resignation, double-pass) actually
 	// ends up - see MainActivity.pauseGameClock's own comment for why a
 	// resignation specifically needed this (it never self-stops the way a
-	// double-pass finish does).
-	_mainActivity.pauseGameClock ();
+	// double-pass finish does). Posted through executeMainCommand, not
+	// called directly - finishGame() runs on this (background) thread, and
+	// GameClock's fields are otherwise only ever touched from the main
+	// thread, so a direct call here would be the one unmarshaled
+	// cross-thread write into that state.
+	executeMainCommand (MainCommand.PAUSE_GAME_CLOCK, 0, 0, null);
 }
+
+// The payload for showScore()'s single-Object slot when it's carrying a
+// real scoring event (see score() below) - a named type instead of an
+// Object[] bundle, so adding, reordering, or dropping a field is a compile
+// error at the one other place it's unpacked (MainActivity.showScore())
+// instead of a silent ClassCastException at runtime.
+static final class ScoreUpdate
+{
+	final GameInfo _gameInfo;
+	final String _engineScore;
+	final int _blackCaptured, _whiteCaptured;
+	// Whether this is a genuine fresh scoring event (score()'s own
+	// pFinalScore) as opposed to a territory redisplay (surface resize, a
+	// display-setting toggle, resuming an already-scored game) that
+	// recomputes territory/dead-stone markers but never re-queries the
+	// engine. Only a fresh event may overwrite the engine-score row and
+	// captured-stone counts - otherwise a redisplay racing with the real
+	// scoring event would blank a row that was just correctly filled in.
+	final boolean _freshScore;
+
+	ScoreUpdate (
+		final GameInfo pGameInfo,
+		final String pEngineScore,
+		final int pBlackCaptured,
+		final int pWhiteCaptured,
+		final boolean pFreshScore
+		)
+	{
+		_gameInfo = pGameInfo;
+		_engineScore = pEngineScore;
+		_blackCaptured = pBlackCaptured;
+		_whiteCaptured = pWhiteCaptured;
+		_freshScore = pFreshScore;
+	}
+}
+
+// The per-point/count result of actually querying the engine for a
+// position's score - see score()'s cache below for why this is worth
+// holding onto instead of recomputing on every call.
+private static final class ScoreBreakdown
+{
+	final List <Point> _blackStones, _whiteStones,
+		_blackDeadStones, _whiteDeadStones,
+		_blackTerritory, _whiteTerritory;
+	final int _blackCaptured, _whiteCaptured;
+
+	ScoreBreakdown (
+		final List <Point> pBlackStones, final List <Point> pWhiteStones,
+		final List <Point> pBlackDeadStones, final List <Point> pWhiteDeadStones,
+		final List <Point> pBlackTerritory, final List <Point> pWhiteTerritory,
+		final int pBlackCaptured, final int pWhiteCaptured
+		)
+	{
+		_blackStones = pBlackStones;
+		_whiteStones = pWhiteStones;
+		_blackDeadStones = pBlackDeadStones;
+		_whiteDeadStones = pWhiteDeadStones;
+		_blackTerritory = pBlackTerritory;
+		_whiteTerritory = pWhiteTerritory;
+		_blackCaptured = pBlackCaptured;
+		_whiteCaptured = pWhiteCaptured;
+	}
+}
+
+// Cache of the last position actually queried for - reused by a non-final
+// redisplay (surface resize, a display-setting toggle, resuming an
+// already-scored game) when the position hasn't changed, to skip 3-5
+// redundant blocking GTP round-trips for a redraw that wouldn't compute
+// anything different. Keyed on both GameInfo identity and move number, so
+// any real change to the position (a move, undo, redo) misses and falls
+// through to a fresh query. A fresh scoring event (pFinalScore) always
+// bypasses the cache on read (see score() below) to get the authoritative
+// computation, but still writes through it for the next redisplay.
+private GameInfo _cachedScoreGameInfo;
+private int _cachedScoreMoveNumber = -1;
+private ScoreBreakdown _cachedScoreBreakdown;
 
 private
 void score (
@@ -1252,6 +1338,59 @@ void score (
 	showWaitProgress (resources.
 		getString (R.string.waitProgressFinalScoreMessage));
 	final BoardView boardView = _boardView;
+	final boolean chineseRules = pGameInfo._chineseRules;
+	final ScoreBreakdown breakdown;
+	if (!pFinalScore && pGameInfo == _cachedScoreGameInfo
+		&& pGameInfo._moveNumber == _cachedScoreMoveNumber)
+	{
+		breakdown = _cachedScoreBreakdown;
+	}
+	else
+	{
+		breakdown = computeScoreBreakdown (pGameInfo, chineseRules, pFinalScore);
+		_cachedScoreGameInfo = pGameInfo;
+		_cachedScoreMoveNumber = pGameInfo._moveNumber;
+		_cachedScoreBreakdown = breakdown;
+	}
+	boardView.drawBoard (breakdown._blackStones, breakdown._whiteStones, null, 0, false);
+	boardView.drawDeadStones (breakdown._blackDeadStones, breakdown._whiteDeadStones);
+	boardView.drawTerritory (breakdown._blackTerritory, breakdown._whiteTerritory, false);
+	boardView.drawTerritory (breakdown._whiteDeadStones, breakdown._blackDeadStones, true);
+	boardView.drawBoard2Surface ();
+	final int numBlackDeadStones = breakdown._blackDeadStones.size (),
+		numWhiteDeadStones = breakdown._whiteDeadStones.size ();
+	showCaptures (
+		(chineseRules ? breakdown._blackStones.size () : breakdown._blackCaptured)
+			+ numWhiteDeadStones,
+		(chineseRules ? breakdown._whiteStones.size () : breakdown._whiteCaptured)
+			+ numBlackDeadStones);
+	// Cross-check against the engine's own authoritative total - see
+	// FINAL_SCORE's own comment for why this can disagree with the number
+	// just computed above from LIST_FINAL_STATUS's per-point breakdown. Only
+	// attempted once the game is actually over (pFinalScore) -
+	// gtpCommandOrNull (not plain gtpCommand) specifically so an engine that
+	// doesn't consider the position settled enough to score hides this row
+	// entirely instead of showing a blank one.
+	final String engineScore = pFinalScore
+		? gtpCommandOrNull (GtpCommand.FINAL_SCORE, null, pGameInfo._engineType) : null;
+	if (pFinalScore && engineScore == null && isEnabledFor (_LOG_TAG, Log.WARN))
+	{
+		log (_LOG_TAG, Log.WARN, "final_score errored - engine doesn't consider "
+			+ "this position settled enough to score; hiding the engine-score row");
+	}
+	showScore (breakdown._blackTerritory.size () + numWhiteDeadStones,
+		breakdown._whiteTerritory.size () + numBlackDeadStones,
+		new ScoreUpdate (pGameInfo, engineScore,
+			breakdown._blackCaptured, breakdown._whiteCaptured, pFinalScore));
+}
+
+private
+ScoreBreakdown computeScoreBreakdown (
+	final GameInfo pGameInfo,
+	final boolean pChineseRules,
+	final boolean pFinalScore
+	)
+{
 	// Board state/captures/legality stay GnuGo's job always (the referee -
 	// Pachi's GTP server genuinely has no list_stones/captures/all_legal/
 	// gg-undo), but final scoring is different: Pachi fully implements
@@ -1277,8 +1416,6 @@ void score (
 	}
 	removeDeadStones (blackDeadStones, blackStones);
 	removeDeadStones (whiteDeadStones, whiteStones);
-	boardView.drawBoard (blackStones, whiteStones, null, 0, false);
-	boardView.drawDeadStones (blackDeadStones, whiteDeadStones);
 	final List <Point>
 		blackTerritory = verteces2Points (
 			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _BLACK_TERRITORY, scoringEngine),
@@ -1286,42 +1423,24 @@ void score (
 		whiteTerritory = verteces2Points (
 			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _WHITE_TERRITORY, scoringEngine),
 			pGameInfo);
-	boardView.drawTerritory (blackTerritory, whiteTerritory, false);
-	boardView.drawTerritory (whiteDeadStones, blackDeadStones, true);
-	boardView.drawBoard2Surface ();
-	final int numBlackDeadStones = blackDeadStones.size (),
-		numWhiteDeadStones = whiteDeadStones.size ();
-	final boolean chineseRules = pGameInfo._chineseRules;
 	// GnuGo's own running capture tally - tracked regardless of ruleset, since
 	// it's just "how many stones has each side physically removed from the
 	// board," not a scoring computation. Under Chinese rules the main
 	// captures/stones row switches to a live stone count instead (that's what
 	// Chinese scoring actually counts), so this is surfaced separately -
 	// see showScore below.
-	final int blackCaptured = getCaptures (true),
-		whiteCaptured = getCaptures (false);
-	showCaptures (
-		(chineseRules ? blackStones.size () : blackCaptured)
-			+ numWhiteDeadStones,
-		(chineseRules ? whiteStones.size () : whiteCaptured)
-			+ numBlackDeadStones);
-	// Cross-check against the engine's own authoritative total - see
-	// FINAL_SCORE's own comment for why this can disagree with the number
-	// just computed above from LIST_FINAL_STATUS's per-point breakdown. Only
-	// attempted once the game is actually over (pFinalScore) -
-	// gtpCommandOrNull (not plain gtpCommand) specifically so an engine that
-	// doesn't consider the position settled enough to score hides this row
-	// entirely instead of showing a blank one.
-	final String engineScore = pFinalScore
-		? gtpCommandOrNull (GtpCommand.FINAL_SCORE, null, scoringEngine) : null;
-	if (pFinalScore && engineScore == null && isEnabledFor (_LOG_TAG, Log.WARN))
-	{
-		log (_LOG_TAG, Log.WARN, "final_score errored - engine doesn't consider "
-			+ "this position settled enough to score; hiding the engine-score row");
-	}
-	showScore (blackTerritory.size () + numWhiteDeadStones,
-		whiteTerritory.size () + numBlackDeadStones,
-		new Object [] { pGameInfo, engineScore, blackCaptured, whiteCaptured, pFinalScore });
+	// Skipped (two fewer GTP round-trips) when it would end up unused
+	// anyway: under Japanese rules it's always the row's own value, but
+	// under Chinese rules it's only ever read for the cosmetic
+	// "(N captured)" suffix on a fresh scoring event - never on a
+	// territory redisplay (resize, a display-setting toggle, resuming an
+	// already-scored game), which ScoreScreen.withFinalScore's freshScore
+	// check discards it anyway.
+	final boolean needCaptures = !pChineseRules || pFinalScore;
+	final int blackCaptured = needCaptures ? getCaptures (true) : 0,
+		whiteCaptured = needCaptures ? getCaptures (false) : 0;
+	return new ScoreBreakdown (blackStones, whiteStones, blackDeadStones, whiteDeadStones,
+		blackTerritory, whiteTerritory, blackCaptured, whiteCaptured);
 }
 
 private static

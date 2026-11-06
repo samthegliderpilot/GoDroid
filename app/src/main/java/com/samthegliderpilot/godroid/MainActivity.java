@@ -106,7 +106,8 @@ enum MainCommand
 	SHOW_SCORE,
 	ENABLE_UNDO_MENU,
 	SHOW_COLLECTION_LIST,
-	SHARE_GAME;
+	SHARE_GAME,
+	PAUSE_GAME_CLOCK;
 
 	int _cmd;
 }
@@ -386,6 +387,9 @@ void onCreate ( // 0
 			case SHARE_GAME:
 				shareGame ((Uri)pMessage.obj);
 				break;
+			case PAUSE_GAME_CLOCK:
+				pauseGameClock ();
+				break;
 			}
 		}};
 
@@ -621,8 +625,7 @@ boolean onCreateOptionsMenu (
 	final GameInfo gameInfo = _gameInfo;
 	if (gameInfo != null)
 	{
-		enablePassMenu (!Gtp.playerIsMachine (gameInfo)
-			&& !gameInfo.bothPlayersPassed () && !gameInfo._gameOver);
+		enablePassMenu (!Gtp.playerIsMachine (gameInfo) && !gameInfo.isGameOver ());
 		enableUndoMenu (gameInfo);
 	}
 	return true;
@@ -748,19 +751,20 @@ void redo ()
 	_gtp.redoMove (_gameInfo);
 }
 
-// Package-private (not private): BoardView also calls this directly, to
-// redraw territory after a real resize - see its surfaceChanged.
+// Only used by redrawBoardPreservingScore() below - both a real resize
+// (BoardView.surfaceChanged) and the display-settings toggles go through
+// that one shared method now, instead of each deciding for itself whether
+// to replay territory/dead-stone markers.
+private
 void showTerritory ()
 {
 	_gtp.showTerritory (_gameInfo);
 }
 
-// Package-private: lets BoardView.surfaceChanged decide whether a real
-// resize needs to replay territory/dead-stone markers via showTerritory()
-// above, without exposing _gameInfo itself.
+private
 boolean isGameScored ()
 {
-	return _gameInfo != null && _gameInfo.bothPlayersPassed ();
+	return _gameInfo != null && _gameInfo.isGameOver ();
 }
 
 
@@ -1128,7 +1132,7 @@ void showWait4Move2FinishMessage (
 	// one ended would show this message for no reason, since the old
 	// GameInfo's player/engine assignment is left untouched now (see
 	// GameInfo._gameOver's own comment).
-	if (pGameInfo != null && !pGameInfo._gameOver
+	if (pGameInfo != null && !pGameInfo.isGameOver ()
 		&& Gtp.playerIsMachine (pGameInfo))
 	{
 		showWaitProgress (getResources ().getString (
@@ -1167,16 +1171,24 @@ void attachGameClock ()
 	}
 }
 
-// Package-private: called from Gtp.finishGame(), the common endpoint for
-// every way a game actually ends. GameClock.tick() already stops itself on
-// its own next tick for a double-pass finish (it checks
-// GameInfo.bothPlayersPassed() directly), but a resignation has no
-// equivalent signal - finishGame() runs straight from Gtp.java's PLAY_MOVE
-// handling without ever adding a pass to the move tree, so without this the
-// clock just kept ticking indefinitely after a resignation. Calling
-// pause() here makes a double-pass finish immediate too (instead of waiting
-// up to a second for tick()'s own check), and pause() is already documented
-// as safe to call repeatedly / when not running.
+// Only reached via the PAUSE_GAME_CLOCK MainCommand, posted from
+// Gtp.finishGame() - the common endpoint for every way a game actually
+// ends. finishGame() runs on the GTP background thread, while GameClock's
+// own fields are otherwise only ever touched from the main thread (its
+// tick Runnable, and onWindowFocusChanged's resume()/pause()); routing
+// through the same Handler-post pattern every other UI effect in
+// finishGame() already uses (executeMainCommand) keeps this one on the
+// main thread too, instead of a direct cross-thread call into
+// GameClock's unsynchronized state. GameClock.tick() already stops itself
+// on its own next tick for a double-pass finish (it checks
+// GameInfo.isGameOver() directly), but a resignation has no equivalent
+// signal - finishGame() runs straight from Gtp.java's PLAY_MOVE handling
+// without ever adding a pass to the move tree, so without this the clock
+// just kept ticking indefinitely after a resignation. Calling pause()
+// here makes a double-pass finish immediate too (instead of waiting up to
+// a second for tick()'s own check), and pause() is already documented as
+// safe to call repeatedly / when not running.
+private
 void pauseGameClock ()
 {
 	_gameClock.pause ();
@@ -1322,8 +1334,9 @@ void enableUndoMenu (
 		// when it was computer-vs-computer. Used to fall out of finishGame()
 		// forcing both players human instead; see GameInfo._gameOver's own
 		// comment for why that was dropped.
-		boolean playerIsMachine = !pGameInfo._gameOver && Gtp.playerIsMachine (pGameInfo),
-			otherPlayerIsMachine = !pGameInfo._gameOver && Gtp.otherPlayerIsMachine (pGameInfo);
+		final boolean gameOver = pGameInfo.isGameOver ();
+		boolean playerIsMachine = !gameOver && Gtp.playerIsMachine (pGameInfo),
+			otherPlayerIsMachine = !gameOver && Gtp.otherPlayerIsMachine (pGameInfo);
 		final int moveNumber = pGameInfo._moveNumber;
 		_undoEnabled = undoEnabled =
 			!(playerIsMachine && otherPlayerIsMachine)
@@ -1357,23 +1370,12 @@ void showScore (
 			_scoreViewState.getValue (), (String)pStatus));
 		return;
 	}
-	// Bundled - Handler.obtainMessage (what executeMainCommand posts through)
-	// only has room for one Object, and this now carries both the GameInfo
-	// final scoring already needed and the engine's own cross-check string
-	// (null unless this is Gtp.score()'s pFinalScore=true call - see there).
-	final Object [] statusBundle = (Object [])pStatus;
-	final GameInfo gameInfo = (GameInfo)statusBundle [0];
-	final String engineScore = (String)statusBundle [1];
-	final int blackCaptured = (Integer)statusBundle [2],
-		whiteCaptured = (Integer)statusBundle [3];
-	// Whether this call is a genuine fresh scoring event (Gtp.score()'s own
-	// pFinalScore) as opposed to a territory redisplay (surface resize,
-	// resuming an already-scored game) that recomputes territory/dead-stone
-	// markers but never re-queries the engine. Only a fresh event may
-	// overwrite the engine-score row and captured-stone counts - otherwise a
-	// resize racing with the real scoring event would blank a row that was
-	// just correctly filled in.
-	final boolean freshScore = (Boolean)statusBundle [4];
+	final Gtp.ScoreUpdate scoreUpdate = (Gtp.ScoreUpdate)pStatus;
+	final GameInfo gameInfo = scoreUpdate._gameInfo;
+	final String engineScore = scoreUpdate._engineScore;
+	final int blackCaptured = scoreUpdate._blackCaptured,
+		whiteCaptured = scoreUpdate._whiteCaptured;
+	final boolean freshScore = scoreUpdate._freshScore;
 	final String blackScore = String.valueOf (_blackCaptures + pBlackTerritory),
 		whiteScore = String.valueOf (
 			_whiteCaptures + pWhiteTerritory + Float.parseFloat (gameInfo._komi));
@@ -1383,13 +1385,13 @@ void showScore (
 		blackCaptured, whiteCaptured, freshScore));
 }
 
-// A display setting that forces a redraw (board geometry/decorations, not
-// the position itself) has to re-run showTerritory() too when the game is
-// already scored - drawBoard() alone only knows GameInfo's move list, not
-// the territory/dead-stone markers Gtp.score()'s own GTP queries drew on
-// top of it, so a plain redraw here used to silently wipe them (same gap
-// BoardView.surfaceChanged's real-resize case already had to work around).
-private
+// Package-private: BoardView.surfaceChanged's real-resize branch calls this
+// too. A redraw that doesn't change the position (a real resize, or a
+// display setting like Show Coordinates/Edge Tap Padding) has to re-run
+// showTerritory() when the game is already scored - drawBoard() alone only
+// knows GameInfo's move list, not the territory/dead-stone markers
+// Gtp.score()'s own GTP queries drew on top of it, so a plain redraw here
+// would otherwise silently wipe them.
 void redrawBoardPreservingScore ()
 {
 	if (_gameInfo == null)

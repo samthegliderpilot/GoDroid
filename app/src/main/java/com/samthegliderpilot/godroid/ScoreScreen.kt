@@ -90,35 +90,47 @@ fun withFinalScore(
     engineScore: String?,
     blackCaptured: Int,
     whiteCaptured: Int,
-    // False for a territory redisplay (surface resize, resuming an
-    // already-scored game) that never re-queried the engine - that case must
-    // leave the engine-score row and captured counts as they were, not blank
-    // them, or a resize racing with a real scoring event would clobber a row
-    // that was just correctly filled in. See Gtp.score()'s pFinalScore.
-    freshScore: Boolean = true,
-): ScoreViewState = current.copy(
-    messageText = null,
-    scoreRowVisible = true,
-    capturesLabelRes = if (chineseRules) R.string.stonesLabelText else R.string.capturesLabelText,
-    moveLabelRes = R.string.territoryAndScoreLabelText,
-    // showProgress is forced off unconditionally, not just carried over from
-    // current.blackMove/whiteMove - the double-pass path goes straight from
-    // the AI's "thinking" spinner to this final score without ever calling
-    // showMove() to reveal its last move first, so the spinner would
-    // otherwise never clear.
-    blackMove = MoveCellState(showProgress = false, text = "$blackTerritory / $blackScore"),
-    whiteMove = MoveCellState(showProgress = false, text = "$whiteTerritory / $whiteScore"),
-    blackScoreText = blackScore,
-    whiteScoreText = whiteScore,
-    engineScoreText = if (freshScore) engineScore else current.engineScoreText,
-    // Only shown under Chinese rules - under Japanese rules the Captures row
-    // above already displays this exact number, so a parenthetical repeat
-    // would be redundant noise.
-    blackCapturedCount = if (!freshScore) current.blackCapturedCount
-        else if (chineseRules) blackCaptured else null,
-    whiteCapturedCount = if (!freshScore) current.whiteCapturedCount
-        else if (chineseRules) whiteCaptured else null,
-)
+    // False for a territory redisplay (surface resize, a display-setting
+    // toggle, resuming an already-scored game) that never re-queried the
+    // engine - that case must leave the engine-score row and captured
+    // counts as they were, not blank them, or a redisplay racing with a
+    // real scoring event would clobber a row that was just correctly
+    // filled in. See Gtp.score()'s pFinalScore. No default: every call site
+    // (there is exactly one, MainActivity.showScore) has a real answer from
+    // Gtp.ScoreUpdate, and this flag is exactly the one a forgotten
+    // argument must not silently get wrong.
+    freshScore: Boolean,
+): ScoreViewState {
+    val territoryAndMove = current.copy(
+        messageText = null,
+        scoreRowVisible = true,
+        capturesLabelRes = if (chineseRules) R.string.stonesLabelText else R.string.capturesLabelText,
+        moveLabelRes = R.string.territoryAndScoreLabelText,
+        // showProgress is forced off unconditionally, not just carried over
+        // from current.blackMove/whiteMove - the double-pass path goes
+        // straight from the AI's "thinking" spinner to this final score
+        // without ever calling showMove() to reveal its last move first, so
+        // the spinner would otherwise never clear.
+        blackMove = MoveCellState(showProgress = false, text = "$blackTerritory / $blackScore"),
+        whiteMove = MoveCellState(showProgress = false, text = "$whiteTerritory / $whiteScore"),
+        blackScoreText = blackScore,
+        whiteScoreText = whiteScore,
+    )
+    // A redisplay didn't re-query the engine, so it has nothing new to say
+    // about the engine-score row or the captured-stone counts - leave both
+    // exactly as current.copy() above already carried them forward.
+    if (!freshScore) {
+        return territoryAndMove
+    }
+    return territoryAndMove.copy(
+        engineScoreText = engineScore,
+        // Only shown under Chinese rules - under Japanese rules the
+        // Captures row above already displays this exact number, so a
+        // parenthetical repeat would be redundant noise.
+        blackCapturedCount = if (chineseRules) blackCaptured else null,
+        whiteCapturedCount = if (chineseRules) whiteCaptured else null,
+    )
+}
 
 /**
  * The top status bar: captures/move during play, territory & score (one
