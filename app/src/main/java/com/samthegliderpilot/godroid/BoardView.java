@@ -184,7 +184,19 @@ void surfaceDestroyed (
 {
 }
 
-public
+// synchronized: this replaces _boardBitmap (and, on the slow path, the
+// geometry fields drawBoard()/drawDeadStones()/drawTerritory() all read)
+// from the main thread, while Gtp.score() paints a whole sequence of calls
+// onto that same bitmap from its own background thread before finally
+// blitting it via drawBoard2Surface() - which re-reads _boardBitmap fresh
+// rather than using whatever score()'s earlier calls captured. Without a
+// shared lock, a resize landing in the middle of that sequence (score()'s
+// own Compose updates changing the panel height mid-sequence can trigger
+// exactly this) swaps the bitmap out from under it, so drawBoard2Surface()
+// blits the new, still-blank bitmap instead of the one score() just
+// painted on - the board renders empty even though every draw call
+// "succeeded". See Gtp.score()'s matching synchronized(_boardView) block.
+public synchronized
 void surfaceChanged ( // 4
 					  @NonNull final SurfaceHolder pHolder,
 					  final int pFormat,
@@ -263,6 +275,19 @@ void surfaceChanged ( // 4
 	}
 	else
 	{
+		// _boardBitmap above is fresh and blank, and the real repaint below
+		// only happens asynchronously on the GTP thread - if the user looks
+		// at the screen before that lands, they'd see a blank board. Stretch
+		// the previous frame onto the new bitmap and blit it immediately so
+		// there's always something on screen (a briefly-squished old frame,
+		// not nothing) while the proper repaint is still in flight. This is
+		// the general fix for every real resize (rotation, fold/unfold, and
+		// the one resize a final score's own wait dialog induces on
+		// dismissal - see Gtp.score()) rather than special-casing any one of
+		// their triggers.
+		new Canvas (_boardBitmap).drawBitmap (
+			boardBitmap, null, new Rect (0, 0, pWidth, pHeight), null);
+		drawBoard2Surface ();
 		// drawBoard() redraws from GameInfo's move list alone - it has no
 		// idea a finished game is showing territory/dead-stone markers on
 		// top (that only exists via GTP queries Gtp.score() ran, not in

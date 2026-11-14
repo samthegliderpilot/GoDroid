@@ -14,7 +14,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="capturesLabelText">Захвачено</string>
 	<string name="stonesLabelText">Камни</string>
 	<string name="moveLabelText">Ход</string>
-	<string name="territoryAndScoreLabelText">Территория и очки</string>  <!-- Translation Provided by Claude -->
+	<string name="territoryAndScoreLabelText">Очки</string>  <!-- Translation Provided by Claude -->
 	<string name="timeLabelText">Время</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">Коснитесь камня для игры.\nДлинное нажатие для масштаба.</string>
 	<string name="menuNewEditGameLabel">Новая/Редактировать игру</string> <!-- Translation Provided by ChatGPT -->
@@ -103,7 +103,7 @@ GNU Go это искусственный интеллект (бот), котор
 	<string name="resignedText">сдался</string>
 	<string name="passedText">спасовал</string>
 	<string name="resignationMessageText">%1$s сдался, %2$s выигрывает</string>  <!-- Translation Provided by Claude -->
-	<string name="stonesWithCapturesFormat">%1$d (взято %2$d)</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Отмена невозможна</string>
 	<string name="noRedoHintText">Возврат невозможен</string>
 	<string name="undoHintText">Скользните влево для отмены хода</string>

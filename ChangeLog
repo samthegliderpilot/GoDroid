@@ -1,4 +1,4 @@
-Unreleased
+2026-11-07 GoDroid v1.5.3
 - Added Pachi as a second computer opponent alongside GnuGo, with its own
 think time and resign threshold settings (GnuGo still available as before)
 - Added an optional on-screen game clock
@@ -7,6 +7,10 @@ think time and resign threshold settings (GnuGo still available as before)
 - Territory markers now survive a screen rotation or relaunch
 - New/Edit Game dialog redesigned for quicker access to Start/Apply
 - Various score panel readability and bugfixes
+- Fixed a blank board that could briefly appear right after scoring finished
+- Fixed the Black/White header wrapping or misaligning with the rows below on narrow screens
+- Fixed Pachi playing weak, near-instant moves after its first move in a computer vs computer game
+- Fixed undo not resuming play properly after undoing out of a finished computer vs computer game
 
 2026-10-20 GoDroid v1.5.2
 - Fixed a reported tap-accuracy issue

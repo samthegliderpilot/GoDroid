@@ -1330,10 +1330,11 @@ void enableUndoMenu (
 	{
 		// Once the game is over, nobody's actually "to move" in the sense
 		// this whole method cares about - treating both as non-machine here
-		// is what let undo work to review/back out of a finished game even
-		// when it was computer-vs-computer. Used to fall out of finishGame()
-		// forcing both players human instead; see GameInfo._gameOver's own
-		// comment for why that was dropped.
+		// is what lets undo work to review/back out of a finished game.
+		// Gtp.finishGame() also flips both players to human on a game that
+		// was genuinely computer-vs-computer (so playerIsMachine() alone
+		// would already say false there), but a mixed human/machine game
+		// isn't flipped, so this override is still what covers that case.
 		final boolean gameOver = pGameInfo.isGameOver ();
 		boolean playerIsMachine = !gameOver && Gtp.playerIsMachine (pGameInfo),
 			otherPlayerIsMachine = !gameOver && Gtp.otherPlayerIsMachine (pGameInfo);

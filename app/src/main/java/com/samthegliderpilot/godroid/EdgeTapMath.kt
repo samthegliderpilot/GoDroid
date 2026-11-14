@@ -8,7 +8,13 @@ package com.samthegliderpilot.godroid
  */
 object EdgeTapMath {
 
-    const val AUTO_EDGE_PADDING_THRESHOLD_DP: Float = 40f
+    // Confirmed live on a Galaxy Z Fold5's cover screen (968x2376px @ 420
+    // densityDpi -> 368.8dp wide): a 9x9 board's own cell width there is
+    // ~41.0dp, just over the old 40dp cutoff, so Auto never kicked in on
+    // exactly the board size (fewest, widest cells) and screen (narrowest
+    // real one this project targets) that needed it most. 44dp clears that
+    // with a few dp of margin instead of sitting right on the boundary.
+    const val AUTO_EDGE_PADDING_THRESHOLD_DP: Float = 44f
 
     @JvmStatic
     fun isPaddingActive(

@@ -1,0 +1,2 @@
+• Fixed a reported tap-accuracy issue
+• Smaller app size (enabled minification)

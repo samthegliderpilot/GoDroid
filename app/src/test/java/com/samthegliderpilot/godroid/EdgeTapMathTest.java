@@ -26,4 +26,16 @@ public class EdgeTapMathTest
 		assertFalse (EdgeTapMath.isPaddingActive (
 			EdgeTapPaddingMode.AUTO, 100f, 2f, 40f));
 	}
+
+	@Test
+	public void isPaddingActive_autoCoversA9x9BoardOnAFoldedCoverScreen ()
+	{
+		// Confirmed live: a Galaxy Z Fold5's cover screen is 968px wide at
+		// 420 densityDpi (density 2.625) - a 9x9 board's own cell width
+		// there is 968/9/2.625 =~ 41.0dp. That's a real device/board
+		// combination this project targets, not a hypothetical - Auto has
+		// to cover it. See AUTO_EDGE_PADDING_THRESHOLD_DP's own comment.
+		assertTrue (EdgeTapMath.isPaddingActive (EdgeTapPaddingMode.AUTO,
+			968f / 9f, 2.625f, EdgeTapMath.AUTO_EDGE_PADDING_THRESHOLD_DP));
+	}
 }

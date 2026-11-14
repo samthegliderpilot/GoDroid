@@ -149,9 +149,27 @@ fun ScoreScreen(state: ScoreViewState) {
         else if (state.blackToMove) Side.BLACK else Side.WHITE
     Column(modifier = Modifier.fillMaxWidth().padding(12.dp)) {
         GridRow(
-            label = {},
-            black = { SideHeader(stringResource(R.string.blackColorText), winner == Side.BLACK, active == Side.BLACK, engineMarginSuffix(state, Side.BLACK)) },
-            white = { SideHeader(stringResource(R.string.whiteColorText), winner == Side.WHITE, active == Side.WHITE, engineMarginSuffix(state, Side.WHITE)) },
+            // The engine's own cross-check score (e.g. "B+75.5") goes here
+            // rather than appended to whichever side's name it names - this
+            // column is otherwise blank for the header, and the full "B+"/
+            // "W+" text is already unambiguous about which side it's for.
+            // Styled to match the winner's own name (titleLarge, bold,
+            // primary color) - it's naming that same side's margin, so it
+            // reads as part of the same "winner" cue rather than a plain
+            // label.
+            label = {
+                state.engineScoreText?.let {
+                    OutlinedText(
+                        it,
+                        style = MaterialTheme.typography.titleLarge,
+                        fontWeight = if (winner != null) FontWeight.Bold else null,
+                        fillColor = if (winner != null) MaterialTheme.colorScheme.primary
+                            else MaterialTheme.colorScheme.onSurface,
+                    )
+                }
+            },
+            black = { SideHeader(stringResource(R.string.blackColorText), winner == Side.BLACK, active == Side.BLACK) },
+            white = { SideHeader(stringResource(R.string.whiteColorText), winner == Side.WHITE, active == Side.WHITE) },
         )
         // The normal captures+move rows and a status message (e.g. "Calculating
         // territory status...", shown while Gtp.score() is still querying GnuGo)
@@ -192,17 +210,6 @@ fun ScoreScreen(state: ScoreViewState) {
     }
 }
 
-/** The engine's own cross-check score (e.g. "B+75.5") read onto whichever
- * side it names, as a "+<margin>" suffix for that side's header - rather
- * than a 5th row, since the Black/White header row already has room next to
- * the winner's star. Null for the other side, and for both when the engine
- * hasn't produced a score (see Gtp.score()/ScoreViewState.engineScoreText). */
-private fun engineMarginSuffix(state: ScoreViewState, side: Side): String? {
-    val text = state.engineScoreText ?: return null
-    val prefix = if (side == Side.BLACK) "B+" else "W+"
-    return if (text.startsWith(prefix)) " +${text.substring(prefix.length)}" else null
-}
-
 @Composable
 private fun stonesValueText(stones: Int, captured: Int?): String =
     if (captured != null) stringResource(R.string.stonesWithCapturesFormat, stones, captured)
@@ -226,9 +233,8 @@ private fun winningSide(state: ScoreViewState): Side? {
 }
 
 @Composable
-private fun SideHeader(name: String, isWinning: Boolean, isActive: Boolean, engineMargin: String? = null) {
-    val base = if (isWinning) "$name ★" else if (isActive) "● $name" else name
-    val label = if (engineMargin != null) "$base$engineMargin" else base
+private fun SideHeader(name: String, isWinning: Boolean, isActive: Boolean) {
+    val label = if (isWinning) "$name ★" else if (isActive) "● $name" else name
     OutlinedText(
         text = label,
         style = MaterialTheme.typography.titleLarge,
@@ -284,8 +290,9 @@ private fun OutlinedText(
 }
 
 /** One label column plus two equal value columns (black/white), kept the
- * same width across every row - including the Black/White header, whose
- * label cell is empty - so values stay aligned under their header. */
+ * same width across every row - including the Black/White header itself
+ * (called with an empty label) - so values stay aligned under each other
+ * from row to row. */
 @Composable
 private fun GridRow(
     label: @Composable () -> Unit,
@@ -307,10 +314,16 @@ private fun ValueText(text: String) {
 @Composable
 private fun MoveCell(state: MoveCellState) {
     if (state.showProgress) {
-        // Sized close to ValueText's line height - a full-size (40dp) indicator would
+        // Sized close to this cell's line height - a full-size (40dp) indicator would
         // grow this row and shove the board below it around while the AI is thinking.
         CircularProgressIndicator(modifier = Modifier.size(18.dp), strokeWidth = 2.dp)
     } else {
-        ValueText(state.text)
+        // Smaller than ValueText's titleLarge (used by Captures/Stones and Time,
+        // both always short) - this cell alone also carries the scored-state
+        // "<territory> / <score>" text (e.g. "15 / 41.5"), which is the widest
+        // value in the whole panel. A fixed, content-independent size (not just
+        // applied when that longer text shows up) keeps this cell's height from
+        // changing between live play and scored display.
+        OutlinedText(text = state.text, style = MaterialTheme.typography.titleMedium)
     }
 }

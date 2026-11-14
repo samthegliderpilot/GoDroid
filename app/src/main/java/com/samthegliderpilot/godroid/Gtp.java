@@ -116,16 +116,29 @@ enum GtpCommand
 	// defaulted ruleset that read as free/harmless, while the game's real
 	// ruleset may have scored it as a wasted point.
 	KGS_RULES ("kgs-rules "),
+	// Re-sent before every Pachi genmove (see playMove's own comment), not
+	// just once at game start - see Pachi's own gtp.c/timeinfo.c: its
+	// genmove() only calls time_start_timer() itself when timer_start is
+	// still 0 ("first game move"); every other move's timer is meant to be
+	// started by the GTP "play" command for the PREVIOUS move instead
+	// (gtp.c: "this is where kgs starts the timer, not at genmove!"). A
+	// computer-vs-computer game run entirely through Pachi never sends that
+	// "play" for Pachi's own generated moves back to Pachi itself (genmove
+	// already committed it on Pachi's own board - re-playing it would be a
+	// second, now-illegal commit), so that hook never fires there, and
+	// timer_start is left stuck at the game's first move forever after.
+	// Pachi's own time-pressure "net lag" estimate grows as real wallclock
+	// time minus that stale timer_start, so a few seconds into any longer
+	// self-play game it exceeds the whole think-time budget and Pachi starts
+	// returning near-instant, barely-searched moves - confirmed live via its
+	// stderr ("lag" climbing move after move while genmove replies arrive
+	// within milliseconds of each other). time_settings resets timer_start
+	// back to 0 for both colors (cmd_kgs_time_settings copies black's reset
+	// struct onto white's) in addition to the numeric budget, so resending it
+	// here makes genmove's own "first move" fallback fire fresh every time
+	// instead - a plain time_left wouldn't: it only touches the numeric
+	// budget, never timer_start.
 	TIME_SETTINGS ("time_settings "),
-	// time_settings only establishes the byoyomi_stones=1 PROTOCOL once, at
-	// game start - it does not by itself reset Pachi's own clock before each
-	// move. Without an explicit time_left before every genmove, Pachi's one
-	// continuous byoyomi period just keeps draining for the entire game
-	// (never refreshing), which is exactly what its own stderr's "LOST ON
-	// TIME internally!" (confirmed live, deficit escalating move after move)
-	// was reporting - not real think time being spent, just this app never
-	// telling Pachi "your clock is full again" between moves.
-	TIME_LEFT ("time_left "),
 	// Pachi has no gg-undo equivalent - plain standard GTP "undo" (no count
 	// argument) already undoes exactly one move, which is all UNDO_MOVE ever
 	// asks for (see its one call site).
@@ -755,11 +768,19 @@ void handleMessage (
 				whiteMoves.addAll (redoPoints);
 			}
 		}
-		boardView.drawBoard (
-			blackMoves, whiteMoves,
-			gameInfo.getPreviousMoves (
-				!playerBlackMoves, GameInfo._MAX_HISTORY_STONES +1),
-			redoPoints, gameInfo._moveNumber -1, !playerBlackMoves);
+		// Synchronized to match BoardView.surfaceChanged's own lock - this
+		// draws then blits (drawBoard()'s own last line calls
+		// drawBoard2Surface() internally), so it's just as exposed to a
+		// concurrent resize swapping _boardBitmap mid-call as score()'s own
+		// sequence is. See surfaceChanged's comment.
+		synchronized (boardView)
+		{
+			boardView.drawBoard (
+				blackMoves, whiteMoves,
+				gameInfo.getPreviousMoves (
+					!playerBlackMoves, GameInfo._MAX_HISTORY_STONES +1),
+				redoPoints, gameInfo._moveNumber -1, !playerBlackMoves);
+		}
 		showCaptures (getCaptures (true), getCaptures (false));
 		if (!playerIsMachine (gameInfo))
 		{
@@ -1060,9 +1081,10 @@ static String playMove(
 	for (int attempt = 0; attempt < _PACHI_MOVE_ATTEMPTS; attempt++)
 	{
 		// Refill Pachi's clock immediately before every attempt - see
-		// TIME_LEFT's own comment for why this can't just be set once.
-		gtpCommand (GtpCommand.TIME_LEFT,
-			colorArg + " " + pGameInfo._pachiThinkSeconds + " 1", EngineType.Pachi);
+		// TIME_SETTINGS's own comment for why this has to be resent (not
+		// time_left) and why it matters most for a self-played game.
+		gtpCommand (GtpCommand.TIME_SETTINGS,
+			"0 " + pGameInfo._pachiThinkSeconds + " 1", EngineType.Pachi);
 		final String move = gtpCommand (GtpCommand.GEN_MOVE, colorArg, EngineType.Pachi);
 		if (_RESIGN.equalsIgnoreCase (move))
 		{
@@ -1224,13 +1246,29 @@ void finishGame (
 	final GameInfo pGameInfo
 	)
 {
-	// Marks the position itself as finished - see GameInfo._gameOver's own
-	// comment for why this can't just be inferred from bothPlayersPassed()
-	// (doesn't cover resignation) and why it used to instead flip both
-	// players to human here: that corrupted the actual Human-plays setting
-	// (New/Edit Game would show "Both" after any computer-vs-computer game)
-	// and, via onPrepareOptionsMenu's own playerIsMachine() check, could
-	// re-enable Pass after a resigned one.
+	// A finished computer-vs-computer game switches both players to human:
+	// without it, undoing back out of the finished state (enableUndoMenu
+	// deliberately allows that, to review a finished game) left the board
+	// unlocked and Pass enabled with nobody actually driving either side -
+	// the engine was never told to keep playing, since every call site that
+	// decides that still goes by playerIsMachine()/otherPlayerIsMachine(),
+	// which _gameOver alone (see its own comment) doesn't affect. Flipping
+	// here makes the game genuinely human-vs-human from this point on, so
+	// that undo-to-review path (and everything else gated on player type)
+	// behaves correctly with no extra special-casing. Known trade-off, not
+	// otherwise worked around: this also permanently overwrites the
+	// New/Edit Game dialog's saved Human-plays setting to "Both" the next
+	// time it's opened, since storeGameInfo() persists it.
+	if (playerIsMachine (pGameInfo) && otherPlayerIsMachine (pGameInfo))
+	{
+		pGameInfo._playerBlackHuman = true;
+		pGameInfo._playerWhiteHuman = true;
+		_mainActivity.storeGameInfo (pGameInfo);
+	}
+	// Still needed independently of the flip above - see GameInfo._gameOver's
+	// own comment for why bothPlayersPassed() alone can't detect a
+	// resignation, which this covers for the territory-overlay, clock-pause,
+	// and redo-into-finished re-scoring fixes that depend on isGameOver().
 	pGameInfo._gameOver = true;
 	pGameInfo._redoPoints = null;
 	enableUndoMenu (pGameInfo);
@@ -1333,10 +1371,19 @@ void score (
 	{
 		enablePassMenu (false);
 		_boardView.lockScreen (true);
+		// Only the genuinely slow path (the actual GTP scoring queries below)
+		// is worth telling the user about. A non-final call is just a
+		// redisplay of already-known territory (resize, a display-setting
+		// toggle, resuming an already-scored game) - showing this dialog for
+		// that too meant every one of those redisplays popped its own
+		// "Calculating..." dialog, and dismissing IT could trigger another
+		// resize, which could trigger another redisplay, another dialog, and
+		// so on - a feedback loop where the board could end up blank if the
+		// user looked at the screen before the cascade finished settling.
+		final Resources resources = _mainActivity.getResources ();
+		showWaitProgress (resources.
+			getString (R.string.waitProgressFinalScoreMessage));
 	}
-	final Resources resources = _mainActivity.getResources ();
-	showWaitProgress (resources.
-		getString (R.string.waitProgressFinalScoreMessage));
 	final BoardView boardView = _boardView;
 	final boolean chineseRules = pGameInfo._chineseRules;
 	final ScoreBreakdown breakdown;
@@ -1352,11 +1399,38 @@ void score (
 		_cachedScoreMoveNumber = pGameInfo._moveNumber;
 		_cachedScoreBreakdown = breakdown;
 	}
-	boardView.drawBoard (breakdown._blackStones, breakdown._whiteStones, null, 0, false);
-	boardView.drawDeadStones (breakdown._blackDeadStones, breakdown._whiteDeadStones);
-	boardView.drawTerritory (breakdown._blackTerritory, breakdown._whiteTerritory, false);
-	boardView.drawTerritory (breakdown._whiteDeadStones, breakdown._blackDeadStones, true);
-	boardView.drawBoard2Surface ();
+	// Synchronized on boardView itself, matching BoardView.surfaceChanged's
+	// own synchronized block - this whole sequence paints onto _boardBitmap
+	// across 4 separate calls before finally blitting it, so a resize
+	// (main thread) swapping that bitmap out partway through must be kept
+	// from interleaving, or drawBoard2Surface() ends up blitting a blank
+	// bitmap instead of the one just painted. See surfaceChanged's comment.
+	synchronized (boardView)
+	{
+		// BoardView's own point2Coord()/createCellRect() convert each Point
+		// from board coordinates to screen pixels IN PLACE (see their own
+		// comments) - fine the first time a fresh list is drawn, but
+		// breakdown here can be the SAME cached ScoreBreakdown (and so the
+		// same Point objects) handed back on every redisplay of an
+		// already-scored position (a resize, a display-setting toggle,
+		// resuming a scored game - see _cachedScoreBreakdown's own comment).
+		// Drawing it a second time would convert already-pixel coordinates
+		// AGAIN as if they were still board coordinates, landing every
+		// stone and territory marker far off the visible bitmap - the board
+		// going blank right after toggling a display setting on an already-
+		// scored game was exactly this. Clone the points being handed to
+		// BoardView so the cached breakdown's own copies are never mutated,
+		// regardless of how many times it gets redrawn.
+		boardView.drawBoard (clonePoints (breakdown._blackStones),
+			clonePoints (breakdown._whiteStones), null, 0, false);
+		boardView.drawDeadStones (clonePoints (breakdown._blackDeadStones),
+			clonePoints (breakdown._whiteDeadStones));
+		boardView.drawTerritory (clonePoints (breakdown._blackTerritory),
+			clonePoints (breakdown._whiteTerritory), false);
+		boardView.drawTerritory (clonePoints (breakdown._whiteDeadStones),
+			clonePoints (breakdown._blackDeadStones), true);
+		boardView.drawBoard2Surface ();
+	}
 	final int numBlackDeadStones = breakdown._blackDeadStones.size (),
 		numWhiteDeadStones = breakdown._whiteDeadStones.size ();
 	showCaptures (
@@ -1441,6 +1515,24 @@ ScoreBreakdown computeScoreBreakdown (
 		whiteCaptured = needCaptures ? getCaptures (false) : 0;
 	return new ScoreBreakdown (blackStones, whiteStones, blackDeadStones, whiteDeadStones,
 		blackTerritory, whiteTerritory, blackCaptured, whiteCaptured);
+}
+
+// See score()'s own comment for why this exists: BoardView mutates each
+// Point from board coordinates to screen pixels in place when drawing it,
+// which is only safe the first time - these lists all come from GTP vertex
+// replies (list_stones/final_status_list), never a GameInfo.Passed marker,
+// so a plain Point copy (not a type-preserving clone) is safe here.
+private static
+List <Point> clonePoints (
+	final List <Point> pPoints
+	)
+{
+	final List <Point> copy = Generics.newArrayList (pPoints.size ());
+	for (final Point point : pPoints)
+	{
+		copy.add (new Point (point));
+	}
+	return copy;
 }
 
 private static

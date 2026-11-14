@@ -16,7 +16,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="capturesLabelText">Gefangene</string>
 	<string name="stonesLabelText">Steine</string>
 	<string name="moveLabelText">Zug</string>
-	<string name="territoryAndScoreLabelText">Gebiet &amp; Punkte</string>  <!-- Translation Provided by Claude -->
+	<string name="territoryAndScoreLabelText">Punkte</string>  <!-- Translation Provided by Claude -->
 	<string name="timeLabelText">Zeit</string>  <!-- Translation Provided by Claude -->
 	<string name="tapHintText">
 		Tippen zum Setzen\nDrücken für Zoom
@@ -103,7 +103,7 @@ GNU Go ist ein Computer-Spieler mit einer Stärke von etwa 8 bis 12 Kyu.
 	<string name="resignedText">Gibt auf</string>
 	<string name="passedText">Passt</string>
 	<string name="resignationMessageText">%1$s gibt auf, %2$s gewinnt</string>  <!-- Translation Provided by Claude -->
-	<string name="stonesWithCapturesFormat">%1$d (%2$d gefangen)</string>  <!-- Translation Provided by Claude -->
+	<string name="stonesWithCapturesFormat">%1$d (%2$d)</string>  <!-- Translation Provided by Claude -->
 	<string name="noUndoHintText">Rückgängig nicht möglich</string>
 	<string name="noRedoHintText">Wiederherstellen nicht möglich</string>
 	<string name="undoHintText">Rückgängig\nHier links wischen</string>
