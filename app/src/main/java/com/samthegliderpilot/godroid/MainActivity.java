@@ -1196,13 +1196,16 @@ void pauseGameClock ()
 
 // Package-private: called from Gtp.reStartGame(), before any setup GTP commands
 // for the (re)loaded game are sent, so Pachi is actually there to receive its
-// own setup when chosen. GnuGo itself is always running - see
+// own setup when needed. GnuGo itself is always running - see
 // GoEngineViewModel's class doc for why - so this only starts/stops Pachi.
+// pNeedsPachi covers both reasons Pachi has to be live: it's the game's own
+// engine, or (see computeScoreBreakdown's own comment) Chinese-rules scoring
+// always asks Pachi's judgment even when GnuGo is the one actually playing.
 void ensureEngine (
-	final EngineType pEngineType
+	final boolean pNeedsPachi
 	)
 {
-	_goEngineViewModel.ensurePachiEngine (pEngineType == EngineType.Pachi);
+	_goEngineViewModel.ensurePachiEngine (pNeedsPachi);
 }
 
 // See GoEngineViewModel.pachiNeedsSync/markPachiSynced's own comments - lets

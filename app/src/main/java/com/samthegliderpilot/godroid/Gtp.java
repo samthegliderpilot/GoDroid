@@ -1138,18 +1138,23 @@ void reStartGame (
 	// lastRecordedElapsedTime), rather than MainActivity.newGame()'s earlier
 	// _gameInfo assignment, which runs before that tree is loaded.
 	_mainActivity.attachGameClock ();
-	// Starts/stops Pachi to match this game's choice - a no-op for the common
-	// case (another game, same engine). GnuGo itself is never touched here;
+	// Starts/stops Pachi to match this game's needs - a no-op for the common
+	// case (another game, same needs). GnuGo itself is never touched here;
 	// it's always running (primary engine or referee - see gtpCommand's
 	// comment), so its own setup below is sent unconditionally too. Has to
 	// happen before any setup commands below so Pachi is actually there to
-	// receive its own.
-	_mainActivity.ensureEngine (pGameInfo._engineType);
+	// receive its own. Needed not just when Pachi is this game's own engine,
+	// but also - see computeScoreBreakdown's own comment - whenever Chinese
+	// rules are in play at all, since that scoring always asks Pachi's
+	// judgment even for a GnuGo game.
+	final boolean needsPachi =
+		pGameInfo._engineType == EngineType.Pachi || pGameInfo._chineseRules;
+	_mainActivity.ensureEngine (needsPachi);
 	gtpCommand (GtpCommand.SET_LEVEL, String.valueOf (pGameInfo._level));
 	gtpCommand (GtpCommand.SET_KOMI, pGameInfo._komi);
 	gtpCommand (GtpCommand.SET_RESIGN, pGameInfo._allowResignation ? "1" : "0");
 	gtpCommand (GtpCommand.SET_RULES, pGameInfo._chineseRules ? "1" : "0");
-	if (pGameInfo._engineType == EngineType.Pachi)
+	if (needsPachi)
 	{
 		// Pachi defaults to 19x19 internally if never told otherwise - it was
 		// never sent its own boardsize, so a non-19x19 game had it generating
@@ -1471,12 +1476,32 @@ ScoreBreakdown computeScoreBreakdown (
 	// final_status_list (dead/alive/seki, plus the same black_territory/
 	// white_territory GnuGo extensions - its own source literally labels
 	// them that), backed by its own MCTS ownermap rather than GnuGo's
-	// pattern-based dead-stone heuristics. Querying GnuGo for a position it
-	// never actually played, using GnuGo's own weaker-under-Chinese-rules
-	// judgment, was never a deliberate choice - just never revisited after
-	// confirming list_stones/captures/all_legal's gap and over-generalizing
-	// it to scoring too.
-	final EngineType scoringEngine = pGameInfo._engineType;
+	// pattern-based dead-stone heuristics - weaker specifically under
+	// Chinese (area) rules. So under Chinese rules this always asks Pachi,
+	// even for a GnuGo game: confirmed in Pachi's own gtp.c that
+	// final_status_list/final_score are pure board reads (engine_dead_
+	// groups/engine_ownermap) - nothing there ever calls board_play, so
+	// asking a position it never generated a move on is safe, not a risk of
+	// it "playing" into the real game. The separate engine-score cross-check
+	// shown next to the winner's name (Gtp.score()'s own FINAL_SCORE query)
+	// deliberately stays on pGameInfo._engineType instead - an independent
+	// second opinion from whichever engine actually played is more useful
+	// than asking the same engine that just produced this breakdown to also
+	// "cross-check" itself.
+	final EngineType scoringEngine =
+		pChineseRules ? EngineType.Pachi : pGameInfo._engineType;
+	// reStartGame's own needsPachi/syncPachiHistory only catches Pachi up as
+	// of game start/resume - commitLiveMove/commitUndo only mirror moves
+	// into Pachi live when it's the game's own active engine (see their own
+	// comments), so a GnuGo game scored here under Chinese rules would
+	// otherwise ask Pachi about a stale, mostly-empty board. One more sync
+	// check right before actually querying it covers the rest of the game.
+	if (scoringEngine == EngineType.Pachi
+		&& _mainActivity.pachiNeedsSync (pGameInfo._moveNumber))
+	{
+		pGameInfo.syncPachiHistory ();
+		_mainActivity.markPachiSynced (pGameInfo._moveNumber);
+	}
 	final List <Point> blackStones = getStones (true, pGameInfo),
 		whiteStones = getStones (false, pGameInfo),
 		deadStones = verteces2Points (
