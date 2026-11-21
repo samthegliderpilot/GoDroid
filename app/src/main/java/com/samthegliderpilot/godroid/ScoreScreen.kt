@@ -111,8 +111,18 @@ fun withFinalScore(
         // straight from the AI's "thinking" spinner to this final score
         // without ever calling showMove() to reveal its last move first, so
         // the spinner would otherwise never clear.
-        blackMove = MoveCellState(showProgress = false, text = "$blackTerritory / $blackScore"),
-        whiteMove = MoveCellState(showProgress = false, text = "$whiteTerritory / $whiteScore"),
+        // Chinese (area) rules don't have a separate "territory" concept to
+        // show alongside the total the way Japanese does - stones and
+        // territory are just two parts of the same one area count, so
+        // showing "territory / total" reads as if territory were withheld
+        // from the total, when it's already folded in. Japanese rules keep
+        // showing both: territory alone, then the full score (territory +
+        // captures, which already includes each side's newly-dead enemy
+        // stones - see Gtp.score()'s own showCaptures call).
+        blackMove = MoveCellState(showProgress = false,
+            text = if (chineseRules) blackScore else "$blackTerritory / $blackScore"),
+        whiteMove = MoveCellState(showProgress = false,
+            text = if (chineseRules) whiteScore else "$whiteTerritory / $whiteScore"),
         blackScoreText = blackScore,
         whiteScoreText = whiteScore,
     )

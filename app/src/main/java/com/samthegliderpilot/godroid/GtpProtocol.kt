@@ -46,14 +46,23 @@ object GtpProtocol {
      * parsing "ass" as a row number), so this can't assume its input is
      * always a well-formed vertex; callers decide what an unparsable one
      * means for them (see `Gtp.java`'s own genmove-reply handling) instead
-     * of this throwing.
+     * of this throwing. Also rejects a vertex that parses fine but names a
+     * cell outside this actual board (column/row from a bigger board than
+     * boardSize, or row 0/negative) - chased as a candidate for a stray
+     * mark drawn near A9 on one finished 9x9 game (see Gtp.score()'s own
+     * comment for what that actually turned out to be: a drawing-coordinate
+     * bug, not a bad vertex). Keeping this bounds check anyway - a vertex
+     * genuinely outside the board it was queried against is never valid
+     * regardless of what produced it, and the drawing code should never
+     * have to cope with an out-of-bounds Point at all.
      */
     @JvmStatic
     fun vertex2Point(vertex: String?, boardSize: Int): Point? {
         if (vertex.isNullOrEmpty()) return null
         val column = POSITION_LETTERS.indexOf(vertex[0])
         val row = vertex.substring(1).toIntOrNull()
-        if (column < 0 || row == null) return null
+        if (column < 0 || column >= boardSize || row == null
+            || row < 1 || row > boardSize) return null
         return Point(column, boardSize - row)
     }
 

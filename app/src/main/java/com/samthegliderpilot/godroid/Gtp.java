@@ -1428,21 +1428,36 @@ void score (
 		// regardless of how many times it gets redrawn.
 		boardView.drawBoard (clonePoints (breakdown._blackStones),
 			clonePoints (breakdown._whiteStones), null, 0, false);
-		boardView.drawDeadStones (clonePoints (breakdown._blackDeadStones),
-			clonePoints (breakdown._whiteDeadStones));
+		// The second drawTerritory call below deliberately reuses these same
+		// clones (not fresh ones) after drawDeadStones has already converted
+		// them to pixel coordinates in place - that's what its own
+		// pIsCoord=true is asking for (skip the conversion, they're already
+		// done). Cloning twice here very much broke that: each clone would
+		// start back at the original board coordinates, which pIsCoord=true
+		// then used as raw pixels, landing a phantom mark in the top-left
+		// few pixels of the bitmap - confirmed live.
+		final List <Point> blackDeadStones = clonePoints (breakdown._blackDeadStones),
+			whiteDeadStones = clonePoints (breakdown._whiteDeadStones);
+		boardView.drawDeadStones (blackDeadStones, whiteDeadStones);
 		boardView.drawTerritory (clonePoints (breakdown._blackTerritory),
 			clonePoints (breakdown._whiteTerritory), false);
-		boardView.drawTerritory (clonePoints (breakdown._whiteDeadStones),
-			clonePoints (breakdown._blackDeadStones), true);
+		boardView.drawTerritory (whiteDeadStones, blackDeadStones, true);
 		boardView.drawBoard2Surface ();
 	}
 	final int numBlackDeadStones = breakdown._blackDeadStones.size (),
 		numWhiteDeadStones = breakdown._whiteDeadStones.size ();
+	// Under Chinese (area) rules a captured enemy stone's point becomes YOUR
+	// TERRITORY, not one of your own stones - that's already added into
+	// pBlackTerritory/pWhiteTerritory below (showScore's own numWhiteDead/
+	// numBlackDeadStones terms). Adding it here too, on top of each side's
+	// own live stone count, double-counted every dead stone into the final
+	// score (blackScore = this Stones figure + that Territory figure) -
+	// confirmed live: a game scored B+23.5 by the engine's own cross-check
+	// showed 28/67 here instead of 28/55, exactly one numWhiteDeadStones
+	// (12) too many.
 	showCaptures (
-		(chineseRules ? breakdown._blackStones.size () : breakdown._blackCaptured)
-			+ numWhiteDeadStones,
-		(chineseRules ? breakdown._whiteStones.size () : breakdown._whiteCaptured)
-			+ numBlackDeadStones);
+		chineseRules ? breakdown._blackStones.size () : breakdown._blackCaptured + numWhiteDeadStones,
+		chineseRules ? breakdown._whiteStones.size () : breakdown._whiteCaptured + numBlackDeadStones);
 	// Cross-check against the engine's own authoritative total - see
 	// FINAL_SCORE's own comment for why this can disagree with the number
 	// just computed above from LIST_FINAL_STATUS's per-point breakdown. Only
@@ -1770,7 +1785,25 @@ List <Point> verteces2Points (
 	final GameInfo pGameInfo
 	)
 {
-	return GtpProtocol.verteces2Points (pVerteces, pGameInfo._boardSize);
+	final List <Point> points = GtpProtocol.verteces2Points (pVerteces, pGameInfo._boardSize);
+	// Diagnostic only - see GtpProtocol.vertex2Point's own comment on the
+	// out-of-bounds rejection this is watching for. Counting raw tokens
+	// instead of comparing against pVerteces being non-null/non-blank
+	// keeps this simple without needing to know every reason a token can
+	// legitimately be filtered (a pass marker, an engine-specific spelling).
+	if (pVerteces != null && isEnabledFor (_LOG_TAG, Log.WARN))
+	{
+		final int tokenCount = pVerteces.trim ().isEmpty () ? 0
+			: pVerteces.trim ().split ("[ \n]+").length;
+		if (tokenCount != points.size ())
+		{
+			log (_LOG_TAG, Log.WARN, "verteces2Points rejected "
+				+ (tokenCount - points.size ()) + " of " + tokenCount
+				+ " token(s) from '" + pVerteces + "' as not a real cell on this "
+				+ pGameInfo._boardSize + "x" + pGameInfo._boardSize + " board");
+		}
+	}
+	return points;
 }
 
 static
