@@ -1,0 +1,7 @@
+• Pachi added as a second computer opponent, alongside GnuGo
+• Optional on-screen game clock
+• Setting to show or hide board coordinates
+• Redesigned New/Edit Game dialog
+• Scoring fixes: human vs human games, territory markers kept on rotation, clearer score panel
+• Fixes for weak Pachi moves in computer vs computer games, undo after a finished game, and the header on narrow screens
+• Earlier fixes included: a tap-accuracy issue, smaller app size

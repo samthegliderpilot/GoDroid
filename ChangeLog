@@ -1,4 +1,4 @@
-2026-11-07 GoDroid v1.5.3
+2026-11-07 GoDroid v1.6.0
 - Added Pachi as a second computer opponent alongside GnuGo, with its own
 think time and resign threshold settings (GnuGo still available as before)
 - Added an optional on-screen game clock
@@ -17,7 +17,7 @@ think time and resign threshold settings (GnuGo still available as before)
 - Smaller app size (enabled minification)
 
 2026-10-17 GoDroid v1.5.1
-- Now available on F-Droid
+- Releasing on F-Droid (still in review...)
 
 2026-10-14 GoDroid v1.5.0
 - Added the option to move saved games to another folder
