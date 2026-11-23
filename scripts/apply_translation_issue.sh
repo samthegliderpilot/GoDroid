@@ -51,6 +51,87 @@ xml_escape() {
     printf '%s' "$s"
 }
 
+# The raw inner text of the default <string name="$1"> (it can span lines).
+default_value() {
+    awk -v key="$1" '
+        BEGIN { want = "<string name=\"" key "\"" }
+        { sub(/\r$/, "") }
+        !cap && (i = index($0, want)) > 0 {
+            rest = substr($0, i); sub(/^[^>]*>/, "", rest); cap = 1
+            if ((j = index(rest, "</string>")) > 0) { print substr(rest, 1, j - 1); exit }
+            print rest; next
+        }
+        cap { if ((j = index($0, "</string>")) > 0) { print substr($0, 1, j - 1); exit } print }
+    ' "$default_file"
+}
+
+# printf-style placeholders (%s, %d, %1$s ...) of a string, order-independent,
+# positions dropped, "%%" ignored. A translation whose placeholders differ from
+# the English one can crash the app at runtime. A "% s" with a space (as in
+# French "100 % sur") is deliberately not counted.
+placeholders() {
+    printf '%s' "$1" | sed 's/%%//g' \
+        | grep -oE '%([0-9]+\$)?[-#+0,(]*[0-9]*(\.[0-9]+)?[sdfxXcCbBeEgGoOhH]' \
+        | sed -E 's/^%([0-9]+\$)?[-#+0,(]*[0-9]*(\.[0-9]+)?/%/' \
+        | sort | tr '\n' ' ' | sed 's/ $//' || true
+}
+
+# Validate one submitted value against the English string and turn it into the
+# text for the XML file. Prints the encoded text and returns 0, or prints the
+# reason it was refused and returns 1. Contributors type plain text (that is all
+# the translate page produces), so every character Android treats specially
+# is escaped here: nothing a contributor types can break out of the string.
+encode_value() {
+    local key="$1" value="$2" default want got s
+    local bs='\' sq="'" dq='"'
+    default="$(default_value "$key")"
+
+    if [ "${#value}" -gt 2000 ]; then
+        echo "too long (over 2000 characters)"; return 1
+    fi
+    # ASCII control characters (tab is fine) and the Unicode C1 controls. Checked
+    # byte-wise with LC_ALL=C: [[:cntrl:]] depends on the locale and can treat
+    # the bytes of ordinary accented or typographic characters as controls.
+    if printf '%s' "$value" | LC_ALL=C grep -qE $'[\x01-\x08\x0b-\x1f\x7f]|\xc2[\x80-\x9f]'; then
+        echo "contains a control character"; return 1
+    fi
+    # Text-direction embeddings/overrides/isolates can make a reviewer see
+    # different text than the app shows ("Trojan Source"), so refuse them.
+    if printf '%s' "$value" | LC_ALL=C grep -qE $'\xe2\x80[\xaa-\xae]|\xe2\x81[\xa6-\xa9]'; then
+        echo "contains invisible text-direction control characters"; return 1
+    fi
+    if [[ "$default" == *'<![CDATA['* ]]; then
+        echo "the English text uses special markup (CDATA) and has to be edited by a maintainer"; return 1
+    fi
+    # Only the escape sequences Android understands. "\\" first so a literal
+    # backslash followed by n is not mistaken for a newline escape.
+    if printf '%s' "$value" | sed -E 's/\\(\\|n|t|u[0-9a-fA-F]{4}|'"'"'|"|@|\?)//g' | grep -q '\\'; then
+        echo "contains a backslash sequence Android does not understand (allowed: \\n \\t \\\\ \\' \\\" \\@ \\? \\uXXXX)"; return 1
+    fi
+    want="$(placeholders "$default")"
+    got="$(placeholders "$value")"
+    if [ "$want" != "$got" ]; then
+        echo "placeholders must match the English text (expected: ${want:-none}, got: ${got:-none})"; return 1
+    fi
+
+    s="$value"
+    # A value copied from an existing strings.xml may already carry \' or \" -
+    # undo that first so those are never escaped twice.
+    s="${s//"$bs$sq"/$sq}"
+    s="${s//"$bs$dq"/$dq}"
+    s="$(xml_escape "$s")"
+    s="${s//"$sq"/"$bs$sq"}"
+    s="${s//"$dq"/"$bs$dq"}"
+    # A leading @ or ? would be read as a reference to another resource.
+    case "$s" in '@'*|'?'*) s="$bs$s" ;; esac
+    # Keep <b> bold markup only where the English text itself uses it.
+    if [[ "$default" == *'<b>'* ]]; then
+        s="${s//&lt;b&gt;/<b>}"
+        s="${s//&lt;\/b&gt;/</b>}"
+    fi
+    printf '%s' "$s"
+}
+
 # --- Language field: first non-blank line, trimmed ---
 locale="$(extract_field "Language" | grep -m1 -v '^[[:space:]]*$' | sed -e 's/^[[:space:]]*//' -e 's/[[:space:]]*$//')"
 if ! [[ "$locale" =~ ^[a-z]{2,3}(-r[A-Z]{2})?$ ]]; then
@@ -93,7 +174,10 @@ while IFS= read -r line; do
         continue
     fi
 
-    escaped_value="$(xml_escape "$value")"
+    if ! escaped_value="$(encode_value "$key" "$value")"; then
+        skipped+=("'$key' was not applied: $escaped_value")
+        continue
+    fi
     # Submitted values may contain a literal backslash-n (Android's own
     # newline escape for a plain, non-CDATA string - see translate.html).
     # Passed as NEW_LINE here and read back via ENVIRON[], not -v: awk's -v
@@ -116,6 +200,11 @@ while IFS= read -r line; do
 done <<< "$translations_text"
 
 if [ "${#applied[@]}" -eq 0 ]; then
+    # Say why each line was refused before failing, so the Action's log (and
+    # whoever reads it) can tell a typo from a deliberately refused value.
+    for problem in "${skipped[@]}"; do
+        echo "  - $problem"
+    done
     fail "No valid 'key = value' translation lines found"
 fi
 
