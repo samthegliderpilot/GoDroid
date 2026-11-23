@@ -1,6 +1,7 @@
 package com.samthegliderpilot.godroid
 
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -24,8 +25,13 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.TextMeasurer
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.rememberTextMeasurer
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.isUnspecified
 
 /** Java-callable: builds the [MutableState] `MainActivity` holds and passes
  * back into the update functions below. */
@@ -269,9 +275,10 @@ private fun ScoreRow(label: String, blackValue: String, whiteValue: String) {
 /**
  * Text with a thin stroke of the opposite tone behind its fill - like a map
  * label or subtitle - so it stays legible over the painted board-art
- * background no matter what's directly behind it. Scales with the text
- * itself (no fixed-size box to fit), so it works the same regardless of how
- * long a translated string runs.
+ * background no matter what's directly behind it. Always a single line: a
+ * string wider than the room it is given (a long translation in a narrow
+ * column) is shrunk to fit - see [fitStyleToWidth] - instead of wrapping,
+ * and is ellipsized only if even the smallest allowed size does not fit.
  */
 @Composable
 private fun OutlinedText(
@@ -288,15 +295,73 @@ private fun OutlinedText(
     // between this stroke-drawn pass and the plain fill pass below (same
     // text, two Paint styles), which reads as the two not matching.
     val pinnedStyle = style.copy(fontFamily = FontFamily.SansSerif)
-    Box(modifier = modifier) {
+    val measurer = rememberTextMeasurer()
+    BoxWithConstraints(modifier = modifier) {
+        // One fitted style shared by both passes below, so the stroke and the
+        // fill are always the same size.
+        val fitted = fitStyleToWidth(measurer, text, pinnedStyle, fontWeight, constraints.maxWidth)
         Text(
             text = text,
-            style = pinnedStyle.copy(drawStyle = Stroke(width = strokeWidthPx, join = StrokeJoin.Round)),
+            style = fitted.copy(drawStyle = Stroke(width = strokeWidthPx, join = StrokeJoin.Round)),
             fontWeight = fontWeight,
             color = outlineColor,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
         )
-        Text(text = text, style = pinnedStyle, fontWeight = fontWeight, color = fillColor)
+        Text(
+            text = text,
+            style = fitted,
+            fontWeight = fontWeight,
+            color = fillColor,
+            maxLines = 1,
+            softWrap = false,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
+}
+
+/**
+ * [style] with its font size reduced just enough that [text] fits on one line
+ * in [maxWidthPx], or [style] unchanged if it already fits. Only the font size
+ * changes - the line height stays as the theme set it, so the panel is the same
+ * height whether or not a label was shrunk and the board below never moves.
+ */
+private fun fitStyleToWidth(
+    measurer: TextMeasurer,
+    text: String,
+    style: TextStyle,
+    fontWeight: FontWeight?,
+    maxWidthPx: Int,
+): TextStyle {
+    // An unbounded width (not inside a sized column) or a style with no
+    // explicit size has nothing to fit against.
+    if (maxWidthPx == Constraints.Infinity || style.fontSize.isUnspecified) {
+        return style
+    }
+    fun widthAt(candidate: TextStyle): Int =
+        measurer.measure(
+            text = text,
+            style = candidate.copy(fontWeight = fontWeight ?: candidate.fontWeight),
+            softWrap = false,
+            maxLines = 1,
+        ).size.width
+
+    var scale = TextFit.scaleFor(widthAt(style), maxWidthPx)
+    if (scale == 1f) {
+        return style
+    }
+    // Text width is only roughly proportional to size (glyph hinting and rounding),
+    // so confirm the proportional guess and nudge it down a little if it is
+    // still a pixel or two too wide.
+    var fitted = style.copy(fontSize = style.fontSize * scale)
+    repeat(3) {
+        if (scale > TextFit.DEFAULT_MIN_SCALE && widthAt(fitted) > maxWidthPx) {
+            scale = (scale * 0.96f).coerceAtLeast(TextFit.DEFAULT_MIN_SCALE)
+            fitted = style.copy(fontSize = style.fontSize * scale)
+        }
+    }
+    return fitted
 }
 
 /** One label column plus two equal value columns (black/white), kept the
