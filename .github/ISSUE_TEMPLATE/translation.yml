@@ -1,7 +1,6 @@
 name: Translation (add or fix)
 description: Add a new language, or fix/complete an existing translation.
 title: "[Translation] "
-labels: ["translation"]
 body:
   - type: markdown
     attributes:

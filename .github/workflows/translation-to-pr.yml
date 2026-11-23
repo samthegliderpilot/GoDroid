@@ -1,17 +1,32 @@
 name: Translation Issue to PR
 
-# Runs only when a maintainer adds the "translation-ready" label to an issue -
-# never automatically on issue creation. That keeps a human in the loop
-# before anything from an untrusted submitter touches the repo: the trigger
-# itself is a maintainer decision, and the result is a PR for review, not a
-# direct commit.
+# Turns a submitted "Translation" issue into a pull request. Runs when such an
+# issue is opened, and again when it is edited, which updates the same PR (so a
+# contributor can fix a typo without starting over).
+#
+# There is no maintainer gate before the PR is opened - the result is only ever
+# a pull request, never a commit to main, and nothing is merged automatically.
+# What stands between a stranger's text and the repo is:
+#   - scripts/apply_translation_issue.sh, which accepts only a valid locale
+#     code and known string keys, escapes the text for Android, and refuses
+#     unsafe values (see that script);
+#   - normal review of the PR before merging.
+# The issue body reaches the script through an environment variable, never
+# pasted into a shell command. If spam ever becomes a problem, gate this with a
+# label again: change the trigger to `labeled` and test the label name.
 on:
   issues:
-    types: [labeled]
+    types: [opened, edited]
+
+# One run per issue at a time, so a quick edit cannot race the first run.
+concurrency:
+  group: translation-issue-${{ github.event.issue.number }}
+  cancel-in-progress: true
 
 jobs:
   open-pr:
-    if: github.event.label.name == 'translation-ready'
+    # Only issues made from the translation form (it always has this heading).
+    if: ${{ contains(github.event.issue.body, '### Translations') }}
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -41,10 +56,10 @@ jobs:
             Generated from #${{ github.event.issue.number }} by the
             translation-to-pr workflow. Please review the actual translated
             text before merging - this only checks that the string *keys*
-            are valid, not that the translation itself is correct.
+            are valid and the text is safe for Android, not that the
+            translation itself is correct.
 
             Closes #${{ github.event.issue.number }}
-          labels: translation
 
       - name: Comment on success
         if: success()
@@ -55,7 +70,7 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Thanks! I've opened a pull request with these translations for a maintainer to review."
+              body: "Thanks! I've opened (or updated) a pull request with these translations for a maintainer to review."
             });
 
       - name: Comment on failure
@@ -67,5 +82,5 @@ jobs:
               owner: context.repo.owner,
               repo: context.repo.repo,
               issue_number: context.issue.number,
-              body: "Something went wrong turning this into a pull request automatically (maybe the language code or the `key = value` lines need a second look). A maintainer will take it from here."
+              body: "Something went wrong turning this into a pull request automatically (maybe the language code or the `key = value` lines need a second look - the details are in the workflow run's log). Editing this issue runs it again. A maintainer will take it from here."
             });

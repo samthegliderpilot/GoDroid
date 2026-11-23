@@ -39,19 +39,25 @@ template directly.
 
 ### How a translation issue becomes a change
 
-A filled-out translation issue doesn't change anything by itself. Once a
-maintainer reviews it and adds the `translation-ready` label, a GitHub Action
+Submitting a translation issue opens a pull request for you. A GitHub Action
 ([`.github/workflows/translation-to-pr.yml`](.github/workflows/translation-to-pr.yml))
 parses the issue, applies the `key = value` lines to the right
 `values-<locale>/strings.xml` (creating it if the language is new), and opens
-a pull request from the result. That PR still goes through normal review
-before merging - the automation saves the maintainer from retyping
-translations by hand, it doesn't skip review.
+a pull request from the result. If you spot a mistake afterwards, just edit
+the issue - the pull request is updated. That PR still goes through normal
+review before merging - the automation saves the maintainer from retyping
+translations by hand, it doesn't skip review, and nothing is merged
+automatically.
 
 The same script that applies translations
 ([`scripts/apply_translation_issue.sh`](scripts/apply_translation_issue.sh))
 only accepts keys that already exist in the default `strings.xml`, so a typo
-in a key name gets flagged rather than silently creating a dead string.
+in a key name gets flagged rather than silently creating a dead string. It
+also escapes what you type for Android (apostrophes, quotes, `&`, `<`, a
+leading `@` or `?`), keeps `<b>` only where the English text uses it, and
+refuses values that are unsafe: control or invisible text-direction
+characters, over-long text, unknown backslash sequences, and `%s`/`%d`
+placeholders that don't match the English text.
 Every push also runs
 [`scripts/check_locale_sync.sh`](scripts/check_locale_sync.sh) in CI, which
 fails if any locale file has a key that isn't in the default `strings.xml`
