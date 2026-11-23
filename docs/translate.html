@@ -27,6 +27,21 @@
   main { max-width: 900px; margin: 0 auto; }
   h1 { margin-top: 0; }
   p.intro { color: var(--muted); line-height: 1.5; }
+
+  /* Deliberately loud: submitting needs a GitHub account, and we want people to
+     know that before they spend time typing translations. */
+  .banner {
+    background: #ffcc00;
+    color: #1b1b1b;
+    border: 3px solid #fff;
+    border-radius: 8px;
+    padding: 1rem 1.25rem;
+    margin-bottom: 1.25rem;
+    font-size: 1.1rem;
+    line-height: 1.4;
+  }
+  .banner strong { display: block; font-size: 1.5rem; letter-spacing: 0.02em; margin-bottom: 0.25rem; }
+  .banner a { color: #002a8a; font-weight: 700; }
   a { color: var(--accent); }
 
   .controls {
@@ -112,6 +127,13 @@
 </head>
 <body>
 <main>
+  <div class="banner" role="note">
+    <strong>Requires a free GitHub account</strong>
+    Submitting your translations opens a GitHub issue, so you will be asked to sign in
+    when you click <em>Submit on GitHub</em>. No account yet? It is free and takes a couple of
+    minutes: <a href="https://github.com/signup">create one here</a>.
+  </div>
+
   <h1>Translate GoDroid</h1>
   <p class="intro">
     Pick a language below. Rows already translated are pre-filled from the
