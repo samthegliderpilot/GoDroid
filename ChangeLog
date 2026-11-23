@@ -1,4 +1,4 @@
-2026-11-07 GoDroid v1.6.0
+2026-11-23 GoDroid v1.6.0
 - Added Pachi as a second computer opponent alongside GnuGo, with its own
 think time and resign threshold settings (GnuGo still available as before)
 - Added an optional on-screen game clock
