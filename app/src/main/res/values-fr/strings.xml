@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<string name="app_name">GoDroid\'ChangeMe</string>
+	<string name="app_name">GoDroid</string>
 	<string name="app_description">
 		<![CDATA[\
 Jeux de stratégie.
@@ -10,7 +10,7 @@ Jouer au Go (Weiqi, Igo, Baduk) contre votre ordinateur.
 Interface graphique pour Gnu Go (v3.8). GNU Go est une intelligence artificielle de niveaux 8 à 12 Kyu.
 		]]>
 	</string>
-	<string name="blackColorText">NoirChangeMe</string>
+	<string name="blackColorText">Noir</string>
 	<string name="whiteColorText">Blanc</string>
 	<string name="capturesLabelText">Prisonniers</string>
 	<string name="stonesLabelText">Pierres</string>
