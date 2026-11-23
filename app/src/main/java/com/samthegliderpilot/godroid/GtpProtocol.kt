@@ -22,6 +22,39 @@ object GtpProtocol {
      * showboard are left intact). A null, empty, or error ("?"-prefixed)
      * reply becomes "".
      */
+    /** The result of [splitDeadStones]. */
+    class DeadStoneSplit<T>(
+        val blackDead: MutableList<T>,
+        val whiteDead: MutableList<T>,
+        /** Points an engine called dead that hold no stone of either color. */
+        val notStones: MutableList<T>,
+    )
+
+    /**
+     * Sorts the points an engine named in `final_status_list dead` into black and
+     * white dead stones, using the referee's own stone lists. A point that holds no
+     * stone of either color is NOT a dead stone - an engine whose board has drifted
+     * from the real game can name one (a stone it still has where one was captured) -
+     * so it is returned separately instead of being counted as a white stone, which
+     * is what used to inflate the score.
+     */
+    @JvmStatic
+    fun <T> splitDeadStones(
+        dead: List<T>,
+        blackStones: Collection<T>,
+        whiteStones: Collection<T>,
+    ): DeadStoneSplit<T> {
+        val split = DeadStoneSplit<T>(ArrayList(), ArrayList(), ArrayList())
+        for (point in dead) {
+            when {
+                blackStones.contains(point) -> split.blackDead.add(point)
+                whiteStones.contains(point) -> split.whiteDead.add(point)
+                else -> split.notStones.add(point)
+            }
+        }
+        return split
+    }
+
     @JvmStatic
     fun cleanReply(rawReply: String?): String {
         val reply = rawReply?.replaceFirst("= ", "")?.removeSuffix("\n").orEmpty()

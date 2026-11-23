@@ -34,4 +34,47 @@ class GtpProtocolTest {
         assertEquals("", GtpProtocol.cleanReply(""))
         assertEquals("", GtpProtocol.cleanReply("? unacceptable move\n"))
     }
+
+    // splitDeadStones is generic, so it is tested here with plain strings (the real
+    // code passes android.graphics.Point, which the unit-test classpath cannot use).
+
+    @Test
+    fun `splitDeadStones separates black and white dead stones`() {
+        val split = GtpProtocol.splitDeadStones(
+            dead = listOf("D4", "H8"),
+            blackStones = listOf("D4", "A1"),
+            whiteStones = listOf("H8", "J9"),
+        )
+        assertEquals(listOf("D4"), split.blackDead)
+        assertEquals(listOf("H8"), split.whiteDead)
+        assertEquals(emptyList<String>(), split.notStones)
+    }
+
+    @Test
+    fun `splitDeadStones does not treat an empty point as a dead white stone`() {
+        // Regression: a live Pachi, replayed into without clearing its board, still had
+        // stones where earlier captures had emptied G4 and G5, and named them in
+        // final_status_list dead. They hold no stone in the real game, and counting them as
+        // dead WHITE stones (the old behaviour) credited black for stones that were never
+        // there - the score row came out wrong while the engine's own W+8.5 was right.
+        val split = GtpProtocol.splitDeadStones(
+            dead = listOf("G4", "G5"),
+            blackStones = listOf("G9", "F8"),
+            whiteStones = listOf("H8", "H7"),
+        )
+        assertEquals(emptyList<String>(), split.blackDead)
+        assertEquals(emptyList<String>(), split.whiteDead)
+        assertEquals(listOf("G4", "G5"), split.notStones)
+    }
+
+    @Test
+    fun `splitDeadStones keeps real dead stones when empty points are mixed in`() {
+        val split = GtpProtocol.splitDeadStones(
+            dead = listOf("H8", "G4", "H7"),
+            blackStones = emptyList(),
+            whiteStones = listOf("H8", "H7"),
+        )
+        assertEquals(listOf("H8", "H7"), split.whiteDead)
+        assertEquals(listOf("G4"), split.notStones)
+    }
 }

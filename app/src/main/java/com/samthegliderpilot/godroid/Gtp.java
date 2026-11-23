@@ -78,6 +78,10 @@ static
 enum GtpCommand
 {
 	SET_BOARDSIZE ("boardsize "),
+	// Standard GTP. Sent to Pachi before GameInfo.syncPachiHistory replays a game's
+	// moves, so the replay always rebuilds the position from an empty board - see
+	// that method for what goes wrong when the board is not cleared first.
+	CLEAR_BOARD ("clear_board"),
 	SET_LEVEL ("level "),
 	SET_KOMI ("komi "),
 	SET_RESIGN("set_resign_option "),
@@ -1520,13 +1524,19 @@ ScoreBreakdown computeScoreBreakdown (
 	final List <Point> blackStones = getStones (true, pGameInfo),
 		whiteStones = getStones (false, pGameInfo),
 		deadStones = verteces2Points (
-			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _DEAD, scoringEngine), pGameInfo),
-		blackDeadStones = Generics.newArrayList (),
-		whiteDeadStones = Generics.newArrayList ();
-	for (final Point dead : deadStones)
+			gtpCommand (GtpCommand.LIST_FINAL_STATUS, _DEAD, scoringEngine), pGameInfo);
+	// Only a point that really holds a stone is a dead stone. The engine can name
+	// an empty point (see GameInfo.syncPachiHistory for how); filing it as a dead
+	// white stone, as this used to, drew a phantom mark and credited black for it.
+	final GtpProtocol.DeadStoneSplit <Point> deadSplit =
+		GtpProtocol.splitDeadStones (deadStones, blackStones, whiteStones);
+	final List <Point> blackDeadStones = deadSplit.getBlackDead (),
+		whiteDeadStones = deadSplit.getWhiteDead ();
+	if (!deadSplit.getNotStones ().isEmpty ()
+		&& isEnabledFor (_LOG_TAG, Log.WARN))
 	{
-		(blackStones.contains (dead) ? blackDeadStones : whiteDeadStones).
-			add (dead);
+		log (_LOG_TAG, Log.WARN, "ignoring dead points that hold no stone: "
+			+ deadSplit.getNotStones ());
 	}
 	removeDeadStones (blackDeadStones, blackStones);
 	removeDeadStones (whiteDeadStones, whiteStones);

@@ -703,6 +703,16 @@ class GameInfo {
      * same-color stone placed later), leaving its board wrong even after every
      * stone's been replayed. */
     fun syncPachiHistory() {
+        // Start from an empty board. This replay is also run on a Pachi that is already
+        // live and holding the whole game (when the move-count check in
+        // GoEngineViewModel.pachiNeedsSync is stale, e.g. after an undo followed by an
+        // Activity recreation, or at scoring time). Replaying onto that board is not a
+        // harmless no-op: every point still occupied just rejects the move, but a point
+        // that is empty now - where a stone was captured - ACCEPTS it, silently putting
+        // the captured stone back. Pachi then reports those stones as dead, inside the
+        // capturer's territory, from final_status_list.
+        // (komi, rules and options survive clear_board - checked against the engine.)
+        Gtp.gtpCommand(Gtp.GtpCommand.CLEAR_BOARD, null, EngineType.Pachi)
         val setupNode = _setupNode ?: return
         replaySingleColor(setupStonePoints(true, setupNode), true, EngineType.Pachi)
         replaySingleColor(setupStonePoints(false, setupNode), false, EngineType.Pachi)
