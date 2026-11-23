@@ -1,6 +1,7 @@
 name: Build and Test
 
 on:
+  workflow_dispatch: {}
   push:
     branches: [ "**" ]
   pull_request:
@@ -11,10 +12,17 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout (with submodules)
+      - name: Checkout
         uses: actions/checkout@v4
-        with:
-          submodules: recursive
+
+      - name: Fetch submodules (with retries - git.savannah.gnu.org is flaky)
+        run: |
+          for attempt in 1 2 3 4; do
+            git submodule update --init --recursive && exit 0
+            echo "Submodule fetch failed (attempt $attempt), retrying..."
+            sleep $((attempt * 20))
+          done
+          exit 1
 
       - name: Set up JDK 21
         uses: actions/setup-java@v4
@@ -24,6 +32,12 @@ jobs:
 
       - name: Accept Android SDK licenses
         run: yes | $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager --licenses > /dev/null || true
+
+      - name: Install the pinned Android NDK
+        # GnuGo and Pachi are built by calling ndk-build directly (see
+        # app/buildGnugoExecutable.gradle.kts), so the Android Gradle plugin
+        # never auto-installs the NDK for them. Keep in sync with ndkVersion.
+        run: $ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager "ndk;27.0.12077973"
 
       - name: Grant execute permission to gradlew
         run: chmod +x gradlew
