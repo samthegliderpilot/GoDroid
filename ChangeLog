@@ -1,5 +1,6 @@
 2026-11-24 GoDroid v1.6.1
 - Fixed the score panel text above the board being hard to read in light mode; it now uses the same light lettering as dark mode in both themes
+- Made dialog values and buttons easier to read in light mode (darker accent color)
 
 2026-11-23 GoDroid v1.6.0
 - Added Pachi as a second computer opponent alongside GnuGo, with its own

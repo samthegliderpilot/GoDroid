@@ -18,7 +18,9 @@ import androidx.savedstate.setViewTreeSavedStateRegistryOwner
 // window background.
 
 private val GoLightColorScheme = lightColorScheme(
-    primary = Color(0xFF8D6E4F),
+    // Dark enough for dropdown values and button text on the cream surface to read
+    // clearly (about 7:1; the previous 0xFF8D6E4F was 4.4:1, under the usual 4.5:1 floor).
+    primary = Color(0xFF6B4F34),
     onPrimary = Color(0xFFFFFBF5),
     primaryContainer = Color(0xFFE4D2BA),
     onPrimaryContainer = Color(0xFF2B2219),
