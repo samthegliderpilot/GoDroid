@@ -44,7 +44,7 @@ fun createScoreViewState(): MutableState<ScoreViewState> = mutableStateOf(ScoreV
  * from `onCreate` right after the ComposeView is inflated. */
 fun setUpScoreComposeView(composeView: ComposeView, state: MutableState<ScoreViewState>) {
     composeView.setContent {
-        GoDroidTheme { ScoreScreen(state.value) }
+        GoHeaderTheme { ScoreScreen(state.value) }
     }
 }
 

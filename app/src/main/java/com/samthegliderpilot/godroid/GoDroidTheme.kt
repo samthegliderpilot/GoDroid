@@ -52,6 +52,23 @@ fun GoDroidTheme(content: @Composable () -> Unit) {
 }
 
 /**
+ * Theme for the score panel above the board, which - unlike every other screen
+ * here - always uses the dark palette, whatever the system theme is.
+ *
+ * The panel's text is drawn straight over the header artwork (the Kunisada
+ * print), and that picture is the same in light and dark mode. Light text with
+ * a dark outline reads crisply on it; the light palette's dark text with a thick
+ * cream outline reads as heavy, blobby lettering and made the left-hand labels
+ * and the values look like two different styles. So the text colors here must
+ * not follow the system theme the way a dialog's (which sits on its own themed
+ * surface) correctly does.
+ */
+@Composable
+fun GoHeaderTheme(content: @Composable () -> Unit) {
+    MaterialTheme(colorScheme = GoDarkColorScheme, content = content)
+}
+
+/**
  * A plain `Dialog`'s window - unlike an Activity's own window - doesn't automatically
  * have a `ViewTreeLifecycleOwner`/`ViewModelStoreOwner`/`SavedStateRegistryOwner`
  * reachable from it, which a `ComposeView` requires to create its recomposer
